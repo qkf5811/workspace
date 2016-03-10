@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.equ.dao.BorrowRecordCustomMapper" >
+	
+	<resultMap id="BaseResultMapExtend" type="com.dkt.school.equ.model.BorrowRecord"
+		extends="com.dkt.school.equ.dao.BorrowRecordMapper.BaseResultMap">
+	</resultMap>
+	
+	<resultMap type="com.dkt.school.equ.dto.BorrowRecordDto" id="BorrowRecordDto" extends="BaseResultMapExtend">
+		<result column="mobile" property="mobile" jdbcType="VARCHAR"/>
+		<result column="email" property="email" jdbcType="VARCHAR"/>
+		<result column="address" property="address" jdbcType="VARCHAR"/>
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="item_name" property="itemName" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<sql id="Base_Column_List">id,item_id,borrow_user_id,borrow_date,borrow_dealine,remark</sql>
+	
+	<select id="findBorrowRecordById" resultMap="BaseResultMapExtend"
+		parameterType="java.lang.Integer">		
+		select 
+    	<include refid="Base_Column_List" />
+    	from equ_borrow_record
+   		where id = #{id,jdbcType=INTEGER}
+	</select>
+	
+	<select id="getBorrowReportCount" resultType="java.lang.Integer">
+		select count(*) 
+		from equ_borrow_record e
+		LEFT JOIN usr_user u ON u.id = e.borrow_user_id
+		<where>
+			<if test="itemId != null and itemId !=''">
+				 e.item_id like '%${itemId}%'
+			</if>  
+ 			<if test="name != null and name != ''">
+				and u.name like '%${name}%'
+			</if>  
+		</where>
+	</select>
+	
+	<select id="selectByLimit" resultMap="BorrowRecordDto">
+		select	(select ee.name from equ_equipment ee where ee.id=e.item_id) AS item_name, 
+		e.item_id,e.borrow_user_id,u.email,u.name,u.mobile,u.address,e.borrow_date,e.borrow_dealine,e.remark
+		from equ_borrow_record e
+		LEFT JOIN usr_user u ON u.id = e.borrow_user_id
+ 		<where>
+			<if test="itemId != null and itemId !=''">
+				 e.item_id like '%${itemId}%'
+			</if>  
+ 			<if test="name != null and name != ''">
+				and u.name like '%${name}%'
+			</if>  
+		</where>
+		 <if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>  			
+	</select>
+	
+	<select id="selectBorrowRecordDtoByItemId" resultMap="BorrowRecordDto">
+		select	(select ee.name from equ_equipment ee where ee.id=e.item_id) AS item_name, 
+		e.item_id,e.borrow_user_id,u.email,u.name,u.mobile,u.address,e.borrow_date,e.borrow_dealine,e.remark
+		from equ_borrow_record e
+		LEFT JOIN usr_user u ON u.id = e.borrow_user_id
+		where item_id='${itemId}'
+	</select>
+	
+	<delete id="deleteBorrowRecordByItemId" parameterType="java.lang.Integer" >
+    	delete from equ_borrow_record
+    	where item_id = #{itemId,jdbcType=INTEGER}
+  	</delete>
+  	
+  	 <update id="updateBorrowRecord" parameterType="com.dkt.school.equ.dto.BorrowRecordDto" >
+    update equ_borrow_record
+    set item_id = #{itemId,jdbcType=INTEGER},
+      borrow_user_id = #{borrowUserId,jdbcType=INTEGER},
+      borrow_date = #{borrowDate,jdbcType=TIMESTAMP},
+      borrow_dealine = #{borrowDealine,jdbcType=TIMESTAMP},
+      remark = #{remark,jdbcType=VARCHAR}
+    where item_id = #{itemId,jdbcType=INTEGER}
+  </update>
+</mapper>

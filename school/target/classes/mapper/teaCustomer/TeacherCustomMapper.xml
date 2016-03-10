@@ -1,0 +1,1072 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.tea.dao.TeacherCustomMapper">
+
+	<resultMap id="BaseResultMapExtend" type="com.dkt.school.tea.model.Teacher"
+		extends="com.dkt.school.tea.dao.TeacherMapper.BaseResultMap">
+	</resultMap>
+
+	<resultMap type="com.dkt.school.tea.dto.TeacherDto" id="TeacherDto"
+		extends="BaseResultMapExtend">
+	</resultMap>
+
+
+	<select id="getTeacherCount" resultType="java.lang.Integer">
+		select count(*)
+		from
+		tea_teacher
+	</select>
+	<select id="getTeaCount" resultType="java.lang.Integer">
+		select count(*)
+		from
+		tea_teacher
+		<where>
+			<if test="name != null and name !=''">
+				name like '%${name}%'
+			</if>
+			<if test="code != null and code != ''">
+				and code like '%${code}%'
+			</if>
+		</where>
+	</select>
+
+	<select id="findTeacher" resultMap="TeacherDto">
+		select *
+		from tea_teacher
+		where code= #{code,jdbcType=VARCHAR}
+	</select>
+
+	<select id="getTeacherByUserId" resultMap="TeacherDto">
+		select *
+		from tea_teacher
+		where user_id= #{userId,jdbcType=INTEGER}
+	</select>
+	
+	<select id="selectByLimit" resultMap="TeacherDto">
+		select *
+		from tea_teacher
+
+
+		<where>
+			<if test="name != null and name !=''">
+				name like '%${name}%'
+			</if>
+			<if test="code != null and code != ''">
+				and code like '%${code}%'
+			</if>
+		</where>
+		<if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>
+
+
+	</select>
+
+	<!-- 冯其康 -->
+	<resultMap id="TeacherResultMap" type="com.dkt.school.tea.model.Teacher">
+		<id column="id" property="idOfTeacher" jdbcType="INTEGER" />
+		<result column="name" property="nameOfTeacher" jdbcType="VARCHAR" />
+		<result column="code" property="code" jdbcType="VARCHAR" />
+		<result column="major_id" property="majorId" jdbcType="INTEGER" />
+		<result column="major_id_str" property="majorIdStr" jdbcType="VARCHAR" />
+		<result column="now_position" property="nowPosition" jdbcType="VARCHAR" />
+		<result column="title_type" property="titleType" jdbcType="INTEGER" />
+		<result column="title_type_str" property="titleTypeStr" jdbcType="VARCHAR" />
+		<result column="staff_type" property="staffType" jdbcType="INTEGER" />
+		<result column="staff_type_str" property="staffTypeStr" jdbcType="VARCHAR" />
+		<result column="position_type" property="positionType"
+			jdbcType="INTEGER" />
+		<result column="position_type_str" property="positionTypeStr" jdbcType="VARCHAR" />
+		<result column="work_start_time" property="workStartTime"
+			jdbcType="DATE" />
+		<result column="take_office_time" property="takeOfficeTime"
+			jdbcType="DATE" />
+		<result column="teacher_remark" property="remarkOfTeacher"
+			jdbcType="VARCHAR" />
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
+	</resultMap>
+
+	<resultMap id="TeacherTotalInfoResultMap" extends="TeacherResultMap"
+		type="com.dkt.school.tea.dto.TeacherTotalInfoDto">
+		<!-- 详细信息 -->
+		<id column="id1" property="id" jdbcType="INTEGER" />
+		<result column="teacher_id" property="teacherId" jdbcType="INTEGER" />
+		<result column="name1" property="name" jdbcType="VARCHAR" />
+		<result column="sex_type" property="sexType" jdbcType="INTEGER" />
+		<result column="sex_type_str" property="sexTypeStr" jdbcType="VARCHAR"/>
+		<result column="birthday" property="birthday" jdbcType="DATE" />
+		<result column="id_card_type" property="idCardType" jdbcType="INTEGER" />
+		<result column="id_card_type_str" property="idCardTypeStr" jdbcType="VARCHAR"/>
+		<result column="id_card" property="idCard" jdbcType="VARCHAR" />
+		<result column="country_id" property="countryId" jdbcType="INTEGER" />
+		<result column="country_id_str" property="countryIdStr" jdbcType="VARCHAR"/>
+		<result column="nation_type" property="nationType" jdbcType="INTEGER" />
+		<result column="nation_type_str" property="nationTypeStr" jdbcType="VARCHAR"/>
+		<result column="political_feature_type" property="politicalFeatureType"
+			jdbcType="INTEGER" />
+		<result column="political_feature_type_str" property="politicalFeatureTypeStr" jdbcType="VARCHAR"/>
+		<result column="native_place" property="nativePlace" jdbcType="VARCHAR" />
+		<result column="marital_status" property="maritalStatus"
+			jdbcType="INTEGER" />
+		<result column="marital_status_str" property="maritalStatusStr" jdbcType="VARCHAR"/>
+		<result column="household_type" property="householdType"
+			jdbcType="INTEGER" />
+		<result column="household_type_str" property="householdTypeStr" jdbcType="VARCHAR"/>
+		<result column="degree_type" property="degreeType" jdbcType="INTEGER" />
+		<result column="degree_type_str" property="degreeTypeStr" jdbcType="VARCHAR"/>
+		<result column="family_address" property="familyAddress"
+			jdbcType="VARCHAR" />
+		<result column="postcode" property="postcode" jdbcType="VARCHAR" />
+		<result column="family_phone" property="familyPhone" jdbcType="VARCHAR" />
+		<result column="office_phone" property="officePhone" jdbcType="VARCHAR" />
+		<result column="mobile_phone" property="mobilePhone" jdbcType="VARCHAR" />
+		<result column="email" property="email" jdbcType="VARCHAR" />
+		<result column="teacher_info_remark" property="remark"
+			jdbcType="VARCHAR" />
+		<!-- 教育经历信息 -->
+		<result column="education_type" property="educationType"
+			jdbcType="INTEGER" />
+		<result column="education_type_str" property="educationTypeStr"
+			jdbcType="VARCHAR" />
+		<result column="school" property="school" jdbcType="VARCHAR" />
+		<result column="major" property="major" jdbcType="VARCHAR" />
+		<result column="start_date" property="startDate" jdbcType="DATE" />
+		<result column="end_date" property="endDate" jdbcType="DATE" />
+		<result column="degree_type" property="degreeType" jdbcType="INTEGER" />
+		<result column="degree_type_str" property="degreeTypeStr" jdbcType="VARCHAR" />
+		<result column="remark_of_edu" property="remarkOfTeaEdu"
+			jdbcType="VARCHAR" />
+			
+		
+		
+		<!-- 用户信息 -->
+		<result column="id_of_user" property="idOfUser" jdbcType="INTEGER" />
+		<result column="account" property="account" jdbcType="VARCHAR" />
+		<result column="password" property="password" jdbcType="VARCHAR" />
+		<result column="name_of_user" property="nameOfUser" jdbcType="VARCHAR" />
+		<result column="sex_type_of_user" property="sexTypeOfUser"
+			jdbcType="INTEGER" />
+		<result column="department_id" property="departmentId"
+			jdbcType="INTEGER" />
+		<result column="department_id_str" property="departmentIdStr"
+			jdbcType="VARCHAR" />
+		<result column="mobile_of_user" property="mobileOfUser"
+			jdbcType="VARCHAR" />
+		<result column="phone_of_user" property="phoneOfUser" jdbcType="VARCHAR" />
+		<result column="email_of_user" property="emailOfUser" jdbcType="VARCHAR" />
+		<result column="address_of_user" property="addressOfUser"
+			jdbcType="VARCHAR" />
+		<result column="is_blocked" property="isBlocked" jdbcType="INTEGER" />
+		
+	</resultMap>
+	
+	<!-- zhenjia -->
+	<resultMap id="TeacherAllInfoResultMap" extends="TeacherResultMap"
+		type="com.dkt.school.tea.dto.TeacherTotalInfoDto">
+		<!-- 详细信息 -->
+		<id column="id1" property="id" jdbcType="INTEGER" />
+		<result column="teacher_id" property="teacherId" jdbcType="INTEGER" />
+		<result column="name1" property="name" jdbcType="VARCHAR" />
+		<result column="sex_type" property="sexType" jdbcType="INTEGER" />
+		<result column="sex_type_str" property="sexTypeStr" jdbcType="VARCHAR"/>
+		<result column="birthday" property="birthday" jdbcType="DATE" />
+		<result column="id_card_type" property="idCardType" jdbcType="INTEGER" />
+		<result column="id_card_type_str" property="idCardTypeStr" jdbcType="VARCHAR"/>
+		<result column="id_card" property="idCard" jdbcType="VARCHAR" />
+		<result column="country_id" property="countryId" jdbcType="INTEGER" />
+		<result column="country_id_str" property="countryIdStr" jdbcType="VARCHAR"/>
+		<result column="nation_type" property="nationType" jdbcType="INTEGER" />
+		<result column="nation_type_str" property="nationTypeStr" jdbcType="VARCHAR"/>
+		<result column="political_feature_type" property="politicalFeatureType"
+			jdbcType="INTEGER" />
+		<result column="political_feature_type_str" property="politicalFeatureTypeStr" jdbcType="VARCHAR"/>
+		<result column="native_place" property="nativePlace" jdbcType="VARCHAR" />
+		<result column="marital_status" property="maritalStatus"
+			jdbcType="INTEGER" />
+		<result column="marital_status_str" property="maritalStatusStr" jdbcType="VARCHAR"/>
+		<result column="household_type" property="householdType"
+			jdbcType="INTEGER" />
+		<result column="household_type_str" property="householdTypeStr" jdbcType="VARCHAR"/>
+		<result column="degree_type" property="degreeType" jdbcType="INTEGER" />
+		<result column="degree_type_str" property="degreeTypeStr" jdbcType="VARCHAR"/>
+		<result column="family_address" property="familyAddress"
+			jdbcType="VARCHAR" />
+		<result column="postcode" property="postcode" jdbcType="VARCHAR" />
+		<result column="family_phone" property="familyPhone" jdbcType="VARCHAR" />
+		<result column="office_phone" property="officePhone" jdbcType="VARCHAR" />
+		<result column="mobile_phone" property="mobilePhone" jdbcType="VARCHAR" />
+		<result column="email" property="email" jdbcType="VARCHAR" />
+		<result column="teacher_info_remark" property="remark"
+			jdbcType="VARCHAR" />
+		
+		<!-- 用户信息 -->
+		<result column="id_of_user" property="idOfUser" jdbcType="INTEGER" />
+		<result column="account" property="account" jdbcType="VARCHAR" />
+		<result column="password" property="password" jdbcType="VARCHAR" />
+		<result column="name_of_user" property="nameOfUser" jdbcType="VARCHAR" />
+		<result column="sex_type_of_user" property="sexTypeOfUser"
+			jdbcType="INTEGER" />
+		<result column="department_id" property="departmentId"
+			jdbcType="INTEGER" />
+		<result column="department_id_str" property="departmentIdStr"
+			jdbcType="VARCHAR" />
+		<result column="mobile_of_user" property="mobileOfUser"
+			jdbcType="VARCHAR" />
+		<result column="phone_of_user" property="phoneOfUser" jdbcType="VARCHAR" />
+		<result column="email_of_user" property="emailOfUser" jdbcType="VARCHAR" />
+		<result column="address_of_user" property="addressOfUser"
+			jdbcType="VARCHAR" />
+		<result column="is_blocked" property="isBlocked" jdbcType="INTEGER" />
+		<!-- 家庭信息 -->
+		<collection property="teaFamilyDtoList"  javaType="ArrayList" ofType="com.dkt.school.tea.dto.TeacherFamilyDto">  
+            <id column="id_of_family" property="id"/>  
+            <result column="teacher_id_of_family" property="teacherId" />
+            <result column="name_of_family" property="name" />
+            <result column="relation_type" property="relationType" />
+            <result column="sex_of_family" property="sex" />
+            <result column="birthday_of_family" property="birthday" />
+            <result column="phone_of_family" property="phone" />
+            <result column="remark_of_family" property="remark" />
+            <result column="sex_in_family" property="sexInFamilyStr" />
+            <result column="relation_type_in_family" property="relationTypeInFamilyStr" />
+        </collection>
+      
+        <!-- 教育经历信息 -->
+		<collection property="teaEduExpDtoList"  javaType="ArrayList" ofType="com.dkt.school.tea.dto.TeacherEduExperienceDto">  
+            <id column="id_of_edu_exp" property="id"/>  
+            <result column="teacher_id_of_edu_exp" property="educationType"
+			jdbcType="INTEGER" />
+			<result column="education_type_str" property="educationTypeStr"
+				jdbcType="VARCHAR" />
+			<result column="school_of_edu_exp" property="school" jdbcType="VARCHAR" />
+			<result column="major_of_edu_exp" property="major" jdbcType="VARCHAR" />
+			<result column="start_date_of_edu_exp" property="startDate" jdbcType="DATE" />
+			<result column="end_date_of_edu_exp" property="endDate" jdbcType="DATE" />
+			<result column="degree_type" property="degreeType" jdbcType="INTEGER" />
+			<result column="degree_type_edu_str" property="degreeTypeStr" jdbcType="VARCHAR" />
+			<result column="remark_of_edu_exp" property="remark"
+				jdbcType="VARCHAR" />
+        </collection>
+        <!-- 简历字段 -->
+        <collection property="teaWorkExprience"  javaType="ArrayList" ofType="com.dkt.school.tea.dto.TeacherWorkExperienceDto">  
+            <id column="id_of_work" property="id"/>  
+            <result column="teacher_id_of_work" property="teacherId"
+			jdbcType="INTEGER" />
+			<result column="work_place_of_work" property="workPlace"
+				jdbcType="VARCHAR" />
+			<result column="position_of_work" property="position" jdbcType="VARCHAR" />
+			<result column="start_date_of_work" property="startDate" jdbcType="DATE" />
+			<result column="end_date_of_work" property="endDate" jdbcType="DATE" />
+			<result column="transfer_cause_of_work" property="transferCause" jdbcType="VARCHAR" />
+			<result column="remark_of_work" property="remark"
+				jdbcType="VARCHAR" />
+        </collection>
+	
+	</resultMap>
+
+	<!-- teacher_info表字段 -->
+	<sql id="Base_Column_List_Of_Teacher_Info">
+		tea_teacher_info.`name` AS name1,
+		tea_teacher_info.sex_type,
+		tea_teacher_info.birthday,
+		tea_teacher_info.id_card_type,
+		tea_teacher_info.id_card,
+		tea_teacher_info.country_id,
+		tea_teacher_info.nation_type,
+		tea_teacher_info.political_feature_type,
+		tea_teacher_info.native_place,
+		tea_teacher_info.marital_status,
+		tea_teacher_info.household_type,
+		tea_teacher_info.degree_type,
+		tea_teacher_info.family_address,
+		tea_teacher_info.postcode,
+		tea_teacher_info.family_phone,
+		tea_teacher_info.office_phone,
+		tea_teacher_info.mobile_phone,
+		tea_teacher_info.email,
+		tea_teacher_info.remark,
+		tea_teacher_info.teacher_id
+	</sql>
+	<!-- 教师表字段 -->
+	<sql id="Base_Column_List_Of_Teacher">
+		tea_teacher.id,
+		tea_teacher.`name`,
+		tea_teacher.`code`,
+		tea_teacher.major_id,
+		tea_teacher.now_position,
+		tea_teacher.title_type,
+		tea_teacher.staff_type,
+		tea_teacher.position_type,
+		tea_teacher.work_start_time,
+		tea_teacher.take_office_time,
+		tea_teacher.remark as teacher_remark,
+		tea_teacher.user_id,
+		tea_teacher_info.id AS id1
+	</sql>
+	<!-- 教育经历字段（临时表） -->
+	<sql id="Base_Column_List_Of_Edu_Exp">
+		tmp_table.education_type,
+		tmp_table.school,
+		tmp_table.major,
+		tmp_table.start_date,
+		tmp_table.end_date,
+		tmp_table.degree_type,
+		tmp_table.remark as remark_of_edu
+	</sql>
+	<!-- 教育经历字段 -->
+	<sql id="Base_Column_List_Of_Edu_Experience">
+		tea_teacher_edu_experience.id as id_of_edu_exp,
+		tea_teacher_edu_experience.teacher_id as teacher_id_of_edu_exp,
+		tea_teacher_edu_experience.education_type as education_type_of_edu_exp,
+		tea_teacher_edu_experience.school as school_of_edu_exp,
+		tea_teacher_edu_experience.major as major_of_edu_exp,
+		tea_teacher_edu_experience.start_date as start_date_of_edu_exp,
+		tea_teacher_edu_experience.end_date as end_date_of_edu_exp,
+		tea_teacher_edu_experience.degree_type as degree_type_of_edu_exp,
+		tea_teacher_edu_experience.remark as remark_of_edu_exp
+	</sql>
+	<!-- 用户字段 -->
+	<sql id="Base_Column_List_Of_User">
+		usr_user.id as id_of_user,
+		usr_user.account,
+		usr_user.`password`,
+		usr_user.`name` as name_of_user,
+		usr_user.sex_type as sex_type_of_user,
+		usr_user.department_id,
+		usr_user.mobile as mobile_of_user,
+		usr_user.phone as phone_of_user,
+		usr_user.email as email_of_user,
+		usr_user.address as address_of_user,
+		usr_user.is_blocked
+	</sql>
+	
+	<!-- 家庭信息字段 -->
+	<sql id="Base_Column_List_Of_TeaFamily">
+		tea_teacher_family.id as id_of_family,
+		tea_teacher_family.teacher_id as teacher_id_of_family,
+		tea_teacher_family.`name` as name_of_family,
+		tea_teacher_family.relation_type ,
+		tea_teacher_family.sex_type as sex_of_family,
+		tea_teacher_family.birthday as birthday_of_family,
+		tea_teacher_family.phone as phone_of_family,
+		tea_teacher_family.remark as remark_of_family
+	</sql>
+	
+	<!-- 简历字段 -->
+	<sql id="Base_Column_List_Of_Work_Experience">
+		tea_teacher_work_experience.id as id_of_work,
+		tea_teacher_work_experience.teacher_id as teacher_id_of_work,
+		tea_teacher_work_experience.work_place as work_place_of_work,
+		tea_teacher_work_experience.position as position_of_work,
+		tea_teacher_work_experience.start_date as start_date_of_work,
+		tea_teacher_work_experience.end_date as end_date_of_work,
+		tea_teacher_work_experience.transfer_cause as transfer_cause_of_work,
+		tea_teacher_work_experience.remark as remark_of_work
+	</sql>
+	
+	<select id="searchCountOfTeacherTotalInfo" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM
+		tea_teacher
+		INNER JOIN tea_teacher_info ON tea_teacher.id =
+		tea_teacher_info.teacher_id
+ 		left OUTER JOIN 
+				(select tea_edu.*
+						from tea_teacher_edu_experience as tea_edu, tea_teacher where teacher_id = tea_teacher.id and end_date = 
+						(select max(end_date) from tea_teacher_edu_experience where teacher_id=tea_teacher.id))
+				as tmp_table ON
+		tmp_table.teacher_id = tea_teacher.id
+		INNER JOIN usr_user ON
+		usr_user.id = tea_teacher.user_id
+		WHERE 1 = 1
+		<!-- select * from v_tea_teacher_total_info where 1=1 -->
+		<if test="dto != null">
+			<if test="dto.code != null and dto.code != ''">
+				and tea_teacher.code like '%${dto.code}%'
+			</if>
+			<if test="dto.name != null and dto.name != ''">
+				and tea_teacher.name like '%${dto.name}%'
+			</if>
+			<if test="dto.nowPosition != null and dto.nowPosition!= ''">
+				and tea_teacher.now_position like '%${dto.nowPosition}%'
+			</if>
+			<if test="dto.titleType != null and dto.titleType != 0">
+				and tea_teacher.title_type = ${dto.titleType}
+			</if>
+			<!-- and 部门 -->
+			<if test="dto.departmentId != null and dto.departmentId != 0">
+				and usr_user.department_id = ${dto.departmentId}
+			</if>
+			<if test="dto.degreeType != null and dto.degreeType != 0">
+				and tea_teacher_info.degree_type = ${dto.degreeType}
+			</if>
+			<if
+				test="dto.politicalFeatureType != null and dto.politicalFeatureType != 0">
+				and tea_teacher_info.political_feature_type =
+				${dto.politicalFeatureType}
+			</if>
+			<if test="dto.sexType != null and dto.sexType != 0">
+				and tea_teacher_info.sex_type = ${dto.sexType}
+			</if>
+			<if test="dto.maritalStatus != null and dto.maritalStatus != 0">
+				and tea_teacher_info.marital_status =
+				${dto.maritalStatus}
+			</if>
+			<if test="dto.householdType != null and dto.householdType != 0">
+				and tea_teacher_info.household_type =
+				${dto.householdType}
+			</if>
+			<if test="dto.positionType != null and dto.positionType != 0">
+				and tea_teacher.position_type = ${dto.positionType}
+			</if>
+		</if>
+		<!-- select count(*) from v_tea_teacher_total_info -->
+	</select>
+	<select id="searchTotalInfoOfTeacher" resultMap="TeacherTotalInfoResultMap">
+		SELECT
+		<include refid="Base_Column_List_Of_Teacher"/>,
+		<include refid="Base_Column_List_Of_Teacher_Info"/>,
+		<include refid="Base_Column_List_Of_Edu_Exp"/>, 
+		<include refid="Base_Column_List_Of_User"/>,
+		(select name from sch_major where sch_major.id = tea_teacher.major_id) as major_id_str,
+		(select name from sys_enumeration_value where id=tea_teacher.title_type) as title_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher.staff_type) as staff_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher.position_type) as position_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.sex_type) as sex_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.id_card_type) as id_card_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.country_id) as country_id_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.nation_type) as nation_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.political_feature_type) as political_feature_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.marital_status) as marital_status_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.household_type) as household_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.degree_type) as degree_type_str,
+		(select name from sys_enumeration_value where id=tmp_table.education_type) as education_type_str,
+		(select name from sys_enumeration_value where id=tmp_table.degree_type) as degree_type_str,
+		(select usr_department.name from usr_department where tea_teacher.user_id=usr_user.id and usr_user.department_id = usr_department.id) as department_id_str
+		FROM
+		tea_teacher
+		INNER JOIN tea_teacher_info ON tea_teacher.id =
+		tea_teacher_info.teacher_id
+ 		left OUTER JOIN 
+				(select tea_edu.*
+						from tea_teacher_edu_experience as tea_edu, tea_teacher where teacher_id = tea_teacher.id and end_date = 
+						(select max(end_date) from tea_teacher_edu_experience where teacher_id=tea_teacher.id))
+				as tmp_table ON
+		tmp_table.teacher_id = tea_teacher.id
+		INNER JOIN usr_user ON
+		usr_user.id = tea_teacher.user_id
+		WHERE 1 = 1
+		<!-- select * from v_tea_teacher_total_info where 1=1 -->
+		<if test="dto != null">
+			<if test="dto.code != null and dto.code != ''">
+				and tea_teacher.code like '%${dto.code}%'
+			</if>
+			<if test="dto.name != null and dto.name != ''">
+				and tea_teacher.name like '%${dto.name}%'
+			</if>
+			<if test="dto.nowPosition != null and dto.nowPosition!= ''">
+				and tea_teacher.now_position like '%${dto.nowPosition}%'
+			</if>
+			<if test="dto.titleType != null and dto.titleType != 0">
+				and tea_teacher.title_type = ${dto.titleType}
+			</if>
+			<!-- and 部门 -->
+			<if test="dto.departmentId != null and dto.departmentId != 0">
+				and usr_user.department_id = ${dto.departmentId}
+			</if>
+			<if test="dto.degreeType != null and dto.degreeType != 0">
+				and tea_teacher_info.degree_type = ${dto.degreeType}
+			</if>
+			<if
+				test="dto.politicalFeatureType != null and dto.politicalFeatureType != 0">
+				and tea_teacher_info.political_feature_type =
+				${dto.politicalFeatureType}
+			</if>
+			<if test="dto.sexType != null and dto.sexType != 0">
+				and tea_teacher_info.sex_type = ${dto.sexType}
+			</if>
+			<if test="dto.maritalStatus != null and dto.maritalStatus != 0">
+				and tea_teacher_info.marital_status =
+				${dto.maritalStatus}
+			</if>
+			<if test="dto.householdType != null and dto.householdType != 0">
+				and tea_teacher_info.household_type =
+				${dto.householdType}
+			</if>
+			<if test="dto.positionType != null and dto.positionType != 0">
+				and tea_teacher.position_type = ${dto.positionType}
+			</if>
+		</if>
+
+		<if test="limit != null">
+			limit ${limit.offset}, ${limit.rows}
+		</if>
+	</select>
+
+	<!-- 插入教师记录 -->
+	<insert id="insertNewTeacherByDto">
+		insert into tea_teacher (name, code, major_id,
+		now_position, title_type, staff_type, position_type,
+		work_start_time,
+		take_office_time, remark, user_id)
+		values ('${dto.nameOfTeacher}',
+		'${dto.code}', ${dto.majorId},
+		'${dto.nowPosition}', ${dto.titleType},
+		${dto.staffType}, ${dto.positionType}, '${dto.workStartTimeStr}',
+		'${dto.takeOfficeTimeStr}',
+		'${dto.remarkOfTeacher}', ${dto.userId})
+	</insert>
+
+	<!-- 插入教师信息记录 -->
+	<insert id="insertNewTeacherInfoByDto">
+		insert into tea_teacher_info (teacher_id,
+		name,sex_type,birthday,id_card_type,id_card,country_id,nation_type,
+		political_feature_type,
+		native_place,
+		marital_status,
+		household_type,
+		degree_type,
+		family_address,
+		postcode,
+		family_phone,
+		office_phone,
+		mobile_phone,
+		email,
+		remark)
+		values (${dto.teacherId},'${dto.name}',
+		${dto.sexType},
+		'${dto.birthdayStr}', ${dto.idCardType},
+		'${dto.idCard}',
+		${dto.countryId}, ${dto.nationType},
+		${dto.politicalFeatureType},
+		'${dto.nativePlace}',
+		${dto.maritalStatus}, ${dto.householdType}, ${dto.degreeType},
+		'${dto.familyAddress}',
+		'${dto.postcode}', '${dto.familyPhone}',
+		'${dto.officePhone}',
+		'${dto.mobilePhone}',
+		'${dto.email}',
+		'${dto.remark}')
+	</insert>
+
+	<!-- 插入教师教育经历信息 -->
+	<insert id="insertNewTeacherEduExpByDto">
+		insert into tea_teacher_edu_experience (teacher_id,
+		education_type, school, major, start_date, end_date,
+		degree_type,
+		remark)
+		values (${dto.teacherId}, ${dto.educationType},
+		'${dto.school}',
+		'${dto.major}',
+		'${dto.startDateStr}',
+		'${dto.endDateStr}', ${dto.degreeType}, '${dto.remarkOfTeaEdu}')
+	</insert>
+	
+	<!-- 插入教师教育经历信息 -->
+	<insert id="insertNewTeacherEduExp">
+		insert into tea_teacher_edu_experience (teacher_id,
+		education_type, school, major, start_date, end_date,
+		degree_type,
+		remark)
+		values (${eduExp.teacherId}, ${eduExp.educationType},
+		'${eduExp.school}',
+		'${eduExp.major}',
+		'${eduExp.startDateStr}',
+		'${eduExp.endDateStr}', ${eduExp.degreeType}, '${eduExp.remark}')
+	</insert>
+	<!-- 根据教师编号查找教师信息 -->
+	<select id="selectTeacherByCode" resultType="com.dkt.school.tea.model.Teacher">
+		select * from
+		tea_teacher where code = '${code}'
+	</select>
+
+	<!-- 通过TeacherTotalInfoDto修改教师基本信息 -->
+	<update id="updateTeacherByDto">
+		update tea_teacher set name='${dto.name}',
+		code='${dto.code}', major_id=${dto.majorId},
+		now_position='${dto.nowPosition}', title_type=${dto.titleType},
+		staff_type=${dto.staffType},
+		position_type=${dto.positionType},
+		work_start_time='${dto.workStartTimeStr}',
+		take_office_time='${dto.takeOfficeTimeStr}',
+		remark='${dto.remarkOfTeacher}'
+		where id = ${dto.idOfTeacher}
+	</update>
+
+	<!-- 通过TeacherTotalInfoDto修改教师详细信息 -->
+	<update id="updateTeacherInfoByDto">
+		update tea_teacher_info set
+		name='${dto.name}',sex_type=${dto.sexType},
+		birthday='${dto.birthdayStr}',id_card_type=${dto.idCardType},id_card='${dto.idCard}',
+		country_id=${dto.countryId},nation_type=${dto.nationType},political_feature_type=${dto.politicalFeatureType},
+		native_place='${dto.nativePlace}',marital_status=${dto.maritalStatus},household_type=${dto.householdType},
+		degree_type=${dto.degreeType},family_address='${dto.familyAddress}',
+		postcode='${dto.postcode}',family_phone='${dto.familyPhone}',office_phone='${dto.officePhone}',
+		mobile_phone='${dto.mobilePhone}',email='${dto.email}',remark='${dto.remark}'
+		where teacher_id=${dto.idOfTeacher}
+	</update>
+
+	<!-- 通过TeacherTotalInfoDto修改教师教育经历信息 -->
+	<update id="updateTeacherEduExpByDto">
+		update tea_teacher_edu_experience set
+		education_type=${dto.educationType}, school='${dto.school}',
+		major='${dto.major}',
+		start_date='${dto.startDateStr}',
+		end_date='${dto.endDateStr}',
+		degree_type=${dto.degreeType},
+		remark='${dto.remarkOfTeaEdu}'
+		where teacher_id=${dto.idOfTeacher}
+	</update>
+
+	<!-- 通过id数组和页面选择导出的条件得到教师信息 -->
+	<select id="searchTotalInfoOfTeacherByIdsAndSelected" resultMap="TeacherTotalInfoResultMap">
+		SELECT
+		<include refid="Base_Column_List_Of_Teacher"/>,
+		<include refid="Base_Column_List_Of_Teacher_Info"/>,
+		<include refid="Base_Column_List_Of_Edu_Exp"/>, 
+		<include refid="Base_Column_List_Of_User"/>,
+		(select name from sch_major where sch_major.id = tea_teacher.major_id) as major_id_str,
+		(select name from sys_enumeration_value where id=tea_teacher.title_type) as title_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher.staff_type) as staff_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher.position_type) as position_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.sex_type) as sex_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.id_card_type) as id_card_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.country_id) as country_id_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.nation_type) as nation_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.political_feature_type) as political_feature_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.marital_status) as marital_status_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.household_type) as household_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.degree_type) as degree_type_str,
+		(select name from sys_enumeration_value where id=tmp_table.education_type) as education_type_str,
+		(select name from sys_enumeration_value where id=tmp_table.degree_type) as degree_type_str,
+		(select usr_department.name from usr_department where tea_teacher.user_id=usr_user.id and usr_user.department_id = usr_department.id) as department_id_str
+		FROM
+		tea_teacher
+		INNER JOIN tea_teacher_info ON tea_teacher.id =
+		tea_teacher_info.teacher_id
+ 		left OUTER JOIN 
+				(select tea_edu.*
+						from tea_teacher_edu_experience as tea_edu, tea_teacher where teacher_id = tea_teacher.id and end_date = 
+						(select max(end_date) from tea_teacher_edu_experience where teacher_id=tea_teacher.id))
+				as tmp_table ON
+		tmp_table.teacher_id = tea_teacher.id
+		INNER JOIN usr_user ON
+		usr_user.id = tea_teacher.user_id
+		WHERE 1 = 1
+		<if test="idArr != null">
+			and tea_teacher.id in
+			<foreach collection="idArr" item="item" open="(" separator=","
+				close=")">
+				#{item}
+			</foreach>
+		</if>
+	</select>
+	
+	<!-- qikang -->
+	<!-- 根据teacherId查询教师完整信息 -->
+		<select id="searchTeacherTotalInfoByTeacherId" resultMap="TeacherTotalInfoResultMap">
+			SELECT
+			<include refid="Base_Column_List_Of_Teacher"/>,
+			<include refid="Base_Column_List_Of_Teacher_Info"/>,
+			<include refid="Base_Column_List_Of_Edu_Exp"/>, 
+			<include refid="Base_Column_List_Of_User"/>,
+			(select name from sch_major where sch_major.id = tea_teacher.major_id) as major_id_str,
+			(select name from sys_enumeration_value where id=tea_teacher.title_type) as title_type_str,
+			(select name from sys_enumeration_value where id=tea_teacher.staff_type) as staff_type_str,
+			(select name from sys_enumeration_value where id=tea_teacher.position_type) as position_type_str,
+			(select name from sys_enumeration_value where id=tea_teacher_info.sex_type) as sex_type_str,
+			(select name from sys_enumeration_value where id=tea_teacher_info.id_card_type) as id_card_type_str,
+			(select name from sys_enumeration_value where id=tea_teacher_info.country_id) as country_id_str,
+			(select name from sys_enumeration_value where id=tea_teacher_info.nation_type) as nation_type_str,
+			(select name from sys_enumeration_value where id=tea_teacher_info.political_feature_type) as political_feature_type_str,
+			(select name from sys_enumeration_value where id=tea_teacher_info.marital_status) as marital_status_str,
+			(select name from sys_enumeration_value where id=tea_teacher_info.household_type) as household_type_str,
+			(select name from sys_enumeration_value where id=tea_teacher_info.degree_type) as degree_type_str,
+			(select name from sys_enumeration_value where id=tmp_table.education_type) as education_type_str,
+			(select name from sys_enumeration_value where id=tmp_table.degree_type) as degree_type_str,
+			(select usr_department.name from usr_department where tea_teacher.user_id=usr_user.id and usr_user.department_id = usr_department.id) as department_id_str
+			FROM
+			tea_teacher
+			INNER JOIN tea_teacher_info ON tea_teacher.id =
+			tea_teacher_info.teacher_id
+	 		left OUTER JOIN 
+					(select tea_edu.*
+							from tea_teacher_edu_experience as tea_edu, tea_teacher where teacher_id = tea_teacher.id and end_date = 
+							(select max(end_date) from tea_teacher_edu_experience where teacher_id=tea_teacher.id))
+					as tmp_table ON
+			tmp_table.teacher_id = tea_teacher.id
+			INNER JOIN usr_user ON
+			usr_user.id = tea_teacher.user_id
+			where
+			tea_teacher.id = ${teacherId}
+		</select>
+		
+		
+	<!-- zhenjia -->
+	<!-- 根据teacherId查询教师完整信息 -->
+	<select id="searchTeacherAllInfoByTeacherId" resultMap="TeacherAllInfoResultMap">
+		SELECT
+		
+		<include refid="Base_Column_List_Of_Teacher"/>,
+		<include refid="Base_Column_List_Of_Work_Experience"/>,
+		<include refid="Base_Column_List_Of_Teacher_Info"/>,
+		<include refid="Base_Column_List_Of_Edu_Experience"/>,
+		<include refid="Base_Column_List_Of_User"/>,
+		<include refid="Base_Column_List_Of_TeaFamily"/>,
+		(select ev.name from sys_enumeration_value ev where ev.id=tea_teacher_family.sex_type) AS sex_in_family,
+		(select ev.name from sys_enumeration_value ev where ev.id=tea_teacher_family.relation_type) AS relation_type_in_family,
+		(select name from sys_enumeration_value where id=tea_teacher.title_type) as title_type_str,
+		(select name from sch_major where sch_major.id = tea_teacher.major_id) as major_id_str,
+		(select name from sys_enumeration_value where id=tea_teacher.title_type) as title_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher.staff_type) as staff_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher.position_type) as position_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.sex_type) as sex_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.id_card_type) as id_card_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.country_id) as country_id_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.nation_type) as nation_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.political_feature_type) as political_feature_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.marital_status) as marital_status_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.household_type) as household_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher_info.degree_type) as degree_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher_edu_experience.education_type) as education_type_str,
+		(select name from sys_enumeration_value where id=tea_teacher_edu_experience.degree_type) as degree_type_edu_str,
+		(select usr_department.name from usr_department where tea_teacher.user_id=usr_user.id and usr_user.department_id = usr_department.id) as department_id_str
+		FROM
+		tea_teacher
+		INNER JOIN tea_teacher_info ON tea_teacher.id =
+		tea_teacher_info.teacher_id
+		LEFT JOIN tea_teacher_edu_experience ON tea_teacher_edu_experience.teacher_id =
+		tea_teacher.id
+		INNER JOIN usr_user ON
+		usr_user.id = tea_teacher.user_id
+		LEFT JOIN tea_teacher_family ON
+		tea_teacher_family.teacher_id = tea_teacher.id
+		LEFT JOIN tea_teacher_work_experience ON
+		tea_teacher_work_experience.teacher_id = tea_teacher.id
+		where
+		tea_teacher.user_id = ${teacherId}
+	</select>
+	
+	<!-- 批量添加教师 -->
+	<insert id="addTeacherByList">
+		insert into tea_teacher values 
+		<foreach collection="dtoList" item="dto" separator=",">
+			(null, '${dto.name}', '${dto.code}', ${dto.majorId}, '${dto.nowPosition}', ${dto.titleType},
+			 ${dto.staffType}, ${dto.positionType}, '${dto.workStartTimeStr}', '${dto.takeOfficeTimeStr}', '${dto.remarkOfTeacher}' , 0)
+		</foreach>
+	</insert>
+	
+	
+	<!-- 批量添加教师信息 -->
+	<insert id="addTeacherInfoByExcel">
+		insert into tea_teacher_info values 
+		<foreach collection="dtoList" item="dto" separator=","> 
+			(null, ${dto.teacherId}, '${dto.name}', ${dto.sexType}, '${dto.birthdayStr}', ${dto.idCardType},
+			'${dto.idCard}', ${dto.countryId}, ${dto.nationType}, ${dto.politicalFeatureType}, '${dto.nativePlace}',
+			${dto.maritalStatus}, ${dto.householdType}, ${dto.degreeType}, '${dto.familyAddress}','${dto.postcode}',
+			'${dto.familyPhone}', '${dto.officePhone}', '${dto.mobilePhone}','${dto.email}', '${dto.remark}')
+		</foreach>
+	</insert>
+
+
+	<!-- 批量添加用户信息 -->
+	<insert id="addUserByExcel">
+		insert into usr_user values 
+		<foreach collection="dtoList" item="dto" separator=",">
+		 (null, '${dto.code}', '123456', '${dto.name}', ${dto.sexType}, ${dto.departmentId}, '${dto.mobilePhone}',
+		 '${dto.familyPhone}', '${dto.email}', '${dto.familyAddress}', 2002)
+		</foreach>
+	</insert>
+
+	<!-- 通过list批量更新teacher表 -->
+	<update id="updateTeacherByList">
+		update tea_teacher set
+		
+			name = case code
+			<foreach collection="dtoList" item="dto" separator=" ">
+			when '${dto.code}' then '${dto.name}'
+			</foreach>
+			end,
+			major_id = case code
+			<foreach collection="dtoList" item="dto" separator=" ">
+			when '${dto.code}' then ${dto.majorId}
+			</foreach>
+			end,
+			now_position = case code
+			<foreach collection="dtoList" item="dto" separator=" ">
+			when '${dto.code}' then '${dto.nowPosition}'
+			</foreach>
+			end,
+			title_type = case code
+			<foreach collection="dtoList" item="dto" separator=" ">
+			when '${dto.code}' then ${dto.titleType}
+			</foreach>
+			end,
+			staff_type = case code
+			<foreach collection="dtoList" item="dto" separator=" ">
+			when '${dto.code}' then ${dto.staffType}
+			</foreach>
+			end,
+			position_type = case code
+			<foreach collection="dtoList" item="dto" separator=" ">
+			when '${dto.code}' then ${dto.positionType}
+			</foreach>
+			end,
+			work_start_time = case code
+			<foreach collection="dtoList" item="dto" separator=" ">
+			when '${dto.code}' then '${dto.workStartTimeStr}'
+			</foreach>
+			end,
+			take_office_time = case code
+			<foreach collection="dtoList" item="dto" separator=" ">
+			when '${dto.code}' then '${dto.takeOfficeTimeStr}'
+			</foreach>
+			end,
+			remark = case code
+			<foreach collection="dtoList" item="dto" separator=" ">
+			when '${dto.code}' then '${dto.remarkOfTeacher}' 
+			</foreach>
+			end
+			where code in (
+			<foreach collection="dtoList" item="dto" separator=" ,">
+				'${dto.code}'
+			</foreach>
+			)
+	</update>
+	
+	<!-- 批量更新教师信息表 -->
+	<update id="updateTeacherInfoByExcel">
+		update tea_teacher_info set
+		
+		name = case teacher_id
+		<foreach collection="dtoList" item="dto" separator=" ">
+			when ${dto.teacherId} then '${dto.name}'
+		</foreach> 
+		end,
+		sex_type = case teacher_id
+		<foreach collection="dtoList" item="dto" separator=" ">
+			when ${dto.teacherId} then ${dto.sexType}
+		</foreach> 
+		end,
+		birthday = case teacher_id
+		<foreach collection="dtoList" item="dto" separator=" ">
+			when ${dto.teacherId} then '${dto.birthdayStr}'
+		</foreach> 
+		end,
+		id_card_type = case teacher_id
+		<foreach collection="dtoList" item="dto" separator=" ">
+			when ${dto.teacherId} then ${dto.idCardType}
+		</foreach> 
+		end,
+		id_card = case teacher_id
+		<foreach collection="dtoList" item="dto" separator=" ">
+			when ${dto.teacherId} then '${dto.idCard}'
+		</foreach> 
+		end,
+		country_id = case teacher_id
+		<foreach collection="dtoList" item="dto" separator=" ">
+			when ${dto.teacherId} then ${dto.countryId}
+		</foreach> 
+		end,
+		nation_type = case teacher_id
+		<foreach collection="dtoList" item="dto" separator=" ">
+			when ${dto.teacherId} then ${dto.nationType}
+		</foreach> 
+		end,
+		political_feature_type = case teacher_id
+		<foreach collection="dtoList" item="dto" separator=" ">
+			when ${dto.teacherId} then ${dto.politicalFeatureType}
+		</foreach> 
+		end,
+		native_place = case teacher_id
+		<foreach collection="dtoList" item="dto" separator=" ">
+			when ${dto.teacherId} then '${dto.nativePlace}'
+		</foreach> 
+		end,
+		marital_status = case teacher_id
+		<foreach collection="dtoList" item="dto" separator=" ">
+			when ${dto.teacherId} then ${dto.maritalStatus}
+		</foreach> 
+		end,
+		household_type = case teacher_id
+		<foreach collection="dtoList" item="dto" separator=" ">
+			when ${dto.teacherId} then ${dto.householdType}
+		</foreach> 
+		end,
+		degree_type = case teacher_id
+		<foreach collection="dtoList" item="dto" separator=" ">
+			when ${dto.teacherId} then ${dto.degreeType}
+		</foreach> 
+		end,
+		family_address = case teacher_id
+		<foreach collection="dtoList" item="dto" separator=" ">
+			when ${dto.teacherId} then '${dto.familyAddress}'
+		</foreach> 
+		end,
+		postcode = case teacher_id
+		<foreach collection="dtoList" item="dto" separator=" ">
+			when ${dto.teacherId} then '${dto.postcode}'
+		</foreach> 
+		end,
+		family_phone = case teacher_id
+		<foreach collection="dtoList" item="dto" separator=" ">
+			when ${dto.teacherId} then '${dto.familyPhone}'
+		</foreach> 
+		end,
+		office_phone = case teacher_id
+		<foreach collection="dtoList" item="dto" separator=" ">
+			when ${dto.teacherId} then '${dto.officePhone}'
+		</foreach> 
+		end,
+		mobile_phone = case teacher_id
+		<foreach collection="dtoList" item="dto" separator=" ">
+			when ${dto.teacherId} then '${dto.mobilePhone}'
+		</foreach> 
+		end,
+		email = case teacher_id
+		<foreach collection="dtoList" item="dto" separator=" ">
+			when ${dto.teacherId} then '${dto.email}'
+		</foreach> 
+		end,
+		remark = case teacher_id
+		<foreach collection="dtoList" item="dto" separator=" ">
+			when ${dto.teacherId} then '${dto.remark}'
+		</foreach> 
+		end
+		where teacher_id in (
+		<foreach collection="dtoList" item="dto" separator=",">
+			${dto.teacherId}
+		</foreach>
+		)
+	</update>
+	
+	<!-- 批量更新用户表 -->
+	<update id="updateUserByExcel">
+		update usr_user set
+		name = case account
+		<foreach collection="dtoList" item="dto" separator=" ">
+		 when '${dto.code}' then '${dto.name}'
+		</foreach>
+		end,
+		sex_type = case account
+		<foreach collection="dtoList" item="dto" separator=" ">
+		 when '${dto.code}' then ${dto.sexType}
+		</foreach>
+		end,
+		department_id = case account
+		<foreach collection="dtoList" item="dto" separator=" ">
+		 when '${dto.code}' then ${dto.departmentId}
+		</foreach>
+		end,
+		mobile = case account
+		<foreach collection="dtoList" item="dto" separator=" ">
+		 when '${dto.code}' then '${dto.mobilePhone}'
+		</foreach>
+		end,
+		phone = case account
+		<foreach collection="dtoList" item="dto" separator=" ">
+		 when '${dto.code}' then '${dto.familyPhone}'
+		</foreach>
+		end,
+		email = case account
+		<foreach collection="dtoList" item="dto" separator=" ">
+		 when '${dto.code}' then '${dto.email}'
+		</foreach>
+		end,
+		address = case account
+		<foreach collection="dtoList" item="dto" separator=" ">
+		 when '${dto.code}' then '${dto.familyAddress}'
+		</foreach>
+		end
+		where account in (
+		<foreach collection="dtoList" item="dto" separator=",">
+		 	'${dto.code}'
+		</foreach>
+		)
+		
+	</update>
+
+
+	<!-- 的到对应的teacherId -->
+	<select id="getTeacherIdArrByList" resultType="java.lang.Integer">
+		select id from tea_teacher where code in (
+		<foreach collection="dtoList" item="dto" separator=",">
+			'${dto.code}'
+		</foreach>
+		)
+	</select>
+	<!-- 得到对应的UserId -->
+	<select id="getUserIdArrByList" resultType="java.lang.Integer">
+		select id from usr_user where account in (
+		<foreach collection="dtoList" item="dto" separator=",">
+			${dto.code}
+		</foreach>
+		)
+	</select>
+	<!-- 批量设置userId -->
+	<update id="updateUserIdByList">
+		update tea_teacher 
+		set user_id = CASE code
+		<foreach collection="dtoList" item="dto" separator=" ">
+			WHEN '${dto.code}' THEN ${dto.userId}
+		</foreach>
+		end
+		where code in (
+		<foreach collection="dtoList" item="dto" separator=",">
+			'${dto.code}'
+		</foreach>
+		)
+	</update>
+	<!-- 添加教育信息后更新教师信息表里的学历(取最大)  -->
+	<update id="updateTeacherInfoDegreeType">
+		update tea_teacher_info set degree_type =
+			(select max(degree_type) from tea_teacher_edu_experience where teacher_id=${teacherId})
+			where teacher_id = ${teacherId}
+	</update>
+	
+	<!-- 新增  -->
+	<select id="getTeacherIdByUserId" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+		SELECT t.id FROM tea_teacher t
+		<where>
+			t.user_id = #{userId}
+		</where>
+	</select>
+	<select id="getClassIdByTeacherId" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+		SELECT c.id FROM stu_class c
+		<where>
+			c.teacher_id = #{teacherId}
+		</where>
+		LIMIT 1
+	</select>
+	
+	<select id="getGradeIdByClassId" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+		SELECT c.grade_id FROM stu_class c
+		<where>
+			c.id = #{classId}
+		</where>
+	</select>
+	
+	<!-- 批量删除教师 -->
+	<delete id="deleteTeacherByList">
+		delete from tea_teacher where 
+		code in (
+		<foreach collection="dtoList" separator="," item="dto">
+			'${dto.code}'
+		</foreach>
+		)
+	</delete>
+	
+	<!-- 批量删除教师 -->
+	<delete id="deleteTeacherInfoByList">
+		delete from tea_teacher_info where 
+		teacher_id in (
+		<foreach collection="dtoList" separator="," item="dto">
+			'${dto.teacherId}'
+		</foreach>
+		)
+	</delete>
+	
+	<select id="getAllTeacher" resultMap="BaseResultMapExtend">
+		SELECT t.id,t.`name` FROM tea_teacher
+	</select>
+</mapper>

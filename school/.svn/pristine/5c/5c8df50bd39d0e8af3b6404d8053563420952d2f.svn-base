@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.tea.dao.TeacherRewardCustomMapper">
+	<resultMap id="TeacherReward" type="com.dkt.school.tea.model.TeacherReward" 
+				extends="com.dkt.school.tea.dao.TeacherRewardMapper.BaseResultMap"></resultMap>
+	<resultMap id="TeacherRewardDto" type="com.dkt.school.tea.dto.TeacherRewardDto"
+				extends="TeacherReward">
+		<result column="schoolYear" property="schoolYear" jdbcType="VARCHAR"/>
+		<result column="code" property="code" jdbcType="VARCHAR"/>
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="rewardDateStr" property="rewardDateStr" jdbcType="VARCHAR"/>
+		<result column="nowPosition" property="nowPosition" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		r.id,r.reward_type,r.title,r.content,r.award,
+		r.school_year_id,r.school_term_type,r.remark
+	</sql>
+	
+	<select id="getTeaRewardList" resultMap="TeacherRewardDto"> 
+		SELECT DISTINCT 
+		<include refid="Base_Column_List" />,
+		(SELECT y.`name` FROM sch_study_year AS y WHERE y.id = r.school_year_id) AS schoolYear,
+		DATE_FORMAT(r.reward_date,'%Y-%m-%d') AS rewardDateStr,
+		t.code AS code,
+		t.`name` AS name,
+		t.now_position AS nowPosition
+		FROM 
+			tea_teacher_reward AS r
+		INNER JOIN tea_teacher AS t
+		ON r.teacher_id = t.id
+		<where>
+			<if test="name != null and name != '' ">
+				t.`name` like '%${name}%' 
+			</if>
+			<if test="code != null and code != '' ">
+				AND t.code like '%${code}%'
+			</if>
+		</where>
+		<if test="limit  != null and limit != '' ">
+		LIMIT #{limit.offset}, #{limit.rows}
+		</if>
+	</select>
+	
+	<select id="getTeaRewardCount" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM tea_teacher_reward AS r
+		INNER JOIN tea_teacher AS t
+		ON r.teacher_id = t.id
+		<where>
+			<if test="code != null and code != ''">
+				t.code like '%${code}%'
+			</if>
+			<if test="name != null and name != ''">
+				AND t.name like '%${name}%'
+			</if>
+		</where>
+		
+	</select>
+	
+	<select id="getAllTeacherList" resultMap="TeacherRewardDto">
+		SELECT DISTINCT 
+		t.id AS teacherId,t.code,t.`name`,t.now_position AS nowPosition
+		FROM tea_teacher t
+		<where>
+			<if test="code != null and code != '' ">
+				t.code like '%${code}%'
+			</if>
+			<if test="name != null and name != '' ">
+				AND t.name like '%${name}%'
+			</if>
+		</where>
+		<if test="limit != null and limit != '' ">
+			LIMIT #{limit.offset},#{limit.rows}
+		</if>
+	</select>
+	
+	<select id="getTeacherCount" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM tea_teacher t
+		<where> 
+			<if test="code != null and code != ''">
+				t.code like '%${code}%'
+			</if>
+			<if test="name != null and name != ''">
+				AND t.name like '%${name}%'
+			</if>
+		</where>
+	</select>
+	
+	<select id="getSpecifiedTeacherRewardList" resultMap="TeacherRewardDto">
+		SELECT DISTINCT <include refid="Base_Column_List"/>,
+		(SELECT y.`name` FROM sch_study_year AS y WHERE y.id = r.school_year_id) AS schoolYear,
+		DATE_FORMAT(r.reward_date,'%Y-%m-%d') AS rewardDateStr
+		FROM tea_teacher_reward AS r 
+		<where>
+			r.teacher_id = #{id}
+			<if test="schoolTermType != null and schoolTermType != '' ">
+				AND r.school_term_type = #{schoolTermType}
+			</if>
+			<if test="schoolYearId != null and schoolYearId != '' ">
+				AND r.school_year_id = #{schoolYearId}
+			</if>
+			<if test="title != null and title != '' ">
+				AND r.title like '%${title}%'
+			</if>
+		</where>
+		<if test="limit != null and limit != '' ">
+			LIMIT #{limit.offset},#{limit.rows}
+		</if>
+	</select>
+	
+	<select id="getSpecifiedTeacherRewardCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) 
+		FROM tea_teacher_reward AS r
+		<where>
+			r.teacher_id = #{teacherId}
+			<if test="schoolTermType != null and schoolTermType != '' ">
+				AND r.school_term_type = #{schoolTermType}
+			</if>
+			<if test="schoolYearId != null and schoolYearId != '' ">
+				AND r.school_year_id = #{schoolYearId}
+			</if>
+			<if test="title != null and title != '' ">
+				AND r.title like '%${title}%'
+			</if>
+		</where>
+	</select>
+	
+	<select id="getTeacherIdByUserId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+		SELECT t.id 
+		FROM tea_teacher t
+		<where>
+			t.user_id = #{id}
+		</where>
+	</select>
+	
+	<delete id="deleteTeaRewardById" parameterType="java.lang.Integer">
+		DELETE FROM tea_teacher_reward 
+		<where>
+			id = #{id}
+		</where>
+	</delete>
+</mapper>

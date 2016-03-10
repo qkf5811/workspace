@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.fin.dao.StudentChargeCustomMapper">
+
+	<resultMap type="com.dkt.school.fin.model.StudentCharge" id="BaseResultMap"
+				extends="com.dkt.school.fin.dao.StudentChargeMapper.BaseResultMap"></resultMap>
+				
+	<resultMap id="StudentChargeOfArrearsDto" type="com.dkt.school.fin.dto.StudentChargeOfArrearsDto"
+				extends="com.dkt.school.fin.dao.StudentChargeMapper.BaseResultMap">
+		
+		<result property="account" column="account" javaType="java.lang.String"></result>
+		<result property="code" column="code" javaType="java.lang.String"></result>
+		<result property="name" column="name" javaType="java.lang.String"></result>
+		<result property="idCard" column="id_card" javaType="java.lang.String"></result>
+		<result property="gradeStr" column="grade_str" javaType="java.lang.String"></result>
+		<result property="classStr" column="class_str" javaType="java.lang.String"></result>	
+		<result property="termTypeStr" column="term_type_str" javaType="java.lang.String"></result>		
+	</resultMap>
+	
+	<resultMap type="com.dkt.school.fin.dto.StudentChargeDto" id="StudentChargeDtoResultMap"
+	           extends="BaseResultMap">
+	    <result column="student_name" property="studentName" jdbcType="VARCHAR" />
+        <result column="grade_name" property="gradeName" jdbcType="VARCHAR" />
+        <result column="study_year_name" property="studentYearStr" jdbcType="VARCHAR" />
+        <result column="term_type_str" property="termTypeStr" jdbcType="VARCHAR" />
+        <result column="student_account_name" property="studentAccountName" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<!-- 龚硕晓 -->
+	<resultMap type="com.dkt.school.fin.dto.StudentChargeToBankDto" id="StudentChargeToBankDtoResultMap"
+	           extends="BaseResultMap">
+	    <result column="student_name" property="studentName" jdbcType="VARCHAR" />
+        <result column="student_account" property="studentAccount" jdbcType="VARCHAR" />
+        <result column="account_name" property="accountName" jdbcType="VARCHAR" />       
+	</resultMap>
+	
+	<!-- 冯其康 -->
+	<select id="selectCountOfStudentChargeOfArrearsDto" resultType="java.lang.Integer">
+		select 
+		count(*)
+		from  `fin_student_charge`, fin_student_account, stu_student, stu_class, stu_student_info, sch_grade,sch_major_field
+		WHERE
+			fin_student_charge.account_id = fin_student_account.id 
+		AND 
+			fin_student_charge.student_id = stu_student.id
+		AND
+			stu_class.id = stu_student.class_id
+		AND
+			stu_student.student_info_id = stu_student_info.id
+		AND
+			sch_grade.id = fin_student_charge.grade_id
+		AND 
+			stu_student_info.major_field_id = sch_major_field.id
+		AND
+			paid_total_fee <![CDATA[<>]]> total_fee
+		<if test="gradeId != null and gradeId != 0">
+		AND
+			fin_student_charge.grade_id = ${gradeId}
+		</if>
+		<if test="majorId != null and majorId != 0">
+		AND
+			sch_major_field.major_id = ${majorId}
+		</if>
+		<if test="fieldId != null and fieldId != 0">
+		AND
+			stu_student_info.major_field_id = ${fieldId}
+		</if>
+		<if test="limit != null">
+			limit ${limit.offset}, ${limit.rows}
+		</if>
+	</select>
+	
+	<!-- 冯其康 -->
+	<select id="selectStudentChargeOfArrearsDto" resultMap="StudentChargeOfArrearsDto">
+		select 
+		fin_student_account.account, 
+		stu_student.`code`, 
+		stu_student.`name`,
+		stu_student_info.id_card,
+		sch_grade.`name` as grade_str,
+		stu_class.`name` as class_str,
+		sys_enumeration_value.`name` as term_type_str,
+		fin_student_charge.* 
+		from  `fin_student_charge`, fin_student_account, stu_student, stu_class, stu_student_info, sch_grade, sys_enumeration_value,sch_major_field
+		WHERE
+			fin_student_charge.account_id = fin_student_account.id 
+		AND 
+			stu_student_info.major_field_id = sch_major_field.id
+		AND 
+			fin_student_charge.student_id = stu_student.id
+		AND
+			sys_enumeration_value.id = fin_student_charge.term_type
+		AND
+			stu_class.id = stu_student.class_id
+		AND
+			stu_student.student_info_id = stu_student_info.id
+		AND
+			sch_grade.id = fin_student_charge.grade_id
+		AND
+			paid_total_fee <![CDATA[<>]]> total_fee
+		<if test="gradeId != null and gradeId != 0">
+		AND
+			fin_student_charge.grade_id = ${gradeId}
+		</if>
+		<if test="majorId != null and majorId != 0">
+		AND
+			sch_major_field.major_id = ${majorId}
+		</if>
+		<if test="fieldId != null and fieldId != 0">
+		AND
+			stu_student_info.major_field_id = ${fieldId}
+		</if>
+		<if test="limit != null">
+			limit ${limit.offset}, ${limit.rows}
+		</if>
+	</select>
+
+    <!-- Lai JiPeng -->
+    <select id="selectStudentChargeListByPage" resultMap="StudentChargeDtoResultMap">
+     SELECT stu_student.name AS student_name,
+            fin_student_charge.*,
+            sch_study_year.name AS study_year_name,
+            sch_grade.name AS grade_name,
+            (SELECT NAME FROM sys_enumeration_value WHERE id=fin_student_charge.term_type) AS term_type_str,
+            fin_student_account.name AS student_account_name
+     FROM fin_student_charge
+          LEFT JOIN sch_grade ON sch_grade.id=fin_student_charge.grade_id
+          LEFT JOIN stu_student ON stu_student.id=fin_student_charge.student_id
+          LEFT JOIN fin_student_account ON fin_student_account.id=fin_student_charge.account_id
+          LEFT JOIN sch_study_year ON sch_study_year.id=fin_student_charge.study_year
+      <where>
+	   <if test="dto.gradeId!=null">
+	     AND fin_student_charge.grade_id=${dto.gradeId}
+	   </if>
+	   <if test="dto.studyYear!=null">
+	     AND fin_student_charge.study_year=${dto.studyYear}
+	   </if>
+	   <if test="dto.termType!=null">
+	     AND fin_student_charge.term_type=${dto.termType}
+	   </if>
+	   <if test="dto.studentName!=null">
+	     AND stu_student.name LIKE '%${dto.studentName}%'
+	   </if>
+	 </where>
+	 ORDER BY study_year_name,grade_name,fin_student_charge.term_type
+     <if test="limit != null">
+		limit ${limit.offset}, ${limit.rows}
+     </if>
+    </select>
+    
+    <!-- Lai JiPeng -->
+    <select id="selectStudentChargeCount" resultType="java.lang.Integer">
+      SELECT COUNT(*)
+      FROM fin_student_charge
+           LEFT JOIN stu_student ON stu_student.id=fin_student_charge.student_id      
+       <where>
+	   <if test="dto.gradeId!=null">
+	     AND fin_student_charge.grade_id=${dto.gradeId}
+	   </if>
+	   <if test="dto.studyYear!=null">
+	     AND fin_student_charge.study_year=${dto.studyYear}
+	   </if>
+	   <if test="dto.termType!=null">
+	     AND fin_student_charge.term_type=${dto.termType}
+	   </if>
+	   <if test="dto.studentName!=null">
+	     AND stu_student.name LIKE '%${dto.studentName}%'
+	   </if>
+	 </where>
+    </select>
+    
+    <!-- Lai JiPeng -->     
+   <insert id="insertAllStudentCharge" >   
+     INSERT INTO  fin_student_charge(grade_id,study_year,term_type,student_id,account_id,tuition_fee,room_fee,book_fee,total_fee)
+          
+     SELECT
+        '${sC.gradeId}','${sC.studyYear}','${sC.termType}','${sC.studentId}','${sC.accountId}','${sC.tuitionFee}'
+        ,'${sC.roomFee}','${sC.bookFee}','${sC.totalFee}'    
+     FROM dual
+     
+     WHERE NOT EXISTS(SELECT * FROM fin_student_charge
+     WHERE    
+       fin_student_charge.grade_id='${sC.gradeId}' AND fin_student_charge.study_year='${sC.studyYear}' 
+       AND fin_student_charge.term_type='${sC.termType}' AND fin_student_charge.student_id='${sC.studentId}'     
+     )
+   </insert>
+
+   
+   <!-- Lai JiPeng -->
+   <update id="updateStudentChargeByMultiCon" >
+     UPDATE fin_student_charge 
+     SET tuition_fee = '${sC.tuitionFee}', room_fee = '${sC.roomFee}', book_fee = '${sC.bookFee}', total_fee = '${sC.totalFee}'
+     WHERE
+       fin_student_charge.grade_id='${sC.gradeId}' AND fin_student_charge.study_year='${sC.studyYear}' 
+       AND fin_student_charge.term_type='${sC.termType}' AND fin_student_charge.student_id='${sC.studentId}'
+   </update>
+   
+   <!-- Lai JiPeng -->
+   <select id="selectStudentChargeCountBeModi" resultType="java.lang.Integer">
+     SELECT COUNT(*)
+     FROM fin_student_charge
+     WHERE
+       fin_student_charge.grade_id='${sC.gradeId}' AND fin_student_charge.study_year='${sC.studyYear}' 
+       AND fin_student_charge.term_type='${sC.termType}' AND fin_student_charge.student_id='${sC.studentId}'
+       <!-- &lt;&gt;是不等于“<>”的转义写法 -->
+       AND format(fin_student_charge.total_fee,3)&lt;&gt;format('${sC.totalFee}',3)
+   </select> 
+
+   
+    <!-- HIU -->
+    <select id="selectStudentChargeListByExport" resultMap="StudentChargeToBankDtoResultMap">
+       SELECT stu_student.name AS student_name,
+       fin_student_account.account AS student_account,fin_student_account.name as account_name
+       , fin_student_charge.* 
+       FROM fin_student_charge LEFT JOIN stu_student 
+       ON stu_student.id=fin_student_charge.student_id LEFT JOIN fin_student_account
+       ON fin_student_account.id=fin_student_charge.account_id  
+
+     <where>
+        total_fee>paid_total_fee
+    
+	   <if test="gradeId!=-1">
+	     AND fin_student_charge.grade_id=${gradeId}
+	   </if>
+	   <if test="studyYearId!=-1">
+	     AND fin_student_charge.study_year=${studyYearId}
+	   </if>
+	   <if test="termTypeId!=-1" >
+	     AND fin_student_charge.term_type=${termTypeId}
+	   </if>
+	 
+	 </where>
+ 
+    </select>
+    
+    <!-- HIU -->
+    <select id="getCurrentStudyYear" resultType="java.lang.Integer">
+       select value from sys_config where code='study_year'
+    </select>
+
+</mapper>

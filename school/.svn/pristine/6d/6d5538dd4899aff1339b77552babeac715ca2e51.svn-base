@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.tea.dao.ContinuingEducationCustomMapper">
+	<resultMap type="com.dkt.school.tea.model.Teacher" id="Teacher" extends="com.dkt.school.tea.dao.TeacherMapper.BaseResultMap"></resultMap>
+	<resultMap type="com.dkt.school.tea.model.ContinuingEducation" id="ContinuingEducation"
+				extends="com.dkt.school.tea.dao.ContinuingEducationMapper.BaseResultMap"></resultMap>
+	<resultMap type="com.dkt.school.tea.dto.ContinuingEducationDto" 
+			id="ContinuingEducationDto" extends="ContinuingEducation">
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="code" property="code" jdbcType="VARCHAR"/>
+		<result column="startDateStr" property="startDateStr" jdbcType="VARCHAR"/>
+		<result column="endDateStr" property="endDateStr" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		e.id,e.teacher_id,e.course_type,e.course_name,
+		e.teach_organization,e.study_hours,e.remark	
+	</sql>
+
+	<select id="getTeaContinueEduList" resultMap="ContinuingEducationDto">
+		SELECT DISTINCT 
+		<include refid="Base_Column_List"/>,
+		DATE_FORMAT(e.start_date,'%Y-%m-%d') AS startDateStr,
+		DATE_FORMAT(e.end_date,'%Y-%m-%d') AS endDateStr,
+		t.code AS code,
+		t.`name` AS name
+		FROM tea_continuing_education AS e
+		INNER JOIN tea_teacher AS t
+		ON e.teacher_id = t.id
+		<where>
+			<if test="name != null and name != ''">
+				t.`name` like '%${name}%'
+			</if>
+			<if test="code != null and code != '' ">
+				AND t.code like '%${code}%'
+			</if>
+		</where>
+		<if test="limit != null and limit !=''">
+			LIMIT #{limit.offset},#{limit.rows}
+		</if>
+	</select>
+	
+	<select id="getTeaContiueEduCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM
+		tea_continuing_education AS e
+		INNER JOIN tea_teacher AS t
+		ON e.teacher_id = t.id
+		<where>
+			<if test="name != null and name != ''">
+				t.`name` like '%${name}%'
+			</if>
+			<if test="code != null and code != ''">
+				AND t.code like '%${code}%'
+			</if>
+		</where>
+	</select>
+	
+	<select id="getTeaContinuingEduDtoById" parameterType="java.lang.Integer" resultMap="ContinuingEducationDto">
+		SELECT <include refid="Base_Column_List"/>,
+		DATE_FORMAT(e.start_date,'%Y-%m-%d') AS startDateStr,
+		DATE_FORMAT(e.end_date,'%Y-%m-%d') AS endDateStr,
+		t.`name`,t.code
+		FROM tea_continuing_education e
+		INNER JOIN tea_teacher t
+		ON e.teacher_id = t.id
+		<where>
+			e.id = #{id}
+		</where>
+	</select>
+	
+	<select id="getTeaContinuingEduList" resultMap="Teacher">
+		SELECT DISTINCT t.id,t.code,t.`name`,t.now_position 
+		FROM 
+		tea_teacher t 
+		<where>
+			<if test="name != null and name != '' ">
+				t.name like '%${name}%'
+			</if>
+			<if test="code != null and code != '' ">
+				AND t.code like '%${code}%'
+			</if>
+		</where>
+		<if test="limit != null and limit != ''">
+			LIMIT #{limit.offset},#{limit.rows}
+		</if>
+	</select>
+	
+	<select id="getTeaContinuingEduCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) 
+		FROM tea_teacher t
+		<where>
+			<if test="name != null and name != ''">
+				t.name like '%${name}%'
+			</if>
+			<if test="code != null and code != '' ">
+				AND t.code like '%${code}%'
+			</if>
+		</where>
+	</select>
+	
+	<select id="getTeacherIdByUserId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+		SELECT t.id 
+		FROM tea_teacher t
+		<where>
+			t.user_id = #{id}
+		</where>
+	</select>
+	
+	<select id="getMyConEduCount" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM tea_continuing_education e
+		<where>
+			e.teacher_id = #{teacherId}
+		<if test="teachOrganization != null and teachOrganization != ''">
+			AND e.teach_organization like '%${teachOrganization}%'
+		</if>
+		<if test="courseName != null and courseName != ''">
+			AND e.course_name  like '%${courseName}%'
+		</if>
+		<if test="courseType != null and courseType != ''">
+			AND e.course_type = #{courseType}
+		</if>
+		</where>
+	</select>
+	
+	<select id="getMyConEduList" resultMap="ContinuingEducation">
+		SELECT DISTINCT <include refid="Base_Column_List" />,
+		DATE_FORMAT(e.start_date,'%Y-%m-%d') AS startDate,
+		DATE_FORMAT(e.end_date,'%Y-%m-%d') AS endDate
+		FROM tea_continuing_education e
+		<where>
+				e.teacher_id = #{teacherId}
+			<if test="teachOrganization != null and teachOrganization != ''">
+				AND e.teach_organization like '%${teachOrganization}%'
+			</if>
+			<if test="courseName != null and courseName != ''">
+				AND e.course_name  like '%${courseName}%'
+			</if>
+			<if test="courseType != null and courseType != ''">
+				AND e.course_type = #{courseType}
+			</if>
+		</where>
+		<if test="limit != null and limit != '' ">
+			LIMIT #{limit.offset},#{limit.rows}
+		</if>
+	</select>
+	
+	<delete id="deleteTeaContinueEduItem" parameterType="java.lang.Integer">
+		DELETE FROM tea_continuing_education
+		<where>
+			id = #{id}
+		</where>
+	</delete>
+</mapper>

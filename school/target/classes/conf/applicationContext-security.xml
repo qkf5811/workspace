@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<b:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:b="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+ 	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd  
+    http://www.springframework.org/schema/security   
+    http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+
+	<http pattern="/**/*.jpg" security="none"></http>
+	<http pattern="/**/*.png" security="none"></http>
+	<http pattern="/**/*.gif" security="none"></http>
+	<http pattern="/**/*.css" security="none"></http>
+	<http pattern="/**/*.js" security="none"></http>
+	<http pattern="/**/*.ico" security="none"></http>
+	<http pattern="/login.do" security="none"></http>
+
+
+	<!-- access-denied-page定义没有权限的时候跳转到哪个页面 -->
+	<http auto-config="true" access-denied-page="/accessDenied.do">
+		<!-- 权限控制 -->
+		<!-- <intercept-url pattern="/index" access="ROLE_ADMIN,ROLE_TEA"></intercept-url> -->
+
+		<intercept-url pattern="/**" access="ROLE_ADMIN,ROLE_TEA"></intercept-url>
+
+		<!--<intercept-url pattern="/index*" access="ROLE_ADMIN,ROLE_FILE_TEA,ROLE_TEMP_FILE"></intercept-url>
+		<intercept-url pattern="/**" access="ROLE_ADMIN,ROLE_TEA"></intercept-url>
+		<intercept-url pattern="/user/*.action" access="ROLE_ADMIN"/>
+		<intercept-url pattern="/role/*.action" access="ROLE_ADMIN"/>
+		
+		只能查看档案权限
+		<intercept-url pattern="/file/toGetFaListByApplicant.action" access="ROLE_ADMIN,ROLE_FILE_TEA,ROLE_TEMP_FILE"/>
+		<intercept-url pattern="/file/getFaListByApplicant.action" access="ROLE_ADMIN,ROLE_FILE_TEA,ROLE_TEMP_FILE"/>
+		
+		<intercept-url pattern="/file/*.action" access="ROLE_ADMIN,ROLE_FILE_TEA"/> -->
+		
+		
+		
+		
+		<!-- 
+			login-page：指定登录页面 
+		-->
+		<form-login login-page="/login.do" default-target-url="/index.do"
+			always-use-default-target="true"></form-login>
+		<logout invalidate-session="true" logout-url="/logout.do"
+			logout-success-url="/login.do" />
+
+
+	<!-- session限制重复登录 -->
+	
+	<!-- 配置session-management -->
+	<!-- <session-management session-authentication-strategy-ref="sessionAuthenticationStrategy" invalid-session-url="/reLogin.do">
+		
+	</session-management>-->
+	
+	<!-- 添加自定义过滤器CONCURRENT_SESSION_FILTER,用于session过滤 -->
+	 <!--<custom-filter position="CONCURRENT_SESSION_FILTER" ref="concurrencyFilter" />-->
+	
+	</http> 
+
+	<!-- 重新配置ConcurrentSessionFilter、ConcurrentSessionControlStrategy和SessionRegistry -->
+	 <!--<b:bean id="concurrencyFilter"
+    	class="org.springframework.security.web.session.ConcurrentSessionFilter">  
+    	<b:property name="sessionRegistry" ref="sessionRegistry" />  
+    	<b:property name="expiredUrl" value="/reLogin.do" />  
+	</b:bean>  
+	<b:bean id="sessionAuthenticationStrategy"
+    	class="org.springframework.security.web.authentication.session.ConcurrentSessionControlStrategy">  
+    	<b:constructor-arg name="sessionRegistry"  
+        	ref="sessionRegistry" />  
+    	<b:property name="maximumSessions" value="1" />  
+	</b:bean>  
+	<b:bean id="sessionRegistry"  
+    	class="org.springframework.security.core.session.SessionRegistryImpl" />-->
+
+
+	<!-- 权限认证管理类 -->
+	<authentication-manager alias="authenticationManager">
+		<authentication-provider user-service-ref="userDetailsManager">
+			<!-- <password-encoder ref="passwordEncoder"></password-encoder> -->
+		</authentication-provider>
+
+	</authentication-manager>
+
+	<!-- 用户的密码加密或解密 -->
+	<!-- <b:bean id="passwordEncoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder">
+		添加密钥值
+		<b:constructor-arg name="secret" value="new-hua"></b:constructor-arg>
+	</b:bean> -->
+	<!-- <b:bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder"></b:bean> -->
+
+
+	<!-- 用户详细信息管理：数据源、用户缓存(通过数据库管理用户、角色、权限、资源) -->
+	<b:bean id="userDetailsManager"
+		class="com.dkt.school.user.service.impl.UserDetailsServiceImpl">
+
+	</b:bean>
+
+	<b:bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<b:property name="basename" value="classpath:conf/message_zh_CN"></b:property>
+	</b:bean>
+</b:beans>

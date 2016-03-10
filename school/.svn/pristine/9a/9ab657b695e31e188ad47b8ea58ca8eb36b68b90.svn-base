@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.fin.dao.StudentChargeMapper" >
+  <resultMap id="BaseResultMap" type="com.dkt.school.fin.model.StudentCharge" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="grade_id" property="gradeId" jdbcType="INTEGER" />
+    <result column="study_year" property="studyYear" jdbcType="INTEGER" />
+    <result column="term_type" property="termType" jdbcType="INTEGER" />
+    <result column="student_id" property="studentId" jdbcType="INTEGER" />
+    <result column="account_id" property="accountId" jdbcType="INTEGER" />
+    <result column="tuition_fee" property="tuitionFee" jdbcType="REAL" />
+    <result column="room_fee" property="roomFee" jdbcType="REAL" />
+    <result column="book_fee" property="bookFee" jdbcType="REAL" />
+    <result column="total_fee" property="totalFee" jdbcType="REAL" />
+    <result column="paid_tuition_fee" property="paidTuitionFee" jdbcType="REAL" />
+    <result column="paid_room_fee" property="paidRoomFee" jdbcType="REAL" />
+    <result column="paid_book_fee" property="paidBookFee" jdbcType="REAL" />
+    <result column="paid_total_fee" property="paidTotalFee" jdbcType="REAL" />
+    <result column="pay_time" property="payTime" jdbcType="TIMESTAMP" />
+    <result column="deduct_remark" property="deductRemark" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, grade_id, study_year, term_type, student_id, account_id, tuition_fee, room_fee, 
+    book_fee, total_fee, paid_tuition_fee, paid_room_fee, paid_book_fee, paid_total_fee, 
+    pay_time, deduct_remark, remark
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.dkt.school.fin.model.StudentChargeExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from fin_student_charge
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from fin_student_charge
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from fin_student_charge
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.dkt.school.fin.model.StudentChargeExample" >
+    delete from fin_student_charge
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.dkt.school.fin.model.StudentCharge" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into fin_student_charge (grade_id, study_year, term_type, 
+      student_id, account_id, tuition_fee, 
+      room_fee, book_fee, total_fee, 
+      paid_tuition_fee, paid_room_fee, paid_book_fee, 
+      paid_total_fee, pay_time, deduct_remark, 
+      remark)
+    values (#{gradeId,jdbcType=INTEGER}, #{studyYear,jdbcType=INTEGER}, #{termType,jdbcType=INTEGER}, 
+      #{studentId,jdbcType=INTEGER}, #{accountId,jdbcType=INTEGER}, #{tuitionFee,jdbcType=REAL}, 
+      #{roomFee,jdbcType=REAL}, #{bookFee,jdbcType=REAL}, #{totalFee,jdbcType=REAL}, 
+      #{paidTuitionFee,jdbcType=REAL}, #{paidRoomFee,jdbcType=REAL}, #{paidBookFee,jdbcType=REAL}, 
+      #{paidTotalFee,jdbcType=REAL}, #{payTime,jdbcType=TIMESTAMP}, #{deductRemark,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.dkt.school.fin.model.StudentCharge" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into fin_student_charge
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="gradeId != null" >
+        grade_id,
+      </if>
+      <if test="studyYear != null" >
+        study_year,
+      </if>
+      <if test="termType != null" >
+        term_type,
+      </if>
+      <if test="studentId != null" >
+        student_id,
+      </if>
+      <if test="accountId != null" >
+        account_id,
+      </if>
+      <if test="tuitionFee != null" >
+        tuition_fee,
+      </if>
+      <if test="roomFee != null" >
+        room_fee,
+      </if>
+      <if test="bookFee != null" >
+        book_fee,
+      </if>
+      <if test="totalFee != null" >
+        total_fee,
+      </if>
+      <if test="paidTuitionFee != null" >
+        paid_tuition_fee,
+      </if>
+      <if test="paidRoomFee != null" >
+        paid_room_fee,
+      </if>
+      <if test="paidBookFee != null" >
+        paid_book_fee,
+      </if>
+      <if test="paidTotalFee != null" >
+        paid_total_fee,
+      </if>
+      <if test="payTime != null" >
+        pay_time,
+      </if>
+      <if test="deductRemark != null" >
+        deduct_remark,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="gradeId != null" >
+        #{gradeId,jdbcType=INTEGER},
+      </if>
+      <if test="studyYear != null" >
+        #{studyYear,jdbcType=INTEGER},
+      </if>
+      <if test="termType != null" >
+        #{termType,jdbcType=INTEGER},
+      </if>
+      <if test="studentId != null" >
+        #{studentId,jdbcType=INTEGER},
+      </if>
+      <if test="accountId != null" >
+        #{accountId,jdbcType=INTEGER},
+      </if>
+      <if test="tuitionFee != null" >
+        #{tuitionFee,jdbcType=REAL},
+      </if>
+      <if test="roomFee != null" >
+        #{roomFee,jdbcType=REAL},
+      </if>
+      <if test="bookFee != null" >
+        #{bookFee,jdbcType=REAL},
+      </if>
+      <if test="totalFee != null" >
+        #{totalFee,jdbcType=REAL},
+      </if>
+      <if test="paidTuitionFee != null" >
+        #{paidTuitionFee,jdbcType=REAL},
+      </if>
+      <if test="paidRoomFee != null" >
+        #{paidRoomFee,jdbcType=REAL},
+      </if>
+      <if test="paidBookFee != null" >
+        #{paidBookFee,jdbcType=REAL},
+      </if>
+      <if test="paidTotalFee != null" >
+        #{paidTotalFee,jdbcType=REAL},
+      </if>
+      <if test="payTime != null" >
+        #{payTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deductRemark != null" >
+        #{deductRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.dkt.school.fin.model.StudentChargeExample" resultType="java.lang.Integer" >
+    select count(*) from fin_student_charge
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update fin_student_charge
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.gradeId != null" >
+        grade_id = #{record.gradeId,jdbcType=INTEGER},
+      </if>
+      <if test="record.studyYear != null" >
+        study_year = #{record.studyYear,jdbcType=INTEGER},
+      </if>
+      <if test="record.termType != null" >
+        term_type = #{record.termType,jdbcType=INTEGER},
+      </if>
+      <if test="record.studentId != null" >
+        student_id = #{record.studentId,jdbcType=INTEGER},
+      </if>
+      <if test="record.accountId != null" >
+        account_id = #{record.accountId,jdbcType=INTEGER},
+      </if>
+      <if test="record.tuitionFee != null" >
+        tuition_fee = #{record.tuitionFee,jdbcType=REAL},
+      </if>
+      <if test="record.roomFee != null" >
+        room_fee = #{record.roomFee,jdbcType=REAL},
+      </if>
+      <if test="record.bookFee != null" >
+        book_fee = #{record.bookFee,jdbcType=REAL},
+      </if>
+      <if test="record.totalFee != null" >
+        total_fee = #{record.totalFee,jdbcType=REAL},
+      </if>
+      <if test="record.paidTuitionFee != null" >
+        paid_tuition_fee = #{record.paidTuitionFee,jdbcType=REAL},
+      </if>
+      <if test="record.paidRoomFee != null" >
+        paid_room_fee = #{record.paidRoomFee,jdbcType=REAL},
+      </if>
+      <if test="record.paidBookFee != null" >
+        paid_book_fee = #{record.paidBookFee,jdbcType=REAL},
+      </if>
+      <if test="record.paidTotalFee != null" >
+        paid_total_fee = #{record.paidTotalFee,jdbcType=REAL},
+      </if>
+      <if test="record.payTime != null" >
+        pay_time = #{record.payTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.deductRemark != null" >
+        deduct_remark = #{record.deductRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.remark != null" >
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update fin_student_charge
+    set id = #{record.id,jdbcType=INTEGER},
+      grade_id = #{record.gradeId,jdbcType=INTEGER},
+      study_year = #{record.studyYear,jdbcType=INTEGER},
+      term_type = #{record.termType,jdbcType=INTEGER},
+      student_id = #{record.studentId,jdbcType=INTEGER},
+      account_id = #{record.accountId,jdbcType=INTEGER},
+      tuition_fee = #{record.tuitionFee,jdbcType=REAL},
+      room_fee = #{record.roomFee,jdbcType=REAL},
+      book_fee = #{record.bookFee,jdbcType=REAL},
+      total_fee = #{record.totalFee,jdbcType=REAL},
+      paid_tuition_fee = #{record.paidTuitionFee,jdbcType=REAL},
+      paid_room_fee = #{record.paidRoomFee,jdbcType=REAL},
+      paid_book_fee = #{record.paidBookFee,jdbcType=REAL},
+      paid_total_fee = #{record.paidTotalFee,jdbcType=REAL},
+      pay_time = #{record.payTime,jdbcType=TIMESTAMP},
+      deduct_remark = #{record.deductRemark,jdbcType=VARCHAR},
+      remark = #{record.remark,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.dkt.school.fin.model.StudentCharge" >
+    update fin_student_charge
+    <set >
+      <if test="gradeId != null" >
+        grade_id = #{gradeId,jdbcType=INTEGER},
+      </if>
+      <if test="studyYear != null" >
+        study_year = #{studyYear,jdbcType=INTEGER},
+      </if>
+      <if test="termType != null" >
+        term_type = #{termType,jdbcType=INTEGER},
+      </if>
+      <if test="studentId != null" >
+        student_id = #{studentId,jdbcType=INTEGER},
+      </if>
+      <if test="accountId != null" >
+        account_id = #{accountId,jdbcType=INTEGER},
+      </if>
+      <if test="tuitionFee != null" >
+        tuition_fee = #{tuitionFee,jdbcType=REAL},
+      </if>
+      <if test="roomFee != null" >
+        room_fee = #{roomFee,jdbcType=REAL},
+      </if>
+      <if test="bookFee != null" >
+        book_fee = #{bookFee,jdbcType=REAL},
+      </if>
+      <if test="totalFee != null" >
+        total_fee = #{totalFee,jdbcType=REAL},
+      </if>
+      <if test="paidTuitionFee != null" >
+        paid_tuition_fee = #{paidTuitionFee,jdbcType=REAL},
+      </if>
+      <if test="paidRoomFee != null" >
+        paid_room_fee = #{paidRoomFee,jdbcType=REAL},
+      </if>
+      <if test="paidBookFee != null" >
+        paid_book_fee = #{paidBookFee,jdbcType=REAL},
+      </if>
+      <if test="paidTotalFee != null" >
+        paid_total_fee = #{paidTotalFee,jdbcType=REAL},
+      </if>
+      <if test="payTime != null" >
+        pay_time = #{payTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deductRemark != null" >
+        deduct_remark = #{deductRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.dkt.school.fin.model.StudentCharge" >
+    update fin_student_charge
+    set grade_id = #{gradeId,jdbcType=INTEGER},
+      study_year = #{studyYear,jdbcType=INTEGER},
+      term_type = #{termType,jdbcType=INTEGER},
+      student_id = #{studentId,jdbcType=INTEGER},
+      account_id = #{accountId,jdbcType=INTEGER},
+      tuition_fee = #{tuitionFee,jdbcType=REAL},
+      room_fee = #{roomFee,jdbcType=REAL},
+      book_fee = #{bookFee,jdbcType=REAL},
+      total_fee = #{totalFee,jdbcType=REAL},
+      paid_tuition_fee = #{paidTuitionFee,jdbcType=REAL},
+      paid_room_fee = #{paidRoomFee,jdbcType=REAL},
+      paid_book_fee = #{paidBookFee,jdbcType=REAL},
+      paid_total_fee = #{paidTotalFee,jdbcType=REAL},
+      pay_time = #{payTime,jdbcType=TIMESTAMP},
+      deduct_remark = #{deductRemark,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

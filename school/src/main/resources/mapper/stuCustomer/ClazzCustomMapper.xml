@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.stu.dao.ClazzCustomMapper">
+	<resultMap id="BaseResultMap" type="com.dkt.school.stu.model.Clazz">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="grade_id" property="gradeId" jdbcType="INTEGER" />
+		<result column="major_field_id" property="majorFieldId"
+			jdbcType="INTEGER" />
+		<result column="teacher_id" property="teacherId" jdbcType="INTEGER" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+		
+	</resultMap>
+    
+    <!-- Lai JiPeng -->
+    <resultMap id="divideClassResultMap" type="com.dkt.school.stu.dto.DivideClassDto">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="major_field_name" property="fieldName" jdbcType="VARCHAR" />
+		<result column="studentCount" property="studentCount" jdbcType="VARCHAR" />
+		<result column="classCount" property="classCount" jdbcType="VARCHAR" />
+		<result column="divided_studentCount" property="divided_studentCount" jdbcType="VARCHAR" />
+		<result column="not_divided_studentCount" property="not_divided_studentCount" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<!-- 炳坚 -->
+	<resultMap type="com.dkt.school.stu.model.Clazz" id="Clazz"
+		extends="com.dkt.school.stu.dao.ClazzMapper.BaseResultMap">
+	</resultMap>
+	<resultMap type="com.dkt.school.stu.dto.ClazzDto" id="ClazzDto"
+		extends="Clazz">
+		<result column="grade_name" property="gradeName" jdbcType="VARCHAR" />
+		<result column="major_field_name" property="majorFieldName"
+			jdbcType="VARCHAR" />
+		<result column="major_field_class_name" property="majorFieldClassName"
+			jdbcType="VARCHAR" />
+		<result column="teacher_name" property="teacherName" jdbcType="VARCHAR"/>
+		<result column="major_id" property="majorId" jdbcType="INTEGER"/>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		sc.id,sc.name,sc.grade_id,sc.major_field_id,sc.teacher_id,sc.enroll_year,sc.remark
+	</sql>
+
+
+	<select id="getAllClass" resultMap="BaseResultMap">
+		select * from stu_class
+	</select>
+
+	<select id="getClassCountByMajorFieldId" resultType="java.lang.Integer">
+		select count(*) from stu_class where major_field_id='${majorFieldId}'
+	</select>
+	<select id="getClassByMajorFieldId" resultMap="ClazzDto">
+		select * from stu_class where major_field_id='${majorFieldId}'
+	</select>
+
+	<select id="getClassByClassName" resultMap="ClazzDto">
+		select * from stu_class where name='${className}'
+	</select>
+	
+	<select id="myClassCount" resultType="java.lang.Integer">
+		select count(*) from stu_class sc where sc.id in (
+		select ett.class_id from edu_course_teacher ect join edu_teach_course etc on etc.id = ect.teach_course_id join 
+		edu_teach_task ett on ett.teach_course_id = etc.id where ect.teacher_id = ${teacherId} group by ett.class_id)
+	</select>
+	
+
+	<select id="getClassByMajorFieldClassName" resultMap="ClazzDto">
+		select id,major_field_class_name from (
+		select id,CONCAT(major_field_name,class_name) AS major_field_class_name
+		from(select smf.name As major_field_name,sc.name As class_name,sc.id
+		As id
+		from stu_class sc
+		LEFT JOIN sch_major_field smf ON smf.id = sc.major_field_id )as tem_table1
+		)as tem_table2
+		where major_field_class_name =
+		#{MajorFieldClass,jdbcType=VARCHAR}
+	</select>
+
+
+
+
+	<select id="getClassCount" resultType="java.lang.Integer">
+		select count(*)
+		from stu_class sc 
+		LEFT JOIN sch_grade sg ON sg.id =sc.grade_id 
+		LEFT JOIN sch_major_field smf ON smf.id =sc.major_field_id
+		<where>
+			<if test="majorFieldClassName != null and majorFieldClassName !=''">
+				CONCAT(smf.name,sc.name) like '%${majorFieldClassName}%'
+			</if>
+			<if test="gradeName != null and gradeName != ''">
+				and sg.name like '%${gradeName}%'
+			</if>
+		</where>
+		<!-- <where>
+			<if test="majorFieldClassName != null and majorFieldClassName !=''">
+				major_field_class_name like '%${majorFieldClassName}%'
+			</if>
+			<if test="gradeName != null and gradeName != ''">
+				and grade_name like '%${gradeName}%'
+			</if>
+		</where> -->
+	</select>
+
+
+
+	<select id="getMyClassByTeacherId" resultMap="ClazzDto">
+		select <include refid="Base_Column_List"/>,
+		(select smf.major_id from sch_major_field smf where smf.id=sc.major_field_id) AS major_id
+		from stu_class sc where sc.id in (
+		select ett.class_id from edu_course_teacher ect join edu_teach_course etc on etc.id = ect.teach_course_id join 
+		edu_teach_task ett on ett.teach_course_id = etc.id where ect.teacher_id = #{teacherId} group by ett.class_id)
+		<if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>
+	</select>
+
+
+	<select id="getClazzsByPage" resultMap="ClazzDto">
+		<!-- SELECT CONCAT(major_field_name,class_name) AS
+		major_field_class_name,grade_name from (
+		select sc.name As class_name,sg.name AS grade_name,smf.name AS
+		major_field_name
+		from stu_class sc
+		LEFT JOIN sch_grade sg ON sg.id = sc.grade_id
+		LEFT JOIN sch_major_field smf ON smf.id = sc.major_field_id
+		)as tem_table -->
+		select CONCAT(smf.name,sc.name) As major_field_class_name,sg.name AS
+		grade_name 
+		from stu_class sc 
+		LEFT JOIN sch_grade sg ON sg.id =sc.grade_id 
+		LEFT JOIN sch_major_field smf ON smf.id =sc.major_field_id
+		<where>
+			<if test="majorFieldClassName != null and majorFieldClassName !=''">
+				CONCAT(smf.name,sc.name) like '%${majorFieldClassName}%'
+			</if>
+			<if test="gradeName != null and gradeName != ''">
+				and sg.name like '%${gradeName}%'
+			</if>
+		</where>
+		<if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>
+
+
+	</select>
+
+
+	<select id="countBySearch" resultType="java.lang.Integer">
+		select count(*) from stu_class sc
+		left join sch_grade sg on sc.grade_id=sg.id
+		left join sch_major_field smf on sc.major_field_id=smf.id
+		left join tea_teacher tt on sc.teacher_id=tt.id
+
+		<where>
+			<if test="name != null and name != ''">
+				sc.name like '%${name}%'
+
+			</if>
+			<if test="gradeId != null and gradeId != ''">
+				and sg.id =#{gradeId}
+
+			</if>
+			<if test="majorFieldId != null and majorFieldId != ''">
+				and smf.id =#{majorFieldId}
+			</if>
+			<if test="teacherName != null and teacherName != ''">
+				and tt.name like '%${teacherName}%'
+
+			</if>
+
+		</where>
+	</select>
+	
+
+
+	<select id="selectByLimit" resultMap="ClazzDto">
+		select <include refid="Base_Column_List"/>,
+		sg.name AS grade_name,
+		CONCAT(smf.name,sc.name) AS major_field_class_name,
+		smf.name AS major_field_name,
+		tt.name AS teacher_name
+		from stu_class sc
+		left join sch_grade sg on sc.grade_id=sg.id
+		left join sch_major_field smf on sc.major_field_id=smf.id
+		left join tea_teacher tt on sc.teacher_id=tt.id
+
+
+
+		<where>
+			<if test="name != null and name != ''">
+				sc.name like '%${name}%'
+			</if>
+			<if test="gradeId != null and gradeId != ''">
+				and sg.id =#{gradeId}
+
+			</if>
+			<if test="majorFieldId != null and majorFieldId != ''">
+				and smf.id =#{majorFieldId}
+			</if>
+			<if test="teacherName != null and teacherName != ''">
+				and tt.name like '%${teacherName}%'
+			</if>
+
+		</where>
+		<if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>
+	</select>
+
+	<select id="selectClazzDtoByClazzId" resultMap="ClazzDto">
+		select <include refid="Base_Column_List"/>,
+		(select smf.major_id from sch_major_field smf where smf.id=sc.major_field_id) AS major_id,
+		tt.name AS teacher_name
+		from stu_class sc
+		left join tea_teacher tt on sc.teacher_id=tt.id
+		<where>
+			<if test="id != null and id != ''">
+				sc.id =#{id}
+			</if>
+
+
+		</where>
+	</select>
+	
+	
+	<!-- Lai JiPeng -->
+	<!-- 查询出各个专业的分班情况 -->
+	<select id="selectTotalInfoOfDivideClass" resultMap="divideClassResultMap">
+	 SELECT stu1.id,
+       sch_major_field.name AS major_field_name,
+       stu1.major_field_id ,
+       COUNT(*)   AS studentCount,
+       (SELECT COUNT(*) FROM stu_class WHERE stu1.major_field_id=stu_class.major_field_id) AS classCount,
+       (SELECT COUNT(*) FROM stu_student_info stu2 WHERE is_divide_class='2001' 
+               AND stu1.major_field_id=stu2.major_field_id) AS divided_studentCount,
+       (SELECT COUNT(*) FROM stu_student_info stu2 WHERE is_divide_class='2002' 
+               AND stu1.major_field_id=stu2.major_field_id) AS not_divided_studentCount     
+     FROM stu_student_info stu1
+          LEFT JOIN sch_major_field ON stu1.major_field_id=sch_major_field.id
+     GROUP BY stu1.major_field_id
+     <if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+	 </if>
+	</select>
+	
+	<select id="selectCountOfTotalInfoOfDivideClass" resultType="java.lang.Integer">
+	   SELECT COUNT(DISTINCT major_field_id)     
+       FROM stu_student_info
+       ORDER BY major_field_id
+	</select>
+	
+	<select id="getClassOfGradeOneByMajorFieldId" resultMap="ClazzDto">
+	    SELECT stu_class.*
+        FROM stu_class
+        LEFT JOIN sch_grade ON stu_class.grade_id=sch_grade.id
+        <where>
+            sch_grade.`name`='一年级'
+			<if test="majorFieldId != null and majorFieldId > 0">
+				AND major_field_id='${majorFieldId}'
+			</if>
+		</where>
+	</select>
+</mapper>

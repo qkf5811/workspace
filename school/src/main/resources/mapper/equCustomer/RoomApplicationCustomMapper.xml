@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.equ.dao.RoomApplicationCustomMapper" >
+  <resultMap id="RoomApplication" type="com.dkt.school.equ.model.RoomApplication" extends="com.dkt.school.equ.dao.RoomApplicationMapper.BaseResultMap">
+
+  </resultMap>
+  
+  <resultMap id="FunctionRoom" type="com.dkt.school.equ.model.FunctionRoom" extends="com.dkt.school.equ.dao.FunctionRoomMapper.BaseResultMap">
+
+  </resultMap>
+
+  <resultMap id="FunctionRoomDto" type="com.dkt.school.equ.dto.FunctionRoomDto" extends="FunctionRoom">
+    <result column="room_name" property="roomName" jdbcType="VARCHAR"/>
+    <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+     <result column="app_name" property="appName" jdbcType="VARCHAR"/>
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    scr.id,scr.name,scr.building_id,scr.floor,scr.capacity,scr.room_type,scr.remark
+  </sql>
+
+  <select id="selectFunctionRoomByBuildingId" resultMap="RoomApplication">
+  	select * from sch_class_room where building_id = ${id}
+  </select>
+
+  <select id="getRoomApplicationCount" resultType="java.lang.Integer">
+	select count(*) from equ_room_application era 
+	join apv_application aa on era.application_id = aa.id
+	join equ_function_room efr on efr.id = era.function_room_id
+	join usr_user usr on usr.id = era.use_user_id
+    <where>
+      <if test="dto.appName != null and dto.appName != ''">
+        aa.name like '%${dto.appName}%'
+
+      </if>
+      <if test="dto.roomName != null and dto.roomName != ''">
+       and efr.name like '%${dto.roomName}%'
+
+      </if>
+      <if test="dto.userName != null and dto.userName != ''">
+       and usr.name like '%${dto.userName}%'
+      </if>
+
+    </where>
+  </select>
+  
+  <select id="getRoomApplicatioByPage" resultMap="FunctionRoomDto">
+    select era.*,aa.name as app_name,
+    efr.name as room_name,
+    usr.name as user_name
+    from equ_room_application era 
+	join apv_application aa on era.application_id = aa.id
+	join equ_function_room efr on efr.id = era.function_room_id
+	join usr_user usr on usr.id = era.use_user_id
+    <where>
+      <if test="dto.appName != null and dto.appName != ''">
+        aa.name like '%${dto.appName}%'
+
+      </if>
+      <if test="dto.roomName != null and dto.roomName != ''">
+       and efr.name like '%${dto.roomName}%'
+
+      </if>
+      <if test="dto.userName != null and dto.userName != ''">
+       and usr.name like '%${dto.userName}%'
+      </if>
+    </where>
+    <if test="limit != null">
+      limit #{limit.offset},#{limit.rows}
+    </if>
+  </select>
+
+
+
+ <select id="selectFunctionRoomById" resultMap="FunctionRoom">
+  	select * from equ_function_room where id = ${id}
+  </select>
+
+ <select id="getRoomApplicationByAppId" resultMap="RoomApplication">
+  	select * from  equ_room_application where application_id = #{appId} limit 1;
+  </select>
+
+</mapper>

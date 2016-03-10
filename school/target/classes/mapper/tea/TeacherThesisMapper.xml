@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.tea.dao.TeacherThesisMapper" >
+  <resultMap id="BaseResultMap" type="com.dkt.school.tea.model.TeacherThesis" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="teacher_id" property="teacherId" jdbcType="INTEGER" />
+    <result column="thesis_name" property="thesisName" jdbcType="VARCHAR" />
+    <result column="publication" property="publication" jdbcType="VARCHAR" />
+    <result column="author_order" property="authorOrder" jdbcType="INTEGER" />
+    <result column="publish_date" property="publishDate" jdbcType="DATE" />
+    <result column="thesis_type" property="thesisType" jdbcType="INTEGER" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, teacher_id, thesis_name, publication, author_order, publish_date, thesis_type, 
+    remark
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.dkt.school.tea.model.TeacherThesisExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from tea_teacher_thesis
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from tea_teacher_thesis
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from tea_teacher_thesis
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.dkt.school.tea.model.TeacherThesisExample" >
+    delete from tea_teacher_thesis
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.dkt.school.tea.model.TeacherThesis" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tea_teacher_thesis (teacher_id, thesis_name, publication, 
+      author_order, publish_date, thesis_type, 
+      remark)
+    values (#{teacherId,jdbcType=INTEGER}, #{thesisName,jdbcType=VARCHAR}, #{publication,jdbcType=VARCHAR}, 
+      #{authorOrder,jdbcType=INTEGER}, #{publishDate,jdbcType=DATE}, #{thesisType,jdbcType=INTEGER}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.dkt.school.tea.model.TeacherThesis" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tea_teacher_thesis
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="teacherId != null" >
+        teacher_id,
+      </if>
+      <if test="thesisName != null" >
+        thesis_name,
+      </if>
+      <if test="publication != null" >
+        publication,
+      </if>
+      <if test="authorOrder != null" >
+        author_order,
+      </if>
+      <if test="publishDate != null" >
+        publish_date,
+      </if>
+      <if test="thesisType != null" >
+        thesis_type,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="teacherId != null" >
+        #{teacherId,jdbcType=INTEGER},
+      </if>
+      <if test="thesisName != null" >
+        #{thesisName,jdbcType=VARCHAR},
+      </if>
+      <if test="publication != null" >
+        #{publication,jdbcType=VARCHAR},
+      </if>
+      <if test="authorOrder != null" >
+        #{authorOrder,jdbcType=INTEGER},
+      </if>
+      <if test="publishDate != null" >
+        #{publishDate,jdbcType=DATE},
+      </if>
+      <if test="thesisType != null" >
+        #{thesisType,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.dkt.school.tea.model.TeacherThesisExample" resultType="java.lang.Integer" >
+    select count(*) from tea_teacher_thesis
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update tea_teacher_thesis
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.teacherId != null" >
+        teacher_id = #{record.teacherId,jdbcType=INTEGER},
+      </if>
+      <if test="record.thesisName != null" >
+        thesis_name = #{record.thesisName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.publication != null" >
+        publication = #{record.publication,jdbcType=VARCHAR},
+      </if>
+      <if test="record.authorOrder != null" >
+        author_order = #{record.authorOrder,jdbcType=INTEGER},
+      </if>
+      <if test="record.publishDate != null" >
+        publish_date = #{record.publishDate,jdbcType=DATE},
+      </if>
+      <if test="record.thesisType != null" >
+        thesis_type = #{record.thesisType,jdbcType=INTEGER},
+      </if>
+      <if test="record.remark != null" >
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update tea_teacher_thesis
+    set id = #{record.id,jdbcType=INTEGER},
+      teacher_id = #{record.teacherId,jdbcType=INTEGER},
+      thesis_name = #{record.thesisName,jdbcType=VARCHAR},
+      publication = #{record.publication,jdbcType=VARCHAR},
+      author_order = #{record.authorOrder,jdbcType=INTEGER},
+      publish_date = #{record.publishDate,jdbcType=DATE},
+      thesis_type = #{record.thesisType,jdbcType=INTEGER},
+      remark = #{record.remark,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.dkt.school.tea.model.TeacherThesis" >
+    update tea_teacher_thesis
+    <set >
+      <if test="teacherId != null" >
+        teacher_id = #{teacherId,jdbcType=INTEGER},
+      </if>
+      <if test="thesisName != null" >
+        thesis_name = #{thesisName,jdbcType=VARCHAR},
+      </if>
+      <if test="publication != null" >
+        publication = #{publication,jdbcType=VARCHAR},
+      </if>
+      <if test="authorOrder != null" >
+        author_order = #{authorOrder,jdbcType=INTEGER},
+      </if>
+      <if test="publishDate != null" >
+        publish_date = #{publishDate,jdbcType=DATE},
+      </if>
+      <if test="thesisType != null" >
+        thesis_type = #{thesisType,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.dkt.school.tea.model.TeacherThesis" >
+    update tea_teacher_thesis
+    set teacher_id = #{teacherId,jdbcType=INTEGER},
+      thesis_name = #{thesisName,jdbcType=VARCHAR},
+      publication = #{publication,jdbcType=VARCHAR},
+      author_order = #{authorOrder,jdbcType=INTEGER},
+      publish_date = #{publishDate,jdbcType=DATE},
+      thesis_type = #{thesisType,jdbcType=INTEGER},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

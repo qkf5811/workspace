@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.pe.dao.PeWorkTaskMapper" >
+  <resultMap id="BaseResultMap" type="com.dkt.school.pe.model.PeWorkTask" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="work_info_id" property="workInfoId" jdbcType="INTEGER" />
+    <result column="person_info_id" property="personInfoId" jdbcType="INTEGER" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, work_info_id, person_info_id, remark
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from pe_work_task
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from pe_work_task
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.dkt.school.pe.model.PeWorkTask" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into pe_work_task (work_info_id, person_info_id, remark
+      )
+    values (#{workInfoId,jdbcType=INTEGER}, #{personInfoId,jdbcType=INTEGER}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.dkt.school.pe.model.PeWorkTask" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into pe_work_task
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="workInfoId != null" >
+        work_info_id,
+      </if>
+      <if test="personInfoId != null" >
+        person_info_id,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="workInfoId != null" >
+        #{workInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="personInfoId != null" >
+        #{personInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.dkt.school.pe.model.PeWorkTask" >
+    update pe_work_task
+    <set >
+      <if test="workInfoId != null" >
+        work_info_id = #{workInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="personInfoId != null" >
+        person_info_id = #{personInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.dkt.school.pe.model.PeWorkTask" >
+    update pe_work_task
+    set work_info_id = #{workInfoId,jdbcType=INTEGER},
+      person_info_id = #{personInfoId,jdbcType=INTEGER},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

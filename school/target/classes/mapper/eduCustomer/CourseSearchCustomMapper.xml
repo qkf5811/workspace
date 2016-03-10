@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.edu.dao.CourseSearchCustomMapper">
+	<resultMap type="com.dkt.school.edu.model.TeachCourse" id="TeachCourse"
+		    extends="com.dkt.school.edu.dao.CourseMapper.BaseResultMap"></resultMap>
+	<resultMap type="com.dkt.school.sch.model.MajorField" id="MajorField"></resultMap>
+	<resultMap type="com.dkt.school.stu.model.Clazz" id="Clazz"></resultMap>
+	<resultMap type="com.dkt.school.edu.dto.CourseSearchDto" id="CourseSearchDto" extends="TeachCourse">
+		<result column="studyYear" property="studyYear" jdbcType="VARCHAR"/>
+		<result column="code" property="code" jdbcType="VARCHAR"/>
+		<result column="courseName" property="courseName" jdbcType="VARCHAR"/>
+		<result column="schoolYear" property="schoolYear" jdbcType="INTEGER"/>
+		<result column="termStr" property="termStr" jdbcType="INTEGER"/>
+		<result column="major" property="major" jdbcType="VARCHAR" />
+		<result column="majorField" property="majorField" jdbcType="VARCHAR"/>
+		<result column="courseType" property="courseType" jdbcType="INTEGER"/>
+		<result column="courseTypeStr" property="courseTypeStr" jdbcType="VARCHAR"/>
+		<result column="examType" property="examType" jdbcType="INTEGER"/>
+		<result column="examTypeStr" property="examTypeStr" jdbcType="VARCHAR"/>
+		<result column="grade" property="grade" jdbcType="VARCHAR"/>
+		<result column="weeks" property="weeks" jdbcType="VARCHAR"/>
+		<result column="weekIds" property="weekIds" jdbcType="VARCHAR"/>
+		<result column="weekday" property="weekday" jdbcType="INTEGER"/>
+		<result column="sectionType" property="sectionType" jdbcType="INTEGER"/>
+		<result column="teacherName" property="teacherName" jdbcType="VARCHAR"/>
+		<result column="lessonPlace" property="lessonPlace" jdbcType="VARCHAR"/>
+		<result column="scoreTypeStr" property="scoreTypeStr" jdbcType="VARCHAR"/>
+		<result column="credit" property="credit" jdbcType="VARCHAR"/>
+		<result column="hours" property="hours" jdbcType="VARCHAR"/>
+		<result column="remark" property="remark" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<parameterMap type="com.dkt.school.edu.dto.CourseSearchConditionDto" id="Condition">
+		<parameter property="studyYearId"/>
+		<parameter property="termType"/>
+		<parameter property="teacherName"/>
+		<parameter property="gradeId"/>
+		<parameter property="classes"/>
+		<parameter property="majorId"/>
+		<parameter property="fieldId"/>
+		<!-- 星期几 -->
+		<parameter property="weekday"/>
+		<!-- 第几周 ,逗号隔开-->		
+		<parameter property="weekIds"/>
+		<!-- 第几周到第几周 -->
+		<parameter property="weeks"/>
+	</parameterMap>
+	
+	<sql id="Base_Column_List">
+		tc.study_year_id,tc.term_type AS termType,tc.classes,tc.score_type AS scoreType
+	</sql>
+	
+	<select id="findCourseByCondition" parameterMap="Condition" resultMap="CourseSearchDto">
+		SELECT DISTINCT
+		<include refid="Base_Column_List"/>,
+			
+			cp.course_type AS courseType,
+			cp.examine_type AS examType,
+			cp.credit,
+			cp.hours,
+			cp.remark,
+			cs.week_day AS weekday,
+			cs.week_ids AS weekIds,
+			cs.weeks AS weeks,
+			cs.section_type AS sectionType,
+			c.`name` AS courseName,
+			c.`code`,
+			(SELECT s.`name` FROM sch_study_year s WHERE s.id = tc.study_year_id) AS studyYear,
+			(SELECT g.`name` FROM sch_grade g WHERE g.id = cp.grade_id) AS grade,
+			(SELECT m.`name` FROM sch_major m WHERE m.id = cp.major_id) AS major,
+			(SELECT f.`name` FROM sch_major_field f WHERE f.id = cp.field_id) AS majorField,
+			t.`name` AS teacherName,
+			sch_class_room.`name` AS lessonPlace
+		FROM
+			edu_teach_course AS tc
+		INNER JOIN edu_course_plan AS cp ON tc.course_plan_id = cp.id
+		INNER JOIN edu_course_schedule AS cs ON tc.id = cs.teach_course_id
+		INNER JOIN edu_course AS c ON tc.course_id = c.id
+		INNER JOIN edu_course_teacher AS ct ON  tc.id = ct.teach_course_id
+		INNER JOIN tea_teacher AS t ON ct.teacher_id = t.id
+		INNER JOIN sch_class_room ON cs.class_room_id = sch_class_room.id
+		<where>
+			<if test="condition.studyYearId != null and condition.studyYearId != '' ">
+				tc.study_year_id = #{condition.studyYearId}
+			</if>
+			<if test="condition.termType != null and condition.termType != '' ">
+				AND tc.term_type = #{condition.termType}
+			</if>
+			<if test="condition.majorId != null and condition.majorId != '' ">
+				AND cp.major_id = #{condition.majorId}
+			</if>
+			<if test="condition.fieldId != null and condition.fieldId != '' ">
+				AND cp.field_id = #{condition.fieldId}
+			</if>
+			<if test="condition.gradeId != null and condition.gradeId != '' ">
+				AND cp.grade_id = #{condition.gradeId}
+			</if>
+			<if test="condition.classes != null and condition.classes != '' ">
+				AND tc.classes like '%${condition.classes}%'
+			</if>
+			<!-- 教师姓名模糊查询 -->
+			<if test="condition.teacherName != null and condition.teacherName != ''">
+				AND t.name like '%${condition.teacherName}%'
+			</if>
+			<if test="condition.weeks != null and condition.weeks != '' ">
+				AND cs.weeks = #{condition.weeks}
+			</if>
+			<if test="condition.weekIds != null and condition.weekIds != '' ">
+				AND cs.week_ids like '%${condition.weekIds}%' 
+			</if>
+			<if test="condition.weekday != null and condition.weekday != '' ">
+				AND cs.week_day = #{condition.weekday}
+			</if>
+		</where>
+		<if test="limit != null and limit != '' ">
+			LIMIT #{limit.offset},#{limit.rows}
+		</if>
+	</select>
+	
+	<select id="findCourseCountByCondition" resultType="java.lang.Integer">
+		SELECT COUNT(*) 
+			FROM edu_teach_course AS tc
+		INNER JOIN edu_course_plan AS cp ON tc.course_plan_id = cp.id
+		INNER JOIN edu_course_schedule AS cs ON tc.id = cs.teach_course_id
+		INNER JOIN edu_course_teacher AS ct ON ct.teach_course_id = tc.id
+		INNER JOIN tea_teacher AS t ON ct.teacher_id = t.id
+		<where>
+			<if test="condition.studyYearId != null and condition.studyYearId != '' ">
+				tc.study_year_id = #{condition.studyYearId}
+			</if>
+			<if test="condition.termType != null and condition.termType != '' ">
+				AND tc.term_type = #{condition.termType}
+			</if>
+			<if test="condition.majorId != null and condition.majorId != '' ">
+				AND cp.major_id = #{condition.majorId}
+			</if>
+			<if test="condition.fieldId != null and condition.fieldId != '' ">
+				AND cp.field_id = #{condition.fieldId}
+			</if>
+			<if test="condition.gradeId != null and condition.gradeId != '' ">
+				AND cp.grade_id = #{condition.gradeId}
+			</if>
+			<if test="condition.classes != null and condition.classes != '' ">
+				AND tc.classes like '%${condition.classes}%'
+			</if>
+			<if test="condition.teacherName != null and condition.teacherName != ''">
+				AND t.`name` like '%${condition.teacherName}%'
+			</if>
+			<if test="condition.weeks != null and condition.weeks != '' ">
+				AND cs.weeks = #{condition.weeks}
+			</if>
+			<if test="condition.weekIds != null and condition.weekIds != '' ">
+				AND cs.week_ids like '%${condition.weekIds}%' 
+			</if>
+			<if test="condition.weekday != null and condition.weekday != '' ">
+				AND cs.week_day = #{condition.weekday}
+			</if>
+		</where>
+	</select>
+	
+</mapper>

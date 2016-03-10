@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.apv.dao.ApplicationCustomMapper" >
+	
+	<resultMap id="BaseResultMapExtend" type="com.dkt.school.apv.model.Application"
+		extends="com.dkt.school.apv.dao.ApplicationMapper.BaseResultMap">
+	</resultMap>
+	
+	<resultMap type="com.dkt.school.apv.dto.ApplicationDto" id="ApplicationDto" extends="BaseResultMapExtend">
+		<result column="mobile" property="mobile" jdbcType="VARCHAR"/>
+		<result column="phone" property="phone" jdbcType="VARCHAR"/>
+		<result column="user_name" property="userName" jdbcType="VARCHAR"/>
+		<result column="application_status_str" property="applicationStatusStr" jdbcType="VARCHAR"/>
+		<result column="application_type_str" property="applicationTypeStr" jdbcType="VARCHAR"/>
+		<result column="department_name" property="departmentName" jdbcType="VARCHAR"/>
+		<result column="node_name" property="nodeName" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	
+	<select id="selectMaxId" resultType="java.lang.Integer">
+		SELECT
+		max(id)
+		FROM
+		apv_application
+		
+	</select>
+	<select id="getApvApplicationCount" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		apv_application
+		LEFT JOIN usr_user ON apv_application.user_id = usr_user.id
+		LEFT JOIN usr_department ON apv_application.depart_id = usr_department.id
+		
+		
+		<where>
+			usr_user.id = ${userId} 
+			and
+			(
+			 apv_application.application_status = 42001
+			or apv_application.application_status = 42002
+			)
+			<if test="name != null and name !=''">
+				and apv_application.name like '%${name}%'
+			</if>  
+ 			<if test="applicationType != null and applicationType != ''">
+				and apv_application.application_type = ${applicationType}
+			</if> 
+			<if test="user != null and user != ''">
+				and usr_user.name like '%${user}%'
+			</if> 
+			<if test="applicationStatus != null and applicationStatus != ''">
+				and apv_application.application_status = ${applicationStatus}
+			</if> 
+			
+			 
+		</where>
+	</select>
+	
+	
+	
+	<select id="selectByLimit" resultMap="ApplicationDto">
+		SELECT
+		apv_application.id,
+		apv_application.`name`,
+		usr_department.`name` as department_name,
+		apv_application.reason,
+		apv_application.depart_id,
+		(select ev.name from sys_enumeration_value ev where ev.id=apv_application.application_type) AS application_type_str,	
+		apv_application.application_type,
+		apv_application.user_id,
+		(select ev.name from sys_enumeration_value ev where ev.id=apv_application.application_status) AS application_status_str,	
+		apv_application.application_status,
+		apv_application.app_time,
+		apv_application.node_id,
+		apv_application.remark,
+		apv_approval_node.node_name,
+		usr_user.mobile as mobile,
+		usr_user.name as user_name,
+		usr_user.phone as phone
+		FROM
+		apv_application
+		LEFT JOIN usr_user ON apv_application.user_id = usr_user.id
+		LEFT JOIN usr_department ON apv_application.depart_id = usr_department.id
+		LEFT JOIN apv_approval_node on apv_approval_node.id = apv_application.node_id
+		
+		
+		<where>
+			usr_user.id = ${userId} 
+			<!-- and(
+			 apv_application.application_status = 42001
+			or apv_application.application_status = 42002
+			) -->
+			
+			<if test="name != null and name !=''">
+				and apv_application.name like '%${name}%'
+			</if>  
+ 			<if test="applicationType != null and applicationType != ''">
+				and apv_application.application_type = ${applicationType}
+			</if> 
+			<if test="user != null and user != ''">
+				and usr_user.name like '%${user}%'
+			</if> 
+			<if test="applicationStatus != null and applicationStatus != ''">
+				and apv_application.application_status = ${applicationStatus}
+			</if> 
+			
+			 
+		</where>
+		<if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>  
+		
+					
+	</select>
+	
+	<!-- 冯其康 -->
+	<update id="updateApplicationStatus">
+		update apv_application
+		set
+		application_status = ${status}
+		where id = ${applicationId}
+	</update>
+	
+	<!-- 冯其康 -->
+	<select id="selectCountOfApplicationWithoutPass" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM apv_application 
+		LEFT JOIN usr_user ON apv_application.user_id = usr_user.id 
+		LEFT JOIN usr_department ON apv_application.depart_id = usr_department.id 
+		LEFT JOIN apv_approval_node on apv_approval_node.id = apv_application.node_id 
+		left join usr_user_role on usr_user_role.role_id = apv_approval_node.role_id
+		
+		<where>
+			usr_user_role.id = ${userId} 
+			and application_status = 43001
+			<if test="name != null and name !=''">
+				and apv_application.name like '%${name}%'
+			</if>  
+ 			<if test="applicationType != null and applicationType != ''">
+				and apv_application.application_type = ${applicationType}
+			</if> 
+			<if test="user != null and user != ''">
+				and usr_user.name like '%${user}%'
+			</if> 
+			<if test="applicationStatus != null and applicationStatus != ''">
+				and apv_application.application_status = ${applicationStatus}
+			</if> 
+			
+			 
+		</where>
+	</select>
+	
+	<!-- 冯其康 -->
+	<select id="selectApplicationListWithoutPass"  resultMap="ApplicationDto">
+		SELECT
+		apv_application.id,
+		apv_application.`name`,
+		usr_department.`name` as department_name,
+		apv_application.reason,
+		apv_application.depart_id,
+		(select ev.name from sys_enumeration_value ev where ev.id=apv_application.application_type) AS application_type_str,	
+		apv_application.application_type,
+		apv_application.user_id,
+		(select ev.name from sys_enumeration_value ev where ev.id=apv_application.application_status) AS application_status_str,	
+		apv_application.application_status,
+		apv_application.app_time,
+		apv_application.node_id,
+		apv_application.remark,
+		apv_approval_node.node_name,
+		usr_user.mobile as mobile,
+		usr_user.name as user_name,
+		usr_user.phone as phone
+		FROM apv_application 
+		LEFT JOIN usr_user ON apv_application.user_id = usr_user.id 
+		LEFT JOIN usr_department ON apv_application.depart_id = usr_department.id 
+		LEFT JOIN apv_approval_node on apv_approval_node.id = apv_application.node_id 
+		left join usr_user_role on usr_user_role.role_id = apv_approval_node.role_id
+		
+		<where>
+			usr_user_role.id = ${userId}
+			and application_status = 42002
+			<if test="name != null and name !=''">
+				and apv_application.name like '%${name}%'
+			</if>  
+ 			<if test="applicationType != null and applicationType != ''">
+				and apv_application.application_type = ${applicationType}
+			</if> 
+			<if test="user != null and user != ''">
+				and usr_user.name like '%${user}%'
+			</if> 
+			<if test="applicationStatus != null and applicationStatus != ''">
+				and apv_application.application_status = ${applicationStatus}
+			</if> 
+			
+			 
+		</where>
+		<if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>  
+	</select>
+	
+	<!-- 冯其康 -->
+	<update id="updateNodeIdById">
+		update apv_application
+		set 
+		node_id = ${nodeId}
+		where id = ${id}
+	</update>
+	
+	<!-- 冯其康 -->
+	<select id="selectCountOfApplicationWithApproved" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM apv_application 
+		LEFT JOIN usr_user ON apv_application.user_id = usr_user.id 
+		LEFT JOIN usr_department ON apv_application.depart_id = usr_department.id 
+		LEFT JOIN apv_approval_node on apv_approval_node.id = apv_application.node_id 
+		left join usr_user_role on usr_user_role.role_id = apv_approval_node.role_id
+		
+		<where>
+			usr_user_role.id = ${userId} 
+			and 
+				apv_application.id in 
+				(select apv_approval.application_id  from apv_approval where apv_approval.user_id = usr_user_role.user_id)
+			<if test="name != null and name !=''">
+				and apv_application.name like '%${name}%'
+			</if>  
+ 			<if test="applicationType != null and applicationType != ''">
+				and apv_application.application_type = ${applicationType}
+			</if> 
+			<if test="user != null and user != ''">
+				and usr_user.name like '%${user}%'
+			</if> 
+			<if test="applicationStatus != null and applicationStatus != ''">
+				and apv_application.application_status = ${applicationStatus}
+			</if> 
+			
+			 
+		</where>
+	</select>
+	
+	<select id="selectApplicationListWithApproved" resultMap="ApplicationDto">
+		SELECT
+		apv_application.id,
+		apv_application.`name`,
+		usr_department.`name` as department_name,
+		apv_application.reason,
+		apv_application.depart_id,
+		(select ev.name from sys_enumeration_value ev where ev.id=apv_application.application_type) AS application_type_str,	
+		apv_application.application_type,
+		apv_application.user_id,
+		(select ev.name from sys_enumeration_value ev where ev.id=apv_application.application_status) AS application_status_str,	
+		apv_application.application_status,
+		apv_application.app_time,
+		apv_application.node_id,
+		apv_application.remark,
+		apv_approval_node.node_name,
+		usr_user.mobile as mobile,
+		usr_user.name as user_name,
+		usr_user.phone as phone
+		FROM apv_application 
+		LEFT JOIN usr_user ON apv_application.user_id = usr_user.id 
+		LEFT JOIN usr_department ON apv_application.depart_id = usr_department.id 
+		LEFT JOIN apv_approval_node on apv_approval_node.id = apv_application.node_id 
+		left join usr_user_role on usr_user_role.role_id = apv_approval_node.role_id
+		
+		<where>
+			usr_user_role.id = ${userId}
+			and 
+				apv_application.id in 
+				(select apv_approval.application_id  from apv_approval where apv_approval.user_id = usr_user_role.user_id)
+			<if test="name != null and name !=''">
+				and apv_application.name like '%${name}%'
+			</if>  
+ 			<if test="applicationType != null and applicationType != ''">
+				and apv_application.application_type = ${applicationType}
+			</if> 
+			<if test="user != null and user != ''">
+				and usr_user.name like '%${user}%'
+			</if> 
+			<if test="applicationStatus != null and applicationStatus != ''">
+				and apv_application.application_status = ${applicationStatus}
+			</if> 
+			
+			 
+		</where>
+		<if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>  
+	</select>
+
+
+	<select id="getAllApvApplicationCount" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		apv_application
+		LEFT JOIN usr_user ON apv_application.user_id = usr_user.id
+		LEFT JOIN usr_department ON apv_application.depart_id = usr_department.id
+		
+		
+		<where>
+			apv_application.application_status != 42001
+			
+			<if test="name != null and name !=''">
+				and apv_application.name like '%${name}%'
+			</if>  
+ 			<if test="applicationType != null and applicationType != ''">
+				and apv_application.application_type = ${applicationType}
+			</if> 
+			<if test="user != null and user != ''">
+				and usr_user.name like '%${user}%'
+			</if> 
+			<if test="applicationStatus != null and applicationStatus != ''">
+				and apv_application.application_status = ${applicationStatus}
+			</if> 
+			
+			 
+		</where>
+	</select>
+	
+	
+	
+	<select id="getAllApvApplicationByPage" resultMap="ApplicationDto">
+		SELECT
+		apv_application.id,
+		apv_application.`name`,
+		usr_department.`name` as department_name,
+		apv_application.reason,
+		apv_application.depart_id,
+		(select ev.name from sys_enumeration_value ev where ev.id=apv_application.application_type) AS application_type_str,	
+		apv_application.application_type,
+		apv_application.user_id,
+		(select ev.name from sys_enumeration_value ev where ev.id=apv_application.application_status) AS application_status_str,	
+		apv_application.application_status,
+		apv_application.app_time,
+		apv_application.node_id,
+		apv_application.remark,
+		usr_user.mobile as mobile,
+		usr_user.name as user_name,
+		usr_user.phone as phone
+		FROM
+		apv_application
+		LEFT JOIN usr_user ON apv_application.user_id = usr_user.id
+		LEFT JOIN usr_department ON apv_application.depart_id = usr_department.id
+		
+		
+		<where>
+			apv_application.application_status != 42001
+			
+			<if test="name != null and name !=''">
+				and apv_application.name like '%${name}%'
+			</if>  
+ 			<if test="applicationType != null and applicationType != ''">
+				and apv_application.application_type = ${applicationType}
+			</if> 
+			<if test="user != null and user != ''">
+				and usr_user.name like '%${user}%'
+			</if> 
+			<if test="applicationStatus != null and applicationStatus != ''">
+				and apv_application.application_status = ${applicationStatus}
+			</if> 
+			
+			 
+		</where>
+		<if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>  
+		
+					
+	</select>
+	
+
+
+</mapper>

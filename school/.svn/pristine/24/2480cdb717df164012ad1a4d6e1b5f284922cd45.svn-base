@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.sch.dao.GradeCustomMapper" >
+	<resultMap id="Grade" type="com.dkt.school.sch.model.Grade"
+		extends="com.dkt.school.sch.dao.GradeMapper.BaseResultMap">
+	</resultMap>
+	<resultMap type="com.dkt.school.stu.model.Clazz" id="Class">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<resultMap id="GradeDto" type="com.dkt.school.sch.dto.GradeDto" extends="Grade">
+		<result column="edu_stage_type_string" property="eduStageTypeString" jdbcType="VARCHAR"/>
+		<result column="is_graduation_string" property="isGraduationString" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		sg.id,sg.name,sg.edu_stage_type,sg.seq,sg.is_graduation,sg.remark
+	</sql>
+	
+	<select id="getAllGrade" resultMap="Grade">
+		SELECT g.id,g.name FROM sch_grade AS g;
+	</select>
+
+	<select id="getClassByGradeId" resultMap="Class" parameterType="java.lang.Integer">
+		SELECT c.id,c.name FROM stu_class AS c 
+		<where>
+			c.grade_id = #{gradeId}
+		</where>
+	</select>
+
+	<select id="selectClassByGradeIdAndFieldId" resultMap="Class" parameterType="java.lang.Integer">
+		SELECT c.id,c.name FROM stu_class AS c
+		<where>
+			c.grade_id = ${gradeId} and c.major_field_id = ${fieldId}
+		</where>
+	</select>
+
+	<select id="countBySearch" resultType="java.lang.Integer">
+		select count(*) from sch_grade sg
+
+
+		<where>
+			<if test="name != null and name != ''">
+				sg.name like '%${name}%'
+
+			</if>
+			<if test="eduStageType != null and eduStageType != ''">
+				and sg.edu_stage_type =#{eduStageType}
+
+			</if>
+			<if test="isGraduation != null and isGraduation != ''">
+				and sg.is_graduation =#{isGraduation}
+			</if>
+			<!--<if test="teacherName != null and teacherName != ''">
+				and tt.name like '%${teacherName}%'
+
+			</if>-->
+
+		</where>
+	</select>
+
+
+	<select id="selectByLimit" resultMap="GradeDto">
+		select <include refid="Base_Column_List"/>,
+		(select ev.name from sys_enumeration_value ev where ev.id=sg.edu_stage_type) AS edu_stage_type_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=sg.is_graduation) AS is_graduation_string
+		from sch_grade sg
+
+		<where>
+			<if test="name != null and name != ''">
+				sg.name like '%${name}%'
+
+			</if>
+			<if test="eduStageType != null and eduStageType != ''">
+				and sg.edu_stage_type =#{eduStageType}
+
+			</if>
+			<if test="isGraduation != null and isGraduation != ''">
+				and sg.is_graduation =#{isGraduation}
+			</if>
+			<!--<if test="teacherName != null and teacherName != ''">
+				and tt.name like '%${teacherName}%'
+
+			</if>-->
+
+		</where>
+		<if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>
+	</select>
+</mapper>

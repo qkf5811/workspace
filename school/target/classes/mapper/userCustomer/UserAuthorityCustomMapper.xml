@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.user.dao.UserAuthorityCustomMapper">
+	<resultMap type="com.dkt.school.user.model.Authority" id="Authority"
+		extends="com.dkt.school.user.dao.AuthorityMapper.BaseResultMap">
+
+	</resultMap>
+
+
+	<select id="selectAuthorityByUserId" resultMap="Authority">
+		select
+		a.id,a.name,a.remark,a.code
+		from usr_user_authority ua,usr_authority a
+		where ua.authority_id=a.id
+		and user_id=${userId}
+	</select>
+	
+	<select id="selectAuthorityIdsByUserId" resultType="java.lang.Integer">
+		select authority_id from usr_user_authority
+		where user_id=#{userId}
+	</select>
+</mapper>

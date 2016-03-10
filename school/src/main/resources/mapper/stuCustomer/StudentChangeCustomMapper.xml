@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.stu.dao.StudentChangeCustomMapper" >
+	
+	<resultMap id="BaseResultMapExtend" type="com.dkt.school.stu.model.StudentChange"
+		extends="com.dkt.school.stu.dao.StudentChangeMapper.BaseResultMap">
+	</resultMap>
+	
+	<resultMap type="com.dkt.school.stu.dto.StudentChangeDto" id="StudentChangeDto" extends="BaseResultMapExtend">
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="change_type_str" property="changeTypeStr" jdbcType="VARCHAR"/>
+		<result column="code" property="code" jdbcType="VARCHAR"/>
+		<result column="out_class_major_name" property="OutClassMajorName" jdbcType="VARCHAR"/>
+		<result column="into_class_major_name" property="IntoClassMajorName" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	
+	<select id="getStudentChangeCount" resultType="java.lang.Integer">
+		select count(*) 
+		from stu_student_change ssc
+		LEFT JOIN stu_student ss ON ss.id = ssc.student_id 
+		<where>
+			<if test="name != null and name !=''">
+				 ss.name like '%${name}%'
+			</if>  
+ 			<if test="code != null and code != ''">
+				and ss.code like '%${code}%'
+			</if>  
+		</where>
+	</select>
+	
+	<select id="selectByLimit" resultMap="StudentChangeDto">
+		select	change_type_str,id,cause,out_class_id,out_class_date,into_class_id,into_class_date,oper_user,remark,name,code,
+			CONCAT(out_major_field_name,out_class_name) AS out_class_major_name ,
+			CONCAT(into_major_field_name,into_class_name) AS into_class_major_name from(select
+				(select ev.name from sys_enumeration_value ev where ev.id=ssc.change_type) AS change_type_str,			
+				ssc.id AS id,ssc.cause AS cause,ssc.out_class_id AS out_class_id,ssc.out_class_date AS out_class_date,ssc.into_class_id AS into_class_id,ssc.into_class_date AS into_class_date,ssc.oper_user AS oper_user,ssc.remark AS remark,
+				ss.name,ss.code,	
+				(select sc.name from stu_class sc where sc.id=ssc.out_class_id) AS out_class_name,
+				(select sc.name from stu_class sc where sc.id=ssc.into_class_id) AS into_class_name,
+				(select smf.name from stu_class sc ,sch_major_field smf 
+					where sc.id=ssc.out_class_id and  smf.id=sc.major_field_id) AS out_major_field_name,
+				(select smf.name from stu_class sc ,sch_major_field smf 
+					where sc.id=ssc.into_class_id and  smf.id=sc.major_field_id) AS into_major_field_name
+				from stu_student_change ssc
+				LEFT JOIN stu_student ss ON ss.id = ssc.student_id  )as tem_table
+		
+ 		<where>
+			<if test="name != null and name !=''">
+				 name like '%${name}%'
+			</if>  
+ 			<if test="code != null and code != ''">
+				and code like '%${code}%'
+			</if>  
+		</where>
+		 <if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>  
+		
+					
+	</select>
+	
+	<select id="findStudentChangeById" resultMap="StudentChangeDto" >
+    	select	ssc.id,ssc.change_type,ssc.cause,ssc.out_class_id,ssc.out_class_date,ssc.into_class_id,ssc.into_class_date,ssc.oper_user,ssc.remark,
+		ss.name,ss.code
+		from stu_student_change ssc
+		LEFT JOIN stu_student ss ON ss.id = ssc.student_id  
+    	where ssc.id = #{id,jdbcType=INTEGER}
+  	</select>
+  	
+  	
+
+  	<update id="updateStudentChange" parameterType="com.dkt.school.stu.dto.StudentChangeDto" >
+    	update stu_student_change
+    	 set change_type = #{changeType,jdbcType=INTEGER},
+	      cause = #{cause,jdbcType=VARCHAR},
+	      out_class_id = #{outClassId,jdbcType=INTEGER},
+	      out_class_date = #{outClassDate,jdbcType=DATE},
+	      into_class_id = #{intoClassId,jdbcType=INTEGER},
+	      into_class_date = #{intoClassDate,jdbcType=DATE},
+	      oper_user = #{operUser,jdbcType=VARCHAR},
+	      remark = #{remark,jdbcType=VARCHAR}
+    	where id = #{id,jdbcType=INTEGER}
+ 	 </update>
+ 	 
+ 	 <select id="findStudentChangeByCode" resultMap="StudentChangeDto" >
+    	select	ssc.id,ssc.change_type,ssc.cause,ssc.out_class_id,ssc.out_class_date,ssc.into_class_id,ssc.into_class_date,ssc.oper_user,ssc.remark,
+		ss.name,ss.code
+		from stu_student_change ssc
+		LEFT JOIN stu_student ss ON ss.id = ssc.student_id  
+    	where ss.code = #{code,jdbcType=VARCHAR}
+    	order by ID ASC
+  	</select>
+</mapper>

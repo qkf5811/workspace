@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.fin.dao.NewStudentPaymentCustomMapper" >
+
+	<resultMap id="BaseResultMap" type="com.dkt.school.fin.model.NewStudentPayment"
+			extends="com.dkt.school.fin.dao.NewStudentPaymentMapper.BaseResultMap">
+	</resultMap>
+	
+	<resultMap id="NewStudentPaymentOfExcelResultMap" type="com.dkt.school.fin.dto.NewStudentPaymentOfExcelDto"
+			extends="com.dkt.school.fin.dao.NewStudentPaymentMapper.BaseResultMap">
+			<result property="idCard" column="id_card" javaType="java.lang.String"/>
+			<result property="admissionNumber" column="admission_number" javaType="java.lang.String"/>
+			<result property="majorField" column="major_field" javaType="java.lang.String"/>
+			<result property="name" column="name" javaType="java.lang.String"/>
+			<result property="timeStr" column="time_str" javaType="java.lang.String"/>
+			<result property="payTypeStr" column="pay_type_str" javaType="java.lang.String"/>
+	</resultMap>
+	
+	<!-- 通过Excel批量插入newStudentPayment -->
+	<insert id="insertNewStudentPaymentByExcel">
+		insert into fin_new_student_payment values
+		<foreach collection="list" item="dto" separator=",">
+		(null, ${dto.studentInfoId}, ${dto.payMoney}, ${dto.payType}, '${dto.timeStr}', '${dto.payOrder}', '${dto.remark}')
+		</foreach>
+	</insert>
+	
+	<!-- 批量删除newStudentPayment -->
+	<delete id="deleteNewStudentPaymentsBystuId">
+		delete from fin_new_student_payment
+		where student_info_id in (
+		<foreach collection="list" item="dto" separator=",">
+			${dto.studentInfoId}
+		</foreach>
+		)
+	</delete>
+	
+	<!-- 根据学生信息id来查询新生缴费资料记录 -->
+	<select id="selectNewStudentPaymentsByStudentInfoId" resultMap="NewStudentPaymentOfExcelResultMap">
+		select 
+		stu_student_info.id_card as id_card,
+		stu_student_info.`name`,
+		stu_student_info.admission_number,
+		fin_new_student_payment.pay_time,
+		fin_new_student_payment.*
+		from stu_student_info, fin_new_student_payment
+		where stu_student_info.id = fin_new_student_payment.student_info_id
+		AND
+			fin_new_student_payment.student_info_id in (
+			<foreach collection="list" item="dto" separator=",">
+				${dto.studentInfoId}
+			</foreach>
+			)
+	</select>
+	
+	<!-- 页面datagrid count -->
+	<select id="selectNewStudentPaymentCountByPage" resultType="java.lang.Integer">
+		select 
+		count(*)
+		from stu_student_info, fin_new_student_payment
+		where stu_student_info.id = fin_new_student_payment.student_info_id
+		<if test="name != null and name != '' ">
+			AND
+			stu_student_info.`name` like '%${name}%'
+		</if>
+		<if test="admissionNumber != null and admissionNumber != '' ">
+			AND
+			stu_student_info.`admission_number` like '%${admissionNumber}%'
+		</if>
+		<if test="idCard != null and idCard != '' ">
+			AND
+			stu_student_info.id_card like '%${idCard}%'
+		</if>
+		<if test="fieldId != null and fieldId != 0 ">
+			AND
+			stu_student_info.major_field_id = ${fieldId}
+		</if>
+		<if test="limit != null">
+			limit ${limit.offset}, ${limit.rows}
+		</if>
+	</select>
+	
+	<!-- 页面 datagrid 数据-->
+	<select id="selectNewStudentPaymentByPage" resultMap="NewStudentPaymentOfExcelResultMap">
+		select 
+		stu_student_info.id_card,
+		stu_student_info.`name`,
+		stu_student_info.admission_number,
+		sys_enumeration_value.name as pay_type_str,
+		fin_new_student_payment.*
+		from stu_student_info, fin_new_student_payment, sys_enumeration_value
+		where stu_student_info.id = fin_new_student_payment.student_info_id
+			  and sys_enumeration_value.id = fin_new_student_payment.pay_type
+		<if test="name != null and name != '' ">
+			AND
+			stu_student_info.`name` like '%${name}%'
+		</if>
+		<if test="admissionNumber != null and admissionNumber != '' ">
+			AND
+			stu_student_info.`admission_number` like '%${admissionNumber}%'
+		</if>
+		<if test="idCard != null and idCard != '' ">
+			AND
+			stu_student_info.id_card like '%${idCard}%'
+		</if>
+		<if test="fieldId != null and fieldId != 0 ">
+			AND
+			stu_student_info.major_field_id = ${fieldId}
+		</if>
+		<if test="limit != null">
+			limit ${limit.offset}, ${limit.rows}
+		</if>
+	</select>
+	
+	<select id="selectNewStudentPaymentByStudentInfoId" resultMap="BaseResultMap">
+		select * from fin_new_student_payment where student_info_id = ${id}
+	</select>
+	
+	<update id="updateByList">
+		update fin_new_student_payment 
+		set
+		pay_money = case student_info_id
+		<foreach collection="updList" item="item" separator=" ">
+			when ${item.studentInfoId} then ${item.payMoney}
+		</foreach>
+		end,
+		pay_type = case student_info_id
+		<foreach collection="updList" item="item" separator=" ">
+			when ${item.studentInfoId} then ${item.payType}
+		</foreach>
+		end,
+		pay_time = case student_info_id
+		<foreach collection="updList" item="item" separator=" ">
+			when ${item.studentInfoId} then '${item.timeStr}'
+		</foreach>
+		end,
+		pay_order = case student_info_id
+		<foreach collection="updList" item="item" separator=" ">
+			when ${item.studentInfoId} then '${item.payOrder}'
+		</foreach>
+		end,
+		remark = case student_info_id
+		<foreach collection="updList" item="item" separator=" ">
+			when ${item.studentInfoId} then '${item.remark}'
+		</foreach>
+		end
+		where student_info_id in(
+		<foreach collection="updList" item="item" separator=",">
+			${item.studentInfoId}
+		</foreach>
+		)
+	</update>
+</mapper>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.edu.dao.TeachCourseCustomMapper" >
+	
+	<resultMap id="BaseResultMapExtend" type="com.dkt.school.edu.model.TeachCourse"
+		extends="com.dkt.school.edu.dao.TeachCourseMapper.BaseResultMap">
+	</resultMap>
+	
+	<resultMap type="com.dkt.school.edu.dto.TeachCourseDto" id="TeachCourseDto" extends="BaseResultMapExtend">
+		<result column="study_year_name" property="studyYearName" jdbcType="VARCHAR"/>
+		<result column="start_date" property="startDate" jdbcType="DATE"/>
+		<result column="end_date" property="endDate" jdbcType="DATE"/>
+		<result column="course_name" property="courseName" jdbcType="VARCHAR"/>
+		<result column="major" property="major" jdbcType="VARCHAR"/>
+		<result column="field" property="field" jdbcType="VARCHAR"/>
+		<result column="score_type_str" property="scoreTypeStr" jdbcType="VARCHAR"/>
+		<result column="grade" property="grade" jdbcType="VARCHAR"/>
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="code" property="code" jdbcType="VARCHAR"/>
+		<result column="term_type_str" property="termTypeStr" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	
+	<select id="getTeachCourseCount" resultType="java.lang.Integer">
+		
+		SELECT
+		count(*)
+		FROM
+		edu_teach_course
+		INNER JOIN edu_course ON edu_teach_course.course_id = edu_course.id
+		INNER JOIN edu_course_plan ON edu_teach_course.course_plan_id = edu_course_plan.id
+		INNER JOIN sch_grade ON edu_course_plan.grade_id = sch_grade.id
+		INNER JOIN sch_study_year ON edu_teach_course.study_year_id = sch_study_year.id
+		INNER JOIN edu_course_teacher ON edu_teach_course.id = edu_course_teacher.teach_course_id
+		INNER JOIN tea_teacher ON edu_course_teacher.teacher_id = tea_teacher.id
+		<where>
+			<if test="name != null and name !=''">
+				tea_teacher.name like '%${name}%'
+			</if>  
+ 			<if test="code != null and code != ''">
+				and tea_teacher.code like '%${code}%'
+			</if> 
+			<if test="courseName != null and courseName != ''">
+				and edu_course.name like '%${courseName}%'
+			</if> 
+			<if test="major != null and major != ''">
+				and sch_major.name like '%${major}%'
+			</if> 
+			<if test="grade != null and grade != ''">
+				and sch_grade.name like '%${grade}%'
+			</if> 
+			<if test="field != null and field != ''">
+				and sch_major_field.name like '%${field}%'
+			</if> 
+			<if test="studyYearId != null and studyYearId != ''">
+				and edu_teach_course.study_year_id = ${studyYearId}
+			</if> 
+			<if test="termType != null and termType != ''">
+				and edu_teach_course.term_type = ${termType}
+			</if> 
+			 
+		</where>
+	</select>
+	
+	
+	
+	<select id="selectByLimit" resultMap="TeachCourseDto">
+		SELECT
+		edu_course.`name` AS course_name,
+		sch_grade.`name` AS grade,
+		(select ev.name from sys_enumeration_value ev where ev.id=edu_teach_course.term_type) AS term_type_str,
+		edu_teach_course.term_type,
+		edu_teach_course.course_seq,
+		edu_teach_course.classes,
+		edu_teach_course.exam_date,
+		(select ev.name from sys_enumeration_value ev where ev.id=edu_teach_course.score_type) AS score_type_str,
+		edu_teach_course.score_type,
+		edu_teach_course.usual_score_ratio,
+		edu_teach_course.input_time,
+		sch_study_year.`name` AS study_year_name,
+		sch_study_year.start_date AS start_date,
+		sch_study_year.end_date AS end_date,
+		tea_teacher.`name` as name,
+		tea_teacher.`code` as code,
+		edu_teach_course.course_id,
+		edu_teach_course.course_plan_id,
+		edu_teach_course.study_year_id,
+		edu_teach_course.id
+		FROM
+		edu_teach_course
+		INNER JOIN edu_course ON edu_teach_course.course_id = edu_course.id
+		INNER JOIN edu_course_plan ON edu_teach_course.course_plan_id = edu_course_plan.id
+		INNER JOIN sch_grade ON edu_course_plan.grade_id = sch_grade.id
+		INNER JOIN sch_study_year ON edu_teach_course.study_year_id = sch_study_year.id
+		INNER JOIN edu_course_teacher ON edu_teach_course.id = edu_course_teacher.teach_course_id
+		INNER JOIN tea_teacher ON edu_course_teacher.teacher_id = tea_teacher.id
+ 
+		
+ 		<where>
+			<if test="name != null and name !=''">
+				tea_teacher.name like '%${name}%'
+			</if>  
+ 			<if test="code != null and code != ''">
+				and tea_teacher.code like '%${code}%'
+			</if> 
+			<if test="courseName != null and courseName != ''">
+				and edu_course.name like '%${courseName}%'
+			</if> 
+			<if test="major != null and major != ''">
+				and sch_major.name like '%${major}%'
+			</if> 
+			<if test="grade != null and grade != ''">
+				and sch_grade.name like '%${grade}%'
+			</if> 
+			<if test="field != null and field != ''">
+				and sch_major_field.name like '%${field}%'
+			</if> 
+			<if test="studyYearId != null and studyYearId != ''">
+				and edu_teach_course.study_year_id = ${studyYearId}
+			</if> 
+			<if test="termType != null and termType != ''">
+				and edu_teach_course.term_type = ${termType}
+			</if> 
+			 
+		</where>
+		<if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>  
+		
+					
+	</select>
+	
+	<select id="findTeachCourseById" resultMap="TeachCourseDto">
+		SELECT
+		edu_course.`name` AS course_name,
+		sch_grade.`name` AS grade,
+		(select ev.name from sys_enumeration_value ev where ev.id=edu_teach_course.term_type) AS term_type_str,
+		edu_teach_course.term_type,
+		edu_teach_course.course_seq,
+		edu_teach_course.classes,
+		edu_teach_course.exam_date,
+		(select ev.name from sys_enumeration_value ev where ev.id=edu_teach_course.score_type) AS score_type_str,
+		edu_teach_course.score_type,
+		edu_teach_course.usual_score_ratio,
+		edu_teach_course.input_time,
+		sch_study_year.`name` AS study_year_name,
+		sch_study_year.start_date AS start_date,
+		sch_study_year.end_date AS end_date,
+		edu_teach_course.course_id,
+		edu_teach_course.course_plan_id,
+		edu_teach_course.study_year_id,
+		edu_teach_course.id
+		FROM
+		edu_teach_course
+		INNER JOIN edu_course ON edu_teach_course.course_id = edu_course.id
+		INNER JOIN edu_course_plan ON edu_teach_course.course_plan_id = edu_course_plan.id
+		INNER JOIN sch_grade ON edu_course_plan.grade_id = sch_grade.id
+		INNER JOIN sch_study_year ON edu_teach_course.study_year_id = sch_study_year.id
+		where edu_teach_course.id= ${id} 
+	</select>
+	
+	<select id="findTeachCourseByCondition" resultMap="TeachCourseDto">
+		select * 
+		from edu_teach_course etc
+		where etc.course_id = ${courseId} and etc.course_plan_id = ${coursePlanId} 
+		and etc.course_seq = ${courseSeq} and etc.study_year_id = ${studyYearId} and etc.term_type = ${termType} 				
+	</select>
+	
+	<!-- ljp -->
+	<select id="getScoreTypeByCIdAndCPId" resultType="java.lang.String">
+	  SELECT NAME FROM sys_enumeration_value WHERE id=(
+          SELECT edu_teach_course.score_type
+   		  FROM edu_teach_course
+   		  WHERE
+   		  course_plan_id=${coursePlanId} AND course_id=${courseId}
+   		  AND study_year_id=${studyYearId} AND term_type=${termType}
+   		  limit 0,1
+	)
+	</select>
+</mapper>

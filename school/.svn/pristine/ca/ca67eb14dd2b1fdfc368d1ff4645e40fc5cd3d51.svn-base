@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.edu.dao.CourseScoreCustomMapper" >
+	
+	<resultMap id="BaseResultMapExtend" type="com.dkt.school.stu.model.Student"
+		extends="com.dkt.school.stu.dao.StudentMapper.BaseResultMap">
+	</resultMap>
+	
+	<resultMap type="com.dkt.school.edu.dto.CourseDto" id="CourseResultMap">
+	   <id column="id" property="id" jdbcType="INTEGER" />
+	   <result column="name" property="name" jdbcType="VARCHAR" />
+	   <result column="code" property="code" jdbcType="VARCHAR" />
+	   <result column="major_id" property="majorId" jdbcType="INTEGER" />
+	   <result column="remark" property="remark" jdbcType="VARCHAR" />
+	   <result column="major_str" property="majorStr" jdbcType="VARCHAR" />
+    </resultMap>
+	
+	<resultMap type="com.dkt.school.edu.dto.TeachCourseDto" id="TeachCourseDto">
+		<result column="study_year_name" property="studyYearName" jdbcType="VARCHAR"/>
+		<result column="start_date" property="startDate" jdbcType="DATE"/>
+		<result column="end_date" property="endDate" jdbcType="DATE"/>
+		<result column="course_name" property="courseName" jdbcType="VARCHAR"/>
+		<result column="major" property="major" jdbcType="VARCHAR"/>
+		<result column="field" property="field" jdbcType="VARCHAR"/>
+		<result column="score_type" property="scoreTypeStr" jdbcType="VARCHAR"/>
+		<result column="grade" property="grade" jdbcType="VARCHAR"/>
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="code" property="code" jdbcType="VARCHAR"/>
+		<result column="classes" property="classes" jdbcType="VARCHAR"/>
+		<result column="exam_date" property="examDateStr" jdbcType="VARCHAR"/>
+		<result column="input_time" property="inputTimeStr" jdbcType="VARCHAR"/>
+		<result column="term_type_str" property="termTypeStr" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<resultMap type="com.dkt.school.edu.dto.CourseScoreDto" id="CourseScoreDto">
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="code" property="code" jdbcType="VARCHAR"/>
+		<result column="hundred_usual_score" property="hundredUsualScore" jdbcType="VARCHAR"/>
+		<result column="hundred_exam_score" property="hundredExamScore" jdbcType="VARCHAR"/>
+		<result column="hundred_total_score" property="hundredTotalScore" jdbcType="VARCHAR"/>
+		<result column="grade_usual_score1" property="gradeUsualStr" jdbcType="VARCHAR"/>
+		<result column="grade_exam_score1" property="gradeExamStr" jdbcType="VARCHAR"/>
+		<result column="grade_total_score1" property="gradeTotalStr" jdbcType="VARCHAR"/>
+		<result column="exam_nature_type1" property="examNatureTypeStr" jdbcType="VARCHAR"/>
+		<result column="grade_total_score" property="gradeTotalScore" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	
+	<select id="getStuToScoreInput" resultMap="BaseResultMapExtend">
+		select stu_student.id,code,name from stu_student 
+		left join edu_teach_task on stu_student.class_id = edu_teach_task.class_id
+		WHERE edu_teach_task.teach_course_id = #{courseId}
+	</select>
+	
+	<select id="getStuByClass" resultMap="BaseResultMapExtend">
+		select stu_student.id,code,name from stu_student WHERE stu_student.class_id = #{classId}
+	</select>
+	
+	
+	<select id="getTeaCourseId" resultType="java.lang.Integer">
+		select edu_teach_course.* from edu_teach_course join edu_course_teacher ON edu_course_teacher.teach_course_id = edu_teach_course.id
+			JOIN edu_teach_task ON edu_teach_task.teach_course_id = edu_teach_course.id
+		<where>
+			<if test="scoreType != null and scoreType !=''">
+				and edu_teach_course.score_type = #{scoreType}
+			</if>  
+ 			<if test="examDate != null and examDate != ''">
+				and edu_teach_course.exam_date = #{examDate}
+			</if> 
+			<if test="courseId != null and courseId != ''">
+				and edu_teach_course.course_id = #{courseId}
+			</if> 
+			<if test="studyYearId != null and studyYearId != ''">
+				and edu_teach_course.study_year_id = #{studyYearId}
+			</if> 
+			<if test="termType != null and termType != ''">
+				and edu_teach_course.term_type = #{termType}
+			</if> 
+			<if test="teacherId != null and teacherId != ''">
+				and edu_course_teacher.teacher_id = #{teacherId}
+			</if> 
+			<if test="classId != null and classId != ''">
+				and edu_teach_task.class_id = #{classId}
+			</if> 
+		</where>
+	</select>
+	
+	
+	
+	<select id="getCourseByTeacherId" resultMap="CourseResultMap">
+		select c.id,c.name from edu_course c join edu_teach_task  ett on c.id = ett.course_id 
+		join  edu_course_teacher ect on ect.teach_course_id = ett.teach_course_id 
+		<where>
+	        <if test="teacherId != null">
+				AND ect.teacher_id = #{teacherId}
+			</if>
+			<if test="classId != null">
+				AND ett.class_id=#{classId}
+			</if>
+		</where>
+	</select>
+	
+	
+	<!-- 批量添加学生课程成绩 -->
+	<insert id="addCourseScores">
+		insert into edu_course_score values 
+		<foreach collection="dtoList" item="dto" separator=",">
+			(null, ${dto.teachCourseId},${dto.studentId}, ${dto.examNatureType}, ${dto.hundredUsualScore}, ${dto.hundredExamScore}, ${dto.hundredTotalScore}, 
+    		${dto.gradeUsualScore}, ${dto.gradeExamScore}, ${dto.gradeTotalScore}, '${dto.inputTimeStr}')
+		</foreach>
+	</insert>
+	
+	
+	<select id="getTeacherCourseList" resultMap="TeachCourseDto">
+		select edu_teach_course.id as id,edu_course.name,edu_course.code,CONCAT_WS(',',edu_teach_course.id,stu_class.id) as field,
+		stu_class.name as classes ,edu_teach_course.exam_date,edu_teach_course.input_time,
+		(select ev.name from sys_enumeration_value ev where ev.id= edu_teach_course.score_type) as score_type,
+		sch_major.name as major,
+		(select name from sch_study_year where id = edu_teach_course.study_year_id) as study_year_name,
+		(select ev.name from sys_enumeration_value ev where ev.id= edu_teach_course.term_type) as term_type_str
+		from edu_course
+		left join sch_major on edu_course.major_id=sch_major.id	
+		join edu_teach_course on edu_teach_course.course_id = edu_course.id
+		join edu_teach_task on edu_teach_task.teach_course_id = edu_teach_course.id
+		join stu_class on stu_class.id = edu_teach_task.class_id
+		join edu_course_teacher on edu_course_teacher.teach_course_id = edu_teach_course.id
+		<where>
+			<if test="teacherId != null">
+				 edu_course_teacher.teacher_id=#{teacherId}
+			</if>
+			<if test="dto.name != null and dto.name != ''">
+				AND edu_course.name like '%${dto.name}%'
+			</if>
+			<if test="dto.major != null and dto.major != ''">
+				AND sch_major.id =#{dto.major}
+			</if>
+			<if test="dto.studyYearId != null and dto.studyYearId != ''">
+				AND edu_teach_course.study_year_id =#{dto.studyYearId}
+			</if>
+			<if test="dto.termType != null and dto.termType != ''">
+				AND edu_teach_course.term_type =#{dto.termType}
+			</if>
+		</where>
+		 <if test="limit != null">
+      		limit #{limit.offset},#{limit.rows}
+  	  	</if>
+	</select>
+	
+	<select id="getTeacherCourseCount" resultType="java.lang.Integer">
+		select count(*)
+		from edu_course
+		left join sch_major on edu_course.major_id=sch_major.id	
+		join edu_teach_course on edu_teach_course.course_id = edu_course.id
+		join edu_teach_task on edu_teach_task.teach_course_id = edu_teach_course.id
+		join stu_class on stu_class.id = edu_teach_task.class_id
+		join edu_course_teacher on edu_course_teacher.teach_course_id = edu_teach_course.id
+		<where>
+			<if test="teacherId != null">
+				 edu_course_teacher.teacher_id=#{teacherId}
+			</if>
+			<if test="dto.name != null and dto.name != ''">
+				AND edu_course.name like '%${dto.name}%'
+			</if>
+			<if test="dto.major != null and dto.major != ''">
+				AND sch_major.id =#{dto.major}
+			</if>
+			<if test="dto.studyYearId != null and dto.studyYearId != ''">
+				AND edu_teach_course.study_year_id =#{dto.studyYearId}
+			</if>
+			<if test="dto.termType != null and dto.termType != ''">
+				AND edu_teach_course.term_type =#{dto.termType}
+			</if>
+		</where>
+	</select>
+	
+	<update id="updateTeachCourse">
+		update edu_teach_course set exam_date = #{examDate},score_type = #{scoreType},usual_score_ratio = #{usualScoreRatio},input_time = #{dateTime}
+			where id= #{courseId}
+	</update>
+	
+	<select id="getCourseScoreList" resultMap="CourseScoreDto">
+		select cs.*,stu_student.code,stu_student.name,
+		(select name from sys_enumeration_value where id=cs.grade_usual_score) as grade_usual_score1,
+		(select name from sys_enumeration_value where id=cs.grade_exam_score) as grade_exam_score1,
+		(select name from sys_enumeration_value where id=cs.grade_total_score) as grade_total_score1,
+		(select name from sys_enumeration_value where id=cs.exam_nature_type) as exam_nature_type1
+		 from edu_course_score cs join stu_student on stu_student.id = cs.student_id
+		<where>
+			<if test="dto.teaCourseId != null and dto.teaCourseId != ''">
+				 cs.teach_course_id = #{dto.teaCourseId}
+			</if>
+			
+			<if test="dto.classId != null and dto.classId != ''">
+				 and stu_student.class_Id = #{dto.classId}
+			</if>
+			
+			<if test="dto.code != null and dto.code != ''">
+				 and stu_student.code like '%${dto.code}%'
+			</if>
+			
+			<if test="dto.name != null and dto.name != ''">
+				 and stu_student.name like '%${dto.name}%'
+			</if>
+		</where>
+	</select>
+	
+	<!-- 课程成绩统计 -->
+	<select id="getAllCourseList" resultMap="TeachCourseDto">
+		select edu_course.id as id,edu_course.name,edu_course.code,
+		edu_teach_course.study_year_id as studyYearId,edu_teach_course.term_type as termType,
+		edu_teach_course.classes,edu_teach_course.exam_date,edu_teach_course.input_time,
+		(select ev.name from sys_enumeration_value ev where ev.id= edu_teach_course.score_type) as score_type,
+		sch_major.name as major,
+		(select name from sch_study_year where id = edu_teach_course.study_year_id) as study_year_name,
+		(select ev.name from sys_enumeration_value ev where ev.id= edu_teach_course.term_type) as term_type_str
+		from edu_course
+		left join sch_major on edu_course.major_id=sch_major.id	
+		join edu_teach_course on edu_teach_course.course_id = edu_course.id
+		<where>
+			<!-- <if test="teacherId != null">
+				 edu_course_teacher.teacher_id=#{teacherId}
+			</if> -->
+			<if test="dto.name != null and dto.name != ''">
+				 edu_course.name like '%${dto.name}%'
+			</if>
+			<if test="dto.major != null and dto.major != ''">
+				AND sch_major.id =#{dto.major}
+			</if>
+			<if test="dto.studyYearId != null and dto.studyYearId != ''">
+				AND edu_teach_course.study_year_id =#{dto.studyYearId}
+			</if>
+			<if test="dto.termType != null and dto.termType != ''">
+				AND edu_teach_course.term_type =#{dto.termType}
+			</if>
+		</where>
+		group by edu_course.id,edu_teach_course.term_type
+		 <if test="limit != null">
+      		limit #{limit.offset},#{limit.rows}
+  	  	</if>
+	</select>
+	
+	<select id="getAllCourseCount" resultType="java.lang.Integer">
+		select count(*) from (select edu_course.id 
+		from edu_course
+		left join sch_major on edu_course.major_id=sch_major.id	
+		join edu_teach_course on edu_teach_course.course_id = edu_course.id
+		<where>
+			<!-- <if test="teacherId != null">
+				 edu_course_teacher.teacher_id=#{teacherId}
+			</if> -->
+			<if test="dto.name != null and dto.name != ''">
+				 edu_course.name like '%${dto.name}%'
+			</if>
+			<if test="dto.major != null and dto.major != ''">
+				AND sch_major.id =#{dto.major}
+			</if>
+			<if test="dto.studyYearId != null and dto.studyYearId != ''">
+				AND edu_teach_course.study_year_id =#{dto.studyYearId}
+			</if>
+			<if test="dto.termType != null and dto.termType != ''">
+				AND edu_teach_course.term_type =#{dto.termType}
+			</if>
+			
+		</where>
+		group by edu_course.id,edu_teach_course.term_type) temp
+	</select>
+	
+	
+	<select id="getCourseCountList" resultMap="CourseScoreDto">
+		SELECT STUC.NAME,STUC.ID,STUS.ID AS STUDENT_ID,TT.TEACH_COURSE_ID,CS.HUNDRED_TOTAL_SCORE,CS.GRADE_TOTAL_SCORE
+		FROM  EDU_TEACH_COURSE TC LEFT JOIN EDU_TEACH_TASK TT  ON TT.TEACH_COURSE_ID = TC.ID
+		LEFT JOIN STU_STUDENT STUS ON STUS.CLASS_ID = TT.CLASS_ID
+		JOIN STU_CLASS STUC ON STUC.ID = TT.CLASS_ID
+		LEFT JOIN EDU_COURSE_SCORE CS ON CS.TEACH_COURSE_ID = TT.TEACH_COURSE_ID AND CS.STUDENT_ID = STUS.ID
+		WHERE  TC.COURSE_ID = #{dto.courseId} AND TC.STUDY_YEAR_ID = #{dto.studyYearId} 
+		AND TC.TERM_TYPE =#{dto.termType}
+	</select>
+	
+	
+	<select id="getCourseDto" resultMap="TeachCourseDto">
+	select c.name,c.code,cp.credit as classes,tc.course_seq as major,tc.score_type 
+	from edu_teach_course tc join edu_course_plan cp on tc.course_plan_id = cp.id 
+	join edu_course c on c.id = tc.course_id
+		<where>
+			<if test="dto.courseId != null and dto.courseId != ''">
+				 tc.course_id = #{dto.courseId}
+			</if>
+			<if test="dto.studyYearId != null and dto.studyYearId != ''">
+				AND tc.study_year_id =#{dto.studyYearId}
+			</if>
+			<if test="dto.termType != null and dto.termType != ''">
+				AND tc.term_type =#{dto.termType}
+			</if>
+		</where>
+		group by tc.course_id
+	</select>
+	
+	<select id="getCurrentValue" resultType="java.lang.Integer">
+       select value from sys_config where code= #{value}
+    </select>
+    
+    
+    <select id="IsExistScore" resultType="java.lang.Integer">
+       select count(*) from edu_course_score cs 
+		join stu_student stus on stus.id = cs.student_id
+ 		where cs.TEACH_COURSE_ID = #{courseId} and stus.class_id = #{classId}
+    </select>
+</mapper>

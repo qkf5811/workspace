@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.spt.dao.SptMeetingCustomMapper" >
+  <resultMap id="meetingResultMap" type="com.dkt.school.spt.model.SptMeeting" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="theme" property="theme" jdbcType="VARCHAR" />
+    <result column="launch_datetime" property="launchDatetime" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <select id="selectSptMeetingCount" resultType="java.lang.Integer">
+  	SELECT COUNT(*) FROM `spt_meeting` 
+  	<where>
+  		<if test="dto.theme != null and dto.theme != '' ">
+  			theme like '%${dto.theme}%'
+  		</if>
+  		<if test="dto.launchDatetimeStr != null and dto.launchDatetimeStr != '' ">
+  			AND launch_datetime <![CDATA[>=]]> '${dto.launchDatetimeStr}'
+  		</if>
+  	</where>
+  </select>
+  
+    <select id="selectSptMeetingList" resultMap="meetingResultMap">
+  	SELECT * FROM `spt_meeting` 
+  	<where>
+  		<if test="dto.theme != null and dto.theme != '' ">
+  			theme like '%${dto.theme}%'
+  		</if>
+  		<if test="dto.launchDatetimeStr != null and dto.launchDatetimeStr != '' ">
+  			AND launch_datetime <![CDATA[>=]]> '${dto.launchDatetimeStr}'
+  		</if>
+  	</where>
+  	<if test="limit != null">
+  		limit ${limit.offset}, ${limit.rows}
+  	</if>
+  </select>
+</mapper>

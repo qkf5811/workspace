@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.stu.dao.StudentInfoCustomMapper">
+	<resultMap id="BaseResultMap" type="com.dkt.school.stu.model.StudentInfo" 
+		extends="com.dkt.school.stu.dao.StudentInfoMapper.BaseResultMap">
+	</resultMap>
+
+	<resultMap id="StudentInfoDto" type="com.dkt.school.stu.dto.StudentInfoDto" extends="BaseResultMap">
+		<result column="sex_type_string" property="sexTypeStr" jdbcType="VARCHAR"/>
+		<result column="nation_type_string" property="nationTypeStr" jdbcType="VARCHAR"/>
+		<result column="political_feature_type_string" property="politicalFeatureTypeStr" jdbcType="VARCHAR"></result>
+		<result column="health_type_string" property="healthTypeStr" jdbcType="VARCHAR"></result>
+		<result column="is_hk_mc_string" property="isHkMcStr" jdbcType="VARCHAR"></result>
+		<result column="household_type_string" property="householdTypeStr" jdbcType="VARCHAR"></result>
+		<result column="examinee_type_string" property="examineeTypeStr" jdbcType="VARCHAR"></result>
+		<result column="study_type_string" property="studyTypeStr" jdbcType="VARCHAR"></result>
+		<result column="study_method_string" property="studyMethodStr" jdbcType="VARCHAR"></result>
+		<result column="enter_school_type_string" property="enterSchoolTypeStr" jdbcType="VARCHAR"></result>
+		<result column="edu_stage_type_string" property="eduStageTypeStr" jdbcType="VARCHAR"></result>
+		<result column="is_divide_class_string" property="isDivideClassStr" jdbcType="VARCHAR"></result>
+		<result column="study_status_string" property="studyStatusStr" jdbcType="VARCHAR"></result>
+	</resultMap>
+
+	<resultMap id="StudentInfoListDto" type="com.dkt.school.stu.dto.StudentInfoListDto" extends="BaseResultMap">
+		<result column="sex" property="sex" jdbcType="VARCHAR"/>
+		<result column="stu_status" property="stuStatus" jdbcType="VARCHAR"></result>
+		<result column="nation" property="nation" jdbcType="VARCHAR"/>
+		<result column="code" property="code" jdbcType="VARCHAR"></result>
+		<result column="household_type_string" property="householdTypeString" jdbcType="VARCHAR"></result>
+		<result column="political_feature_type_string" property="politicalFeatureTypeString" jdbcType="VARCHAR"></result>
+		<result column="is_hk_mc_string" property="isHkMcString" jdbcType="VARCHAR"></result>
+		<result column="examinee_type_string" property="examineeTypeString" jdbcType="VARCHAR"></result>
+		<result column="study_type_string" property="studyTypeString" jdbcType="VARCHAR"></result>
+		<result column="enter_school_type_string" property="enterSchoolTypeString" jdbcType="VARCHAR"></result>
+		<result column="edu_stage_type_string" property="eduStageTypeString" jdbcType="VARCHAR"></result>
+		<result column="class_name" property="className" jdbcType="VARCHAR"></result>
+		<result column="major_field_name" property="majorFieldName" jdbcType="VARCHAR"></result>
+		<result column="student_status_string" property="studentStatusString" jdbcType="VARCHAR"></result>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		ssi.id,ssi.name,ssi.student_number,ssi.sex_type,ssi.birthday,ssi.id_card,ssi.nation_type,
+		ssi.political_feature_type,ssi.health_type,ssi.is_hk_mc,ssi.native_place,ssi.household_type,
+		ssi.household_location,ssi.family_address,ssi.postcode,ssi.family_phone,ssi.examinee_type,
+		ssi.graduation_school,ssi.major_field_id,ssi.exam_total_score,ssi.study_type,
+		ssi.study_method,ssi.enter_school_type,ssi.edu_stage_type,ssi.admission_number,ssi.is_divide_class,
+		ssi.study_status,ssi.entrance_date,ssi.remark
+	</sql>
+
+	<!-- 根据excel文件批量导入招生信息 -->
+	<insert id="insertStuInfoByExcelFile" parameterType="java.util.List">
+		insert into stu_student_info 
+		(id, name, sex_type, birthday, id_card, nation_type, political_feature_type, is_hk_mc, 
+	    native_place, household_type, household_location, family_address, postcode, family_phone, 
+	    examinee_type, graduation_school, major_field_id, exam_total_score, study_type, enter_school_type, 
+	    edu_stage_type, admission_number, is_divide_class, study_status, remark)
+		values
+		<foreach collection="stuList" item="stu" open="" close=""
+			separator=",">
+			(null,'${stu.name}', ${stu.sexType}, '${stu.birthday}',
+			'${stu.idCard}', ${stu.nationType},${stu.politicalFeatureType},
+			${stu.isHkMc}, '${stu.nativePlace}', ${stu.householdType},
+			'${stu.householdLocation}', '${stu.familyAddress}',
+			'${stu.postcode}',
+			'${stu.familyPhone}', ${stu.examineeType},
+			'${stu.graduationSchool}',
+			${stu.majorFieldId}, ${stu.examTotalScore},
+			${stu.studyType},
+			${stu.enterSchoolType}, ${stu.eduStageType},'',
+			${stu.isDivideClass}, ${stu.studyStatus}, '${stu.remark}')
+		</foreach>
+	</insert>
+
+	<!-- 得到新生信息记录的数量 -->
+	<select id="getCountOfNewStudentInfo" resultType="java.lang.Integer">
+		SELECT
+		COUNT(*) FROM stu_student_info 
+		WHERE study_status = 45001
+		<if test="studentName != null and studentName != ''">
+			AND name LIKE '%${studentName}%'
+		</if>
+	</select>
+
+	<!-- 得到招生信息记录列表 -->
+	<select id="getNewStudentInfo" resultMap="StudentInfoDto">
+		select <include refid="Base_Column_List"/>,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.sex_type) AS sex_type_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.nation_type) AS nation_type_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.political_feature_type) AS political_feature_type_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.health_type) AS health_type_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.is_hk_mc) AS is_hk_mc_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.household_type) AS household_type_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.examinee_type) AS examinee_type_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.study_type) AS study_type_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.study_method) AS study_method_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.enter_school_type) AS enter_school_type_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.edu_stage_type) AS edu_stage_type_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.is_divide_class) AS is_divide_class_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.study_status) AS study_status_string
+		from stu_student_info ssi
+		where study_status = 45001
+		<if test="studentName != null and studentName != ''">
+			AND name LIKE '%${studentName}%'
+		</if>
+		<if test="limit != null">
+			limit #{limit.offset}, #{limit.rows}
+		</if>
+	</select>
+	
+	<!-- 根据学生表获取学生基本信息 -->
+	<select id="findStudentInfoByStudent" resultMap="StudentInfoDto">
+		select * from stu_student_info where id in 
+		(select student_info_id from stu_student)
+	</select> 
+
+	<select id="getStudentCountByMajorFieldId" resultType="java.lang.Integer">
+		select count(*) from stu_student_info where major_field_id='${majorFieldId}' and is_divide_class="2002"
+	</select>
+	
+	<select id="getManStudentsByMajorFieldId" resultMap="StudentInfoDto">
+		select * from stu_student_info where major_field_id='${majorFieldId}' and sex_type="1001"
+	</select>
+	
+	<select id="getGirlStudentsByMajorFieldId" resultMap="StudentInfoDto">
+		select * from stu_student_info where major_field_id='${majorFieldId}' and sex_type="1002"
+	</select>
+	<insert id="insertStudentInfoAndGetId" useGeneratedKeys="true" keyProperty="id" 
+		parameterType="com.dkt.school.stu.dto.StudentInfoDto">
+     		  insert into stu_student_info (name, sex_type, birthday, 
+      		id_card, nation_type, political_feature_type, 
+      		is_hk_mc, native_place, household_type, 
+     		household_location, family_address, postcode, 
+      		family_phone, examinee_type, graduation_school, 
+      		major_field_id, exam_total_score, study_type, 
+      		enter_school_type, edu_stage_type, remark,is_divide_class
+      		)
+    	values (#{name,jdbcType=VARCHAR}, #{sexType,jdbcType=INTEGER}, #{birthday,jdbcType=DATE}, 
+      		#{idCard,jdbcType=VARCHAR}, #{nationType,jdbcType=INTEGER}, #{politicalFeatureType,jdbcType=INTEGER}, 
+      		#{isHkMc,jdbcType=INTEGER}, #{nativePlace,jdbcType=VARCHAR}, #{householdType,jdbcType=INTEGER}, 
+      		#{householdLocation,jdbcType=VARCHAR}, #{familyAddress,jdbcType=VARCHAR}, #{postcode,jdbcType=VARCHAR}, 
+      		#{familyPhone,jdbcType=VARCHAR}, #{examineeType,jdbcType=INTEGER}, #{graduationSchool,jdbcType=VARCHAR}, 
+      		#{majorFieldId,jdbcType=INTEGER}, #{examTotalScore,jdbcType=INTEGER}, #{studyType,jdbcType=INTEGER}, 
+      		#{enterSchoolType,jdbcType=INTEGER}, #{eduStageType,jdbcType=INTEGER}, #{remark,jdbcType=VARCHAR},#{isDivideClass,jdbcType=INTEGER}
+      		)
+	</insert>
+
+
+	<select id="countBySearch" resultType="java.lang.Integer">
+		select count(*) from stu_student_info ssi
+		inner join stu_student ss on ssi.id=ss.student_info_id
+		inner join stu_class sc on ss.class_id=sc.id
+		<where>
+			<if test="name != null and name != ''">
+				ssi.name like '%${name}%'
+			</if>
+			<if test="className !=null and className != ''">
+				and sc.name like '%${className}%'
+			</if>
+			<if test="sexType !=null and sexType != ''">
+				and ssi.sex_type=#{sexType}
+			</if>
+			<if test="status != null and status != ''">
+				and ss.status=#{status}
+			</if>
+			<if test="studentStatus != null and studentStatus != ''">
+				and ss.student_status=#{studentStatus}
+			</if>
+		</where>
+	</select>
+
+	<select id="selectByLimit" resultMap="StudentInfoListDto">
+
+		select <include refid="Base_Column_List"/>,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.sex_type) AS sex,
+		(select ev.name from sys_enumeration_value ev where ev.id=ss.status) AS stu_status,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.nation_type) AS nation,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.household_type) AS household_type_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.political_feature_type) AS political_feature_type_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.is_hk_mc) AS is_hk_mc_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.examinee_type) AS examinee_type_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.study_type) AS study_type_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.enter_school_type) AS enter_school_type_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.edu_stage_type) AS edu_stage_type_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ss.student_status) AS student_status_string,
+		ss.code AS code,
+		sc.name AS class_name
+		from stu_student_info ssi
+		inner join stu_student ss on ssi.id=ss.student_info_id
+		inner join stu_class sc on ss.class_id=sc.id
+		<where>
+			<if test="name != null and name != ''">
+				ssi.name like '%${name}%'
+			</if>
+			<if test="className !=null and className != ''">
+				and sc.name like '%${className}%'
+			</if>
+			<if test="sexType !=null and sexType != ''">
+				and ssi.sex_type=#{sexType}
+			</if>
+			<if test="status != null and status != ''">
+				and ss.status=#{status}
+			</if>
+			<if test="studentStatus != null and studentStatus != ''">
+				and ss.student_status=#{studentStatus}
+			</if>
+		</where>
+		<if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>
+	</select>
+
+	<select id="selectByStudentId" resultMap="StudentInfoListDto">
+		select <include refid="Base_Column_List"/>,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.sex_type) AS sex,
+		(select ev.name from sys_enumeration_value ev where ev.id=ss.status) AS stu_status,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.nation_type) AS nation,
+
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.household_type) AS household_type_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.political_feature_type) AS political_feature_type_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.is_hk_mc) AS is_hk_mc_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.examinee_type) AS examinee_type_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.study_type) AS study_type_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.enter_school_type) AS enter_school_type_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ssi.edu_stage_type) AS edu_stage_type_string,
+		(select ev.name from sys_enumeration_value ev where ev.id=ss.student_status) AS student_status_string,
+		ss.code AS code,
+		sc.name AS class_name
+		from stu_student_info ssi
+		inner join stu_student ss on ssi.id=ss.student_info_id
+		inner join stu_class sc on ss.class_id=sc.id
+		<where>
+			<if test="id != null and id != ''">
+				ssi.id=#{id}
+			</if>
+
+		</where>
+	</select>
+	
+	<select id="selectIdByIdCard" resultType="java.lang.Integer">
+	
+		select id from stu_student_info where
+		id_card = '${idCard}'
+	</select>
+
+	
+	<!-- 批量设置录取号到学生信息表 -->
+	<update id="updateAdmissionByNewStudentPaymentOfExcelDto">
+		update stu_student_info
+		set admission_number = CASE id
+		<foreach collection="list" item="dto" separator=" ">
+			WHEN ${dto.studentInfoId} THEN '${dto.admissionNumber}'
+		</foreach>
+		end
+		where id in (
+		<foreach collection="list" item="dto" separator=",">
+			${dto.studentInfoId}
+		</foreach>
+		)
+	</update>
+
+	
+	
+	<!-- Lai JiPeng -->	
+	<select id="getToBeDividedStudentsByMajorFieldId" resultMap="BaseResultMap">
+		select * from stu_student_info where major_field_id='${majorFieldId}' and is_divide_class='2002'
+		ORDER BY sex_type,id
+	</select>
+	
+	<select id="getDividedStudentsByMajorFieldId" resultMap="BaseResultMap">
+		select * from stu_student_info where major_field_id='${majorFieldId}' and is_divide_class='2001'
+	</select>
+	
+	<select id="getSexTypeByStudentId" resultType="java.lang.String">
+	SELECT NAME FROM sys_enumeration_value WHERE id=(
+	   SELECT stu_student_info.sex_type
+       FROM stu_student_info
+            LEFT JOIN stu_student ON stu_student.student_info_id=stu_student_info.id
+       WHERE stu_student.id='${studentId}'
+       )
+	</select>
+	
+	<!-- 冯其康 -->
+	<select id="findStudentinfoByIdCard" resultMap="BaseResultMap">
+		select * from stu_student_info where id_card = '${idCard}'
+	</select>
+	
+	<select id="findStudentInfoByStudentNumber" resultMap="BaseResultMap">
+		select * from stu_student_info where student_number = '${studentNumber}'
+	</select>
+	
+	<!-- 冯其康 -->
+	<update id="updateByList">
+		update stu_student_info
+		set 
+		name = case id_card
+		<foreach collection="list" item="item" separator=" ">
+			when '${item.idCard}' then '${item.name}'
+		</foreach>
+		end,
+		sex_type = case id_card
+		<foreach collection="list" item="item" separator=" ">
+			when '${item.idCard}' then ${item.sexType}
+		</foreach>
+		end,
+		birthday = case id_card
+		<foreach collection="list" item="item" separator=" ">
+			when '${item.idCard}' then '${item.birthday}'
+		</foreach>
+		end,
+		nation_type = case id_card
+		<foreach collection="list" item="item" separator=" ">
+			when '${item.idCard}' then ${item.nationType}
+		</foreach>
+		end,
+		political_feature_type = case id_card
+		<foreach collection="list" item="item" separator=" ">
+			when '${item.idCard}' then ${item.politicalFeatureType}
+		</foreach>
+		end,
+		is_hk_mc = case id_card
+		<foreach collection="list" item="item" separator=" ">
+			when '${item.idCard}' then ${item.isHkMc}
+		</foreach>
+		end,
+		native_place = case id_card
+		<foreach collection="list" item="item" separator=" ">
+			when '${item.idCard}' then '${item.nativePlace}'
+		</foreach>
+		end,
+		household_type = case id_card
+		<foreach collection="list" item="item" separator=" ">
+			when '${item.idCard}' then ${item.householdType}
+		</foreach>
+		end,
+		household_location = case id_card
+		<foreach collection="list" item="item" separator=" ">
+			when '${item.idCard}' then '${item.householdLocation}'
+		</foreach>
+		end,
+		family_address = case id_card
+		<foreach collection="list" item="item" separator=" ">
+			when '${item.idCard}' then '${item.familyAddress}'
+		</foreach>
+		end,
+		postcode = case id_card
+		<foreach collection="list" item="item" separator=" ">
+			when '${item.idCard}' then '${item.postcode}'
+		</foreach>
+		end,
+		family_phone = case id_card
+		<foreach collection="list" item="item" separator=" ">
+			when '${item.idCard}' then '${item.familyPhone}'
+		</foreach>
+		end,
+		examinee_type = case id_card
+		<foreach collection="list" item="item" separator=" ">
+			when '${item.idCard}' then ${item.examineeType}
+		</foreach>
+		end,
+		graduation_school = case id_card
+		<foreach collection="list" item="item" separator=" ">
+			when '${item.idCard}' then '${item.graduationSchool}'
+		</foreach>
+		end,
+		major_field_id = case id_card
+		<foreach collection="list" item="item" separator=" ">
+			when '${item.idCard}' then ${item.majorFieldId}
+		</foreach>
+		end,
+		exam_total_score = case id_card
+		<foreach collection="list" item="item" separator=" ">
+			when '${item.idCard}' then ${item.examTotalScore}
+		</foreach>
+		end,
+		study_type = case id_card
+		<foreach collection="list" item="item" separator=" ">
+			when '${item.idCard}' then ${item.studyType}
+		</foreach>
+		end,
+		enter_school_type = case id_card
+		<foreach collection="list" item="item" separator=" ">
+			when '${item.idCard}' then ${item.enterSchoolType}
+		</foreach>
+		end,
+		edu_stage_type = case id_card
+		<foreach collection="list" item="item" separator=" ">
+			when '${item.idCard}' then ${item.eduStageType}
+		</foreach>
+		end,
+		is_divide_class = case id_card
+		<foreach collection="list" item="item" separator=" ">
+			when '${item.idCard}' then ${item.isDivideClass}
+		</foreach>
+		end,
+		remark = case id_card
+		<foreach collection="list" item="item" separator=" ">
+			when '${item.idCard}' then '${item.remark}'
+		</foreach>
+		end
+		where id_card in (
+		<foreach collection="list" item="item" separator=",">
+			'${item.idCard}'
+		</foreach>
+		)
+	</update>
+</mapper>

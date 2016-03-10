@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.edu.dao.CourseScoreMapper" >
+  <resultMap id="BaseResultMap" type="com.dkt.school.edu.model.CourseScore" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="teach_course_id" property="teachCourseId" jdbcType="INTEGER" />
+    <result column="student_id" property="studentId" jdbcType="INTEGER" />
+    <result column="exam_nature_type" property="examNatureType" jdbcType="INTEGER" />
+    <result column="hundred_usual_score" property="hundredUsualScore" jdbcType="REAL" />
+    <result column="hundred_exam_score" property="hundredExamScore" jdbcType="REAL" />
+    <result column="hundred_total_score" property="hundredTotalScore" jdbcType="REAL" />
+    <result column="grade_usual_score" property="gradeUsualScore" jdbcType="INTEGER" />
+    <result column="grade_exam_score" property="gradeExamScore" jdbcType="INTEGER" />
+    <result column="grade_total_score" property="gradeTotalScore" jdbcType="INTEGER" />
+    <result column="input_time" property="inputTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <!-- 龚硕晓 -->
+  <resultMap type="com.dkt.school.edu.dto.CourseScoreByStudentDto" id="CourseScoreByStudentDtoResultMap"
+	           extends="BaseResultMap">
+	    <result column="student_name" property="studentName" jdbcType="VARCHAR" />
+        <result column="student_code" property="studentCode" jdbcType="VARCHAR" />
+        <result column="course_name" property="courseName" jdbcType="VARCHAR" />  
+        <result column="course_code" property="courseCode" jdbcType="VARCHAR" />
+        <result column="study_year" property="studyYear" jdbcType="VARCHAR" />
+        <result column="term_name" property="termName" jdbcType="VARCHAR" />    
+        <result column="total_score" property="totalScore" jdbcType="VARCHAR" />
+        <result column="class_name" property="className" jdbcType="VARCHAR" />
+        <result column="usual_score" property="usualScore" jdbcType="VARCHAR" />    
+        <result column="exam_score" property="examScore" jdbcType="VARCHAR" />       
+  </resultMap>
+  
+  <!-- 龚硕晓，查询学生信息 -->
+  <resultMap type="com.dkt.school.edu.dto.StudentInfoDto" id="StudentInfoResultMap">
+        <result column="student_name" property="studentName" jdbcType="VARCHAR" />
+        <result column="student_code" property="studentCode" jdbcType="VARCHAR" />
+        <result column="class_name" property="className" jdbcType="VARCHAR" />  
+        <result column="grade_name" property="gradeName" jdbcType="VARCHAR" />
+        <result column="major_field_name" property="majorFieldName" jdbcType="VARCHAR" />
+        <result column="major_name" property="majorName" jdbcType="VARCHAR" /> 
+        <result column="sex_name" property="sexName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="getStuCourseScore_sql">
+      SELECT edu_teach_course.score_type as score_type,stu_student.name as student_name,stu_student.code as student_code,
+     edu_course.name as course_name,edu_course.code as course_code,sch_study_year.name as study_year,stu_class.name as class_name,
+     CASE WHEN edu_teach_course.score_type = 35001 THEN edu_course_score.hundred_usual_score
+     WHEN edu_teach_course.score_type = 35002 THEN 
+     (SELECT NAME from sys_enumeration_value where id=edu_course_score.grade_usual_score) 
+     END as usual_score,
+     CASE WHEN edu_teach_course.score_type = 35001 THEN edu_course_score.hundred_exam_score
+     WHEN edu_teach_course.score_type = 35002 THEN 
+     (SELECT NAME from sys_enumeration_value where id=edu_course_score.grade_exam_score) 
+     END as exam_score,
+     CASE WHEN term_type = 32001 THEN '第一学期' 
+     WHEN term_type = 32002 THEN '第二学期' END as term_name,
+     CASE WHEN edu_teach_course.score_type = 35001 THEN edu_course_score.hundred_total_score
+     WHEN edu_teach_course.score_type = 35002 THEN 
+     (SELECT NAME from sys_enumeration_value where id=edu_course_score.grade_total_score) 
+     END as total_score,edu_course_score.*
+     from (SELECT id,name,code,class_id from stu_student 
+  
+     <where>
+        <if test="studentCode!=null and studentCode!=''">
+          code=#{studentCode}
+        </if> 
+      </where>
+   
+      ) as stu_student
+     LEFT JOIN edu_course_score
+     on edu_course_score.student_id=stu_student.id
+     left join edu_teach_course 
+     on edu_teach_course.id=edu_course_score.teach_course_id
+     left JOIN edu_course 
+     on edu_course.id=edu_teach_course.course_id
+     left join sch_study_year 
+     on sch_study_year.id=edu_teach_course.study_year_id
+     left JOIN stu_class on stu_class.id=stu_student.class_id
+  </sql>
+  
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, teach_course_id, student_id, exam_nature_type, hundred_usual_score, hundred_exam_score, 
+    hundred_total_score, grade_usual_score, grade_exam_score, grade_total_score, input_time
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.dkt.school.edu.model.CourseScoreExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from edu_course_score
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from edu_course_score
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from edu_course_score
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.dkt.school.edu.model.CourseScoreExample" >
+    delete from edu_course_score
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.dkt.school.edu.model.CourseScore" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into edu_course_score (teach_course_id, student_id, exam_nature_type, 
+      hundred_usual_score, hundred_exam_score, hundred_total_score, 
+      grade_usual_score, grade_exam_score, grade_total_score, 
+      input_time)
+    values (#{teachCourseId,jdbcType=INTEGER}, #{studentId,jdbcType=INTEGER}, #{examNatureType,jdbcType=INTEGER}, 
+      #{hundredUsualScore,jdbcType=REAL}, #{hundredExamScore,jdbcType=REAL}, #{hundredTotalScore,jdbcType=REAL}, 
+      #{gradeUsualScore,jdbcType=INTEGER}, #{gradeExamScore,jdbcType=INTEGER}, #{gradeTotalScore,jdbcType=INTEGER}, 
+      #{inputTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.dkt.school.edu.model.CourseScore" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into edu_course_score
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="teachCourseId != null" >
+        teach_course_id,
+      </if>
+      <if test="studentId != null" >
+        student_id,
+      </if>
+      <if test="examNatureType != null" >
+        exam_nature_type,
+      </if>
+      <if test="hundredUsualScore != null" >
+        hundred_usual_score,
+      </if>
+      <if test="hundredExamScore != null" >
+        hundred_exam_score,
+      </if>
+      <if test="hundredTotalScore != null" >
+        hundred_total_score,
+      </if>
+      <if test="gradeUsualScore != null" >
+        grade_usual_score,
+      </if>
+      <if test="gradeExamScore != null" >
+        grade_exam_score,
+      </if>
+      <if test="gradeTotalScore != null" >
+        grade_total_score,
+      </if>
+      <if test="inputTime != null" >
+        input_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="teachCourseId != null" >
+        #{teachCourseId,jdbcType=INTEGER},
+      </if>
+      <if test="studentId != null" >
+        #{studentId,jdbcType=INTEGER},
+      </if>
+      <if test="examNatureType != null" >
+        #{examNatureType,jdbcType=INTEGER},
+      </if>
+      <if test="hundredUsualScore != null" >
+        #{hundredUsualScore,jdbcType=REAL},
+      </if>
+      <if test="hundredExamScore != null" >
+        #{hundredExamScore,jdbcType=REAL},
+      </if>
+      <if test="hundredTotalScore != null" >
+        #{hundredTotalScore,jdbcType=REAL},
+      </if>
+      <if test="gradeUsualScore != null" >
+        #{gradeUsualScore,jdbcType=INTEGER},
+      </if>
+      <if test="gradeExamScore != null" >
+        #{gradeExamScore,jdbcType=INTEGER},
+      </if>
+      <if test="gradeTotalScore != null" >
+        #{gradeTotalScore,jdbcType=INTEGER},
+      </if>
+      <if test="inputTime != null" >
+        #{inputTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.dkt.school.edu.model.CourseScoreExample" resultType="java.lang.Integer" >
+    select count(*) from edu_course_score
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update edu_course_score
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.teachCourseId != null" >
+        teach_course_id = #{record.teachCourseId,jdbcType=INTEGER},
+      </if>
+      <if test="record.studentId != null" >
+        student_id = #{record.studentId,jdbcType=INTEGER},
+      </if>
+      <if test="record.examNatureType != null" >
+        exam_nature_type = #{record.examNatureType,jdbcType=INTEGER},
+      </if>
+      <if test="record.hundredUsualScore != null" >
+        hundred_usual_score = #{record.hundredUsualScore,jdbcType=REAL},
+      </if>
+      <if test="record.hundredExamScore != null" >
+        hundred_exam_score = #{record.hundredExamScore,jdbcType=REAL},
+      </if>
+      <if test="record.hundredTotalScore != null" >
+        hundred_total_score = #{record.hundredTotalScore,jdbcType=REAL},
+      </if>
+      <if test="record.gradeUsualScore != null" >
+        grade_usual_score = #{record.gradeUsualScore,jdbcType=INTEGER},
+      </if>
+      <if test="record.gradeExamScore != null" >
+        grade_exam_score = #{record.gradeExamScore,jdbcType=INTEGER},
+      </if>
+      <if test="record.gradeTotalScore != null" >
+        grade_total_score = #{record.gradeTotalScore,jdbcType=INTEGER},
+      </if>
+      <if test="record.inputTime != null" >
+        input_time = #{record.inputTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update edu_course_score
+    set id = #{record.id,jdbcType=INTEGER},
+      teach_course_id = #{record.teachCourseId,jdbcType=INTEGER},
+      student_id = #{record.studentId,jdbcType=INTEGER},
+      exam_nature_type = #{record.examNatureType,jdbcType=INTEGER},
+      hundred_usual_score = #{record.hundredUsualScore,jdbcType=REAL},
+      hundred_exam_score = #{record.hundredExamScore,jdbcType=REAL},
+      hundred_total_score = #{record.hundredTotalScore,jdbcType=REAL},
+      grade_usual_score = #{record.gradeUsualScore,jdbcType=INTEGER},
+      grade_exam_score = #{record.gradeExamScore,jdbcType=INTEGER},
+      grade_total_score = #{record.gradeTotalScore,jdbcType=INTEGER},
+      input_time = #{record.inputTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.dkt.school.edu.model.CourseScore" >
+    update edu_course_score
+    <set >
+      <if test="teachCourseId != null" >
+        teach_course_id = #{teachCourseId,jdbcType=INTEGER},
+      </if>
+      <if test="studentId != null" >
+        student_id = #{studentId,jdbcType=INTEGER},
+      </if>
+      <if test="examNatureType != null" >
+        exam_nature_type = #{examNatureType,jdbcType=INTEGER},
+      </if>
+      <if test="hundredUsualScore != null" >
+        hundred_usual_score = #{hundredUsualScore,jdbcType=REAL},
+      </if>
+      <if test="hundredExamScore != null" >
+        hundred_exam_score = #{hundredExamScore,jdbcType=REAL},
+      </if>
+      <if test="hundredTotalScore != null" >
+        hundred_total_score = #{hundredTotalScore,jdbcType=REAL},
+      </if>
+      <if test="gradeUsualScore != null" >
+        grade_usual_score = #{gradeUsualScore,jdbcType=INTEGER},
+      </if>
+      <if test="gradeExamScore != null" >
+        grade_exam_score = #{gradeExamScore,jdbcType=INTEGER},
+      </if>
+      <if test="gradeTotalScore != null" >
+        grade_total_score = #{gradeTotalScore,jdbcType=INTEGER},
+      </if>
+      <if test="inputTime != null" >
+        input_time = #{inputTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.dkt.school.edu.model.CourseScore" >
+    update edu_course_score
+    set teach_course_id = #{teachCourseId,jdbcType=INTEGER},
+      student_id = #{studentId,jdbcType=INTEGER},
+      exam_nature_type = #{examNatureType,jdbcType=INTEGER},
+      hundred_usual_score = #{hundredUsualScore,jdbcType=REAL},
+      hundred_exam_score = #{hundredExamScore,jdbcType=REAL},
+      hundred_total_score = #{hundredTotalScore,jdbcType=REAL},
+      grade_usual_score = #{gradeUsualScore,jdbcType=INTEGER},
+      grade_exam_score = #{gradeExamScore,jdbcType=INTEGER},
+      grade_total_score = #{gradeTotalScore,jdbcType=INTEGER},
+      input_time = #{inputTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <!-- 龚硕晓，查询学生的各门课成绩 ，默认是根据学号来查询-->
+  <select id="getStuCourseScoreList" resultMap="CourseScoreByStudentDtoResultMap" >
+      <include refid="getStuCourseScore_sql"/>     
+     <!-- 默认不使用以下条件
+     <where>
+
+	   <if test="studyYearId!=-1">
+	     AND edu_teach_course.id=#{studyYearId}
+	   </if>
+	   <if test="termTypeId!=-1" >
+	     AND edu_teach_course.term_type=#{termTypeId}
+	   </if>
+     </where>
+      -->
+    ORDER BY sch_study_year.id,edu_teach_course.term_type,edu_course.code 
+  </select>
+  
+  <!-- 龚硕晓，查询学生的各门课成绩 ，默认是根据学号来查询-->
+  <select id="getScoreByCourse" resultMap="CourseScoreByStudentDtoResultMap" >
+      
+     select * from ( <include refid="getStuCourseScore_sql"/> ) as a     
+  
+     <where>
+	   <if test="studyYear!=null and studyYear!=''">
+	     AND a.study_year=#{studyYear}
+	   </if>
+	   <if test="termName!=null and termName!=''" >
+	     AND a.term_name=#{termName}
+	   </if>
+	   <if test="courseCode!=null and courseCode!=''">
+	     AND a.course_code=#{courseCode}
+	   </if>
+	   <if test="className!=null and className!=''" >
+	     AND a.class_name=#{className}
+	   </if>
+     </where>
+      
+    ORDER BY student_code 
+  </select>
+  
+  <!-- 龚硕晓，查询当前数据的不同学年、学期列表 -->
+  <select id="getStudyYearAndTermName" resultType="java.util.HashMap">
+     select DISTINCT study_year,term_name from(<include refid="getStuCourseScore_sql"/> )a order by study_year,term_name
+  </select>
+  
+  <!-- 龚硕晓，查询学生信息 -->
+  <select id="getStudentInfo" resultMap="StudentInfoResultMap" >
+     SELECT stu_student.name as student_name,stu_student.code as student_code,stu_class.name as class_name,
+     sch_grade.name as grade_name,sch_major_field.name as major_field_name,
+     sch_major.name as major_name,sys_enumeration_value.name as sex_name
+     from stu_student 
+     left JOIN stu_class on stu_class.id=stu_student.class_id
+     left join sch_grade on sch_grade.id=stu_class.grade_id
+     left join sch_major_field on sch_major_field.id=stu_class.major_field_id
+     left JOIN sch_major on sch_major.id=sch_major_field.major_id
+     LEFT join stu_student_info on stu_student_info.id=stu_student.student_info_id
+     LEFT join sys_enumeration_value on sys_enumeration_value.id=stu_student_info.sex_type
+     where stu_student.code=#{studentCode}
+  </select>
+  
+  <!-- 龚硕晓，查询学号是否存在 -->
+  <select id="isExistStudentCode" resultType="java.lang.Integer" >
+     select id from stu_student WHERE code=#{studentCode}
+  </select>
+  
+  <!-- 龚硕晓，获取各分数段统计人数 -->
+  <select id="getscoreRegion" resultType="java.util.HashMap">
+     SELECT case when recoredCount=0 THEN 0 else round(E/recoredCount,1)*100  end as Epercent, 
+     case when recoredCount=0 THEN 0 else round(D/recoredCount,1)*100 END as Dpercent , 
+     case when recoredCount=0 THEN 0 else round(C/recoredCount,1)*100 end as Cpercent, 
+     case when recoredCount=0 THEN 0 else round(B/recoredCount,1)*100 end as Bpercent, 
+     case when recoredCount=0 THEN 0 else round(A/recoredCount,1)*100 end as Apercent, 
+     a.*,case when recoredCount>0 and score_type=35001 THEN ROUND(total_score/recoredCount,2) else 0 END as averageScore from (
+     select myTable.study_year, myTable.term_name,myTable.course_code,myTable.class_name,
+     sum(case when score_type=35002 and grade_total_score&gt;40004 then 1
+     when score_type=35001 and hundred_total_score&gt;=0 and hundred_total_score&lt;60 then 1 else 0 end)E, 
+     sum(case when score_type=35002 and grade_total_score=40004 then 1 
+     when score_type=35001 AND hundred_total_score&gt;=60 and hundred_total_score&lt;70 then 1 else 0 end) D, 
+     sum(case when score_type=35002 and grade_total_score=40003 then 1 
+     when score_type=35001 AND hundred_total_score&gt;=70 and hundred_total_score&lt;80 then 1 else 0 end)C,
+     sum(case when score_type=35002 and grade_total_score=40002 then 1 
+     when score_type=35001 AND hundred_total_score&gt;=80 and hundred_total_score&lt;90 then 1 else 0 end)B,
+     sum(case when score_type=35002 and grade_total_score=40001 then 1 
+     when score_type=35001 AND hundred_total_score&gt;=90 then 1 else 0 end) A,COUNT(*) as recoredCount,
+     score_type,sum(hundred_total_score) as total_score 
+
+       from (<include refid="getStuCourseScore_sql"/> ) as myTable 
+       <where>
+	   <if test="studyYear!=null and studyYear!=''">
+	     AND myTable.study_year=#{studyYear}
+	   </if>
+	   <if test="termName!=null and termName!=''" >
+	     AND myTable.term_name=#{termName}
+	   </if>
+	   <if test="courseCode!=null and courseCode!=''">
+	     AND myTable.course_code=#{courseCode}
+	   </if>
+	   <if test="className!=null and className!=''" >
+	     AND myTable.class_name=#{className}
+	   </if>
+       </where>
+       GROUP BY myTable.study_year, myTable.term_name,myTable.course_code,myTable.class_name
+     ) as a
+   </select>
+  
+</mapper>

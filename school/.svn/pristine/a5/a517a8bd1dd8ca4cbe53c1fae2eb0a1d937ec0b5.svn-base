@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.tea.dao.TeacherEduExperienceCustomMapper" >
+
+	<resultMap type="com.dkt.school.tea.model.TeacherEduExperience" id="teaEduExpResultMap"
+				extends="com.dkt.school.tea.dao.TeacherEduExperienceMapper.BaseResultMap">
+		
+	</resultMap>
+	
+	<resultMap type="com.dkt.school.tea.dto.TeacherEduExperienceDto" id="dtoMap"
+				extends="com.dkt.school.tea.dao.TeacherEduExperienceMapper.BaseResultMap">
+		
+	</resultMap>
+	
+	<select id="getTeaEduExpByTeacherId" resultMap="teaEduExpResultMap">
+		select tea_teacher_edu_experience.id, tea_teacher_edu_experience.degree_type, tea_teacher_edu_experience.education_type,
+						tea_teacher_edu_experience.end_date, tea_teacher_edu_experience.major, tea_teacher_edu_experience.remark, 
+						tea_teacher_edu_experience.school, tea_teacher_edu_experience.start_date, tea_teacher_edu_experience.teacher_id
+						from tea_teacher_edu_experience, tea_teacher where teacher_id = tea_teacher.id and degree_type = 
+						(select max(degree_type) from tea_teacher_edu_experience where teacher_id=tea_teacher.id)
+						and teacher_id = ${teacherId}
+	</select>
+	
+	<select id="getAllTeaEduExpCountByTeacherId" resultType="java.lang.Integer">
+		select count(*) from tea_teacher_edu_experience where teacher_id = ${teacherId}
+	</select>
+	
+	<select id="getAllTeacherEduExpByTeacherId" resultMap="dtoMap">
+		select * from tea_teacher_edu_experience where teacher_id = ${teacherId}
+	</select>
+</mapper>

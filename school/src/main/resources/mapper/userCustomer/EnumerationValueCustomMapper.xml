@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.system.dao.EnumerationValueCustomMapper">
+	<resultMap type="com.dkt.school.system.model.EnumerationValue"
+		id="EnumerationValue" extends="com.dkt.school.system.dao.EnumerationValueMapper.BaseResultMap">
+
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,name,enumeration_id,seq,remark
+	</sql>
+	
+	<select id="selectByEnumerationId" resultMap="EnumerationValue">
+		select <include refid="Base_Column_List"/>
+		from sys_enumeration_value
+		where enumeration_id=#{enumId}
+	</select>
+	<select id="selectByEnumerationValueId" resultMap="EnumerationValue">
+		select <include refid="Base_Column_List"/>
+		from sys_enumeration_value
+		where id=#{id}
+	</select>
+	
+	<!-- HIU，如果在籍状态为“在籍”，则不取出“复学” -->
+	<select id="getEnumValueListByEnumIdByStuCode" resultMap="EnumerationValue">
+		SELECT 0 as 'id','请选择' as name,0 as enumeration_id,0 as seq,'请选择' as remark from sys_enumeration_value
+        UNION
+		select <include refid="Base_Column_List"/>
+		from sys_enumeration_value
+		where enumeration_id=#{enumId} and remark<![CDATA[<>]]>'在籍' AND id not in(
+		SELECT case when student_status=14001 then 14004 ELSE student_status END as student_status
+		 from stu_student WHERE code=#{stuCode})
+	</select>
+</mapper>

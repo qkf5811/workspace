@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.sch.dao.CampusCustomMapper" >
+  <resultMap type="com.dkt.school.sch.dto.CampusDto" id="BaseResultMap">
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+
+  
+  <select id="selectAllCampus" resultMap="BaseResultMap">
+  	select * from sch_campus
+  </select>
+  	<sql id="Base_Column_List">
+		id, name,  remark
+	</sql>
+	
+	
+	<select id="getCampusCount" resultType="java.lang.Integer">
+		select count(*) from sch_campus
+	</select>
+
+	<select id="selectByLimit"  resultMap="BaseResultMap">
+		select *	from sch_campus
+		<if test="limit != null">
+			LIMIT #{limit.offset}, #{limit.rows}
+		</if>
+	</select>
+
+	<select id="selectCampusDtoByCampusId" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from sch_campus
+		<where>
+			<if test="campusId != null and campusId != ''">
+				id=#{campusId}
+			</if>
+		</where>
+	</select>
+</mapper>

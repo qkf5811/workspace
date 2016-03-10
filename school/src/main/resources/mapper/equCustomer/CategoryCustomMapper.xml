@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.equ.dao.CategoryCustomMapper" >
+	<select id="getCategorysInfo" resultType="com.dkt.school.equ.model.Category">
+		select * from equ_category
+	</select>
+	<resultMap type="com.dkt.school.equ.dto.CategoryDto" id="BaseResultMap">
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+
+  
+  <select id="selectAllCategory" resultMap="BaseResultMap">
+  	select * from equ_category
+  </select>
+  	<sql id="Base_Column_List">
+		id, name,  remark
+	</sql>
+	
+	
+	<select id="getCategoryCount" resultType="java.lang.Integer">
+		select count(*) from equ_category
+	</select>
+
+	<select id="selectByLimit"  resultMap="BaseResultMap">
+		select *	from equ_category
+		<if test="limit != null">
+			LIMIT #{limit.offset}, #{limit.rows}
+		</if>
+	</select>
+
+	<select id="selectCategoryDtoByCategoryId" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from equ_category
+		<where>
+			<if test="categoryId != null and categoryId != ''">
+				id=#{categoryId}
+			</if>
+		</where>
+	</select>
+</mapper>

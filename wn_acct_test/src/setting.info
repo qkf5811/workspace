@@ -1,0 +1,8 @@
+{
+	"systemUrlKeyServer" : "http://192.168.1.181:8090/c_service/json/.api",
+	"serviceName" : "wn_acct",
+	"ownerKey":"local_8080",
+	"logGateWay":"true",
+	"logDb":"true",
+	"logPrint":"true"
+}

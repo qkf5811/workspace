@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.apv.dao.ApprovalNodeCustomMapper" >
+	
+	<resultMap id="BaseResultMap" extends="com.dkt.school.apv.dao.ApprovalNodeMapper.BaseResultMap"
+		type="com.dkt.school.apv.model.ApprovalNode"></resultMap>
+		
+	<resultMap type="com.dkt.school.apv.dto.ApprovalNodeDto" id="ApproveNodeDto"
+				extends="BaseResultMap">
+		<result column="application_type_str" property="applicationTypeStr"/>	
+		<result column="role_id_str" property="roleIdStr"/>	
+		<result column="is_last_str" property="isLastStr"/>					
+	</resultMap>
+	
+	<select id="selectApproveNodeByApplicationType" resultMap="ApproveNodeDto">
+		SELECT 
+ 		apv_approval_node.*,
+ 		(select name from sys_enumeration_value where sys_enumeration_value.id = apv_approval_node.application_type) as application_type_str,
+ 		usr_role.name as role_id_str,
+ 		(select name from sys_enumeration_value where sys_enumeration_value.id = apv_approval_node.is_last) as is_last_str
+		FROM apv_approval_node, usr_role
+		WHERE apv_approval_node.role_id = usr_role.id
+		<if test="applicationType != null and applicationType != 0">
+			AND apv_approval_node.application_type = ${applicationType}
+		</if>
+		ORDER BY apv_approval_node.application_type, apv_approval_node.seq
+		<if test="limit != null">
+			limit ${limit.offset}, ${limit.rows}
+		</if>
+	</select>
+	
+	<select id="selectApproveNodeCountByApplicationType" resultType="java.lang.Integer">
+		SELECT 
+ 		count(*)
+		FROM apv_approval_node, usr_role
+		WHERE apv_approval_node.role_id = usr_role.id
+		<if test="applicationType != null and applicationType != 0">
+			AND apv_approval_node.application_type = ${applicationType}
+		</if>
+		<if test="limit != null">
+			limit ${limit.offset}, ${limit.rows}
+		</if>
+	</select>
+	
+	<insert id="insertNewApprovalNode">
+		insert into `apv_approval_node`(application_type, node_name, role_id, seq, is_last, remark)
+		values (${dto.applicationType}, '${dto.nodeName}', ${dto.roleId}, ${dto.seq}, ${dto.isLast}, '${dto.remark}')
+	</insert>
+	
+	<update id="updateApprovalNodeSeqByList">
+		update apv_approval_node set
+		seq = case id
+		<foreach collection="dtoList" item="dto" separator=" ">
+			when ${dto.id} then ${dto.seq}
+		</foreach>
+		end,
+		is_last = case id
+		<foreach collection="dtoList" item="dto" separator=" ">
+			when ${dto.id} then ${dto.isLast}
+		</foreach>
+		end
+		where id in (
+		<foreach collection="dtoList" item="dto" separator=",">
+			${dto.id}
+		</foreach>
+		)
+	</update>
+	
+</mapper>

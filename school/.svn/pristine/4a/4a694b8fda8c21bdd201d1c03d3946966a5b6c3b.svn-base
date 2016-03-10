@@ -1,0 +1,153 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<div data-options="region:'west',title:'菜单',split:true"
+	style="width: 180px;">
+	<ul class="easyui-tree" data-options="animate:true,onSelect:function(node){$(this).tree('toggle',node.target);}">
+		<set:authorize ifAnyGranted="ROLE_ADMIN">
+		<li data-options="state:'closed'"><span>教职工管理</span>
+			<ul>
+				<li><a onclick="openTab('tea/teaTotalInfo.do', '教职工信息')">教职工信息</a></li>
+				<li><a onclick="openTab('tea/teaChangeList.do', '教师异动信息')">教师异动信息</a></li>
+				<!-- 
+				<li><a onclick="openTab('tea/toResumeList.do','教职工简历列表')">教职工简历列表</a></li>
+				 -->
+				<li><a onclick="openTab('tea/toTeaContinuingEduList.do','教职工继续教育列表')">教职工继续教育列表</a></li>
+				<li><a onclick="openTab('tea/toTeaRewardList.do','教师奖励列表')">教师奖励列表</a></li>
+				<li><a onclick="openTab('tea/toTeaPunishmentList.do','教师处罚列表')">教师处罚列表</a></li>
+				<li><a onclick="openTab('tea/allThesisList.do','教职工论文列表')">教职工论文列表</a></li>
+			</ul>
+		</li>
+		
+		<li data-options="state: 'closed'"><span>学籍管理</span>
+			<ul>
+				<li><a onclick="openTab('stu/toGetClassList.do', '班级列表')">班级列表</a></li>
+				<li><a onclick="openTab('stu/toGetStuList.do', '在籍生列表')">在籍生列表</a></li>
+				<li><a onclick="openTab('stu/managementOfNewStu.do', '新生管理')">新生管理</a></li>
+				<li><a onclick="openTab('stu/studentChangeList.do','学籍异动')">学籍异动</a></li>
+				<li><a onclick="openTab('stu/stuChangeClassList.do','学生转班')">学生转班</a></li>
+				<li><a onclick="openTab('stu/toRewardList.do','奖励信息列表')">奖励信息列表</a></li>
+				<li><a onclick="openTab('stu/toPunishmentList.do','惩罚信息列表')">惩罚信息列表</a></li>
+			</ul>
+		</li>
+		<li data-options="state:'closed'"><span>课程管理</span>
+			<ul>
+				<li><a onclick="openTab('edu/courseSetting.do', '课程设置')">课程设置</a></li>
+				<li><a onclick="openTab('edu/toCoursePlanList.do', '课程计划设置')">课程计划设置</a></li>
+				<li><a onclick="openTab('edu/teachTaskList.do', '教学任务')">教学任务</a></li>
+				<li><a onclick="openTab('edu/setTeacherCourseList.do', '教师任课列表')">教师任课列表</a></li>
+				<li><a onclick="openTab('edu/toImportScheduleManual.do','手动排课')">手动排课</a></li>
+				<li><a onclick="openTab('edu/manualAdjustCourse.do', '手动调课')">手动调课</a></li>
+				<li><a onclick="openTab('edu/toImportSchedulePage.do','导入课程表')">导入课程表</a></li>
+				<li><a onclick="openTab('edu/toSearchCourse.do','开课综合查询')">开课综合查询</a></li>
+				<li><a onclick="openTab('edu/toFindCourseSchedule.do','查询班级课程表')">查询班级课程表</a></li>
+				<li><a onclick="openTab('edu/toFindTeacherSchedule.do','查询教师课程表')">查询教师课程表</a></li>
+			</ul>
+		</li>
+
+		<li data-options="state:'closed'"><span>成绩管理</span>
+			<ul>
+				<li><a onclick="openTab('edu/courseScoreList.do', '成绩录入')">成绩录入</a></li>
+				<li><a onclick="openTab('edu/toAllTeachCourseList.do', '任课老师成绩查询')">任课老师成绩查询</a></li>
+				<li><a onclick="openTab('edu/toAllCourseList.do', '课程成绩统计')">课程成绩统计</a></li>
+				<li><a onclick="openTab('edu/stuScoreQuery.do', '学生成绩查询')">学生成绩查询</a></li>
+			</ul>
+		</li>
+		</set:authorize>
+		
+		<li data-options="state:'closed'"><span>教师管理</span>
+			<ul>
+				<li><a onclick="openTab('tea/myInformation.do?userId=${user.id}','个人信息')">个人信息</a></li>
+				<li><a onclick="openTab('edu/toMyCourseSchedule.do','我的课程表 ')">我的课程表</a></li>
+				<li><a onclick="openTab('edu/courseScoreList.do', '课程成绩录入')">课程成绩录入</a></li>
+				
+				<set:authorize ifAnyGranted="ROLE_ADMIN">
+					<li><a onclick="openTab('tea/toMyContinueEduPage.do','我的继续教育列表')">我的继续教育列表</a></li>
+					<li><a onclick="openTab('tea/toGetSingleRewardList.do','我的奖励列表')">我的奖励列表</a></li>
+					<li><a onclick="openTab('tea/toGetSinglePunishList.do','我的处罚列表')">我的处罚列表</a></li>
+					<li><a onclick="openTab('tea/teacherThesisList.do?userId=${user.id}','我的论文列表')">我的论文列表</a></li>
+				</set:authorize>
+			</ul>
+		</li>
+		
+		<set:authorize ifAnyGranted="ROLE_ADMIN">
+		<li data-options="state:'closed'"><span>班主任管理</span>
+		    <ul>
+		        <li><a onclick="openTab('edu/toScoreQueryByStuOfHeadTeacher.do','班级学生列表')">查询学生个人成绩</a></li>
+		        <li><a onclick="openTab('edu/toScoreQueryByCourseOfHeadTeacher.do','课程列表')">查询单门课程成绩</a></li>
+		        <li><a onclick="openTab('edu/queryScoreByCoursePlan.do','当前学期班级成绩列表')">查询本班学生所有成绩</a></li>
+		    </ul>
+		</li>
+		
+		<li data-options="state:'closed'"><span>审批管理</span>
+			<ul>
+				<li><a onclick="openTab('apv/apvApplicationList.do?userId=${user.id}','我的申请表')">我的申请表</a></li>
+				<li><a onclick="openTab('apv/allApplicationList.do','所有申请表')">所有申请表</a></li>
+				<li><a onclick="openTab('apv/approvalSetting.do','设置审批流程')">设置审批流程</a></li>
+				<li><a onclick="openTab('apv/waitForApprove.do?userId=${user.id}','待审批申请')">待审批申请</a></li>
+				<li><a onclick="openTab('apv/approvedApplication.do?userId=${user.id}','已审批申请')">已审批申请</a></li>
+			</ul>
+		</li>
+
+
+		<li data-options="state:'closed'"><span>校产管理</span>
+
+			<ul>
+		<%-- 	<sec:authorize ifAnyGranted="ROLE_ADMIN,ROLE_FILE_TEA"> --%>
+				<!-- <li><a onclick="openTab('equ/equipmentItemIn.do','入库管理')">入库管理</a></li> -->
+				<li><a onclick="openTab('equ/categoryList.do','设备分类列表')">设备分类列表</a></li>
+				<li><a onclick="openTab('equ/toEquipmentList.do','设备种类列表')">设备种类列表</a></li>
+				<li><a onclick="openTab('equ/toStorageList.do','设备仓库列表')">设备仓库列表</a></li>
+				<li><a onclick="openTab('equ/toEquList.do','设备管理')">设备管理</a></li>
+				<li><a onclick="openTab('equ/equipmentItemOut.do','出库管理')">出库管理</a></li>
+		<%-- 	</sec:authorize> --%>
+		<%-- 		<sec:authorize ifAnyGranted="ROLE_ADMIN,ROLE_FILE_TEA,ROLE_TEMP_FILE"> --%>
+			
+		<%-- 		</sec:authorize> --%>
+				<li><a onclick="openTab('equ/useRecordMood.do','设备领用记录')">设备领用记录</a></li>
+				<li><a onclick="openTab('equ/borrowRecordMood.do','设备借用记录')">设备借用记录</a></li>
+				<li><a onclick="openTab('maintainRecord/maintainRecordList.do','维护记录列表')">设备维护记录</a></li>
+				<li><a onclick="openTab('reformRecord/reformRecordList.do','改造记录列表')">设备改造记录</a></li>
+				<li><a onclick="openTab('scrapRecord/scrapRecordList.do','报废记录列表')">设备报废记录</a></li>
+				<li><a onclick="openTab('equ/totalPrice.do','总设备价值统计')">总设备价值统计</a></li>
+
+
+			<li data-options="state:'closed'"><span>设备使用申请管理</span>
+				<ul>
+					<li><a onclick="openTab('equ/useApplicationMood.do?userId=${user.id}','设备领用申请')">设备领用申请</a></li>
+					
+				</ul>
+
+			</li>
+
+				<li><a onclick="openTab('equ/functionRoomList.do','功能室列表')">功能室列表</a></li>
+				<li><a onclick="openTab('equ/roomApplicationList.do','功能室申请使用')">功能室申请使用</a></li>
+				<li><a onclick="openTab('equ/functionRoomRecordList.do','功能室使用记录')">功能室使用记录</a></li>
+			</ul>
+
+		</li>
+		 
+		<li data-options="state:'closed'"><span>用户管理</span>
+			<ul>
+				<li><a onclick="openTab('user/userList.do','用户列表')">用户列表</a></li>
+				<li><a onclick="openTab('role/roleList.do','角色列表')">角色列表</a></li>
+				<li><a onclick="openTab('user/toFindAllDepartemnt.do','部门列表')">部门列表</a></li>
+				<li><a onclick="openTab('user/toGetSysLogList.do','用户操作历史')">用户操作历史</a></li>
+			</ul>
+		</li>
+		<li data-options="state:'closed'"><span>基础数据管理</span>
+			<ul>
+				<li><a onclick="openTab('sch/schoolEdit.do', '学校信息')">学校信息</a></li>
+				<li><a onclick="openTab('sch/toStudyYearList.do', '学年列表')">学年列表</a></li>
+				<li><a onclick="openTab('sch/toGradeList.do', '年级列表')">年级列表</a></li>
+				<!-- 
+				<li><a onclick="openTab('sch/majorSetting.do', '专业设置')">专业设置</a></li>
+				<li><a onclick="openTab('sch/majorFieldSetting.do', '专业方向设置')">专业方向设置</a></li>
+				 -->
+				<li><a onclick="openTab('sch/campusList.do','校区列表')">校区列表</a></li>
+				<li><a onclick="openTab('sch/toBuildingList.do','教学楼列表')">教学楼列表</a></li>
+				<li><a onclick="openTab('sch/toClassRoomList.do','教室列表')">教室列表</a></li>
+			</ul>
+		</li>
+		</set:authorize>
+		
+</div>

@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.stu.dao.StudentCustomMapper" >
+	<resultMap id="BaseResultMap" type="com.dkt.school.stu.dto.StudentDto">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="code" property="code" jdbcType="VARCHAR" />
+		<result column="class_id" property="classId" jdbcType="INTEGER" />
+		<result column="student_info_id" property="studentInfoId"
+			jdbcType="INTEGER" />
+		<result column="is_free_tuition" property="isFreeTuition"
+			jdbcType="INTEGER" />
+		<result column="is_free_tuition" property="isFreeTuition" jdbcType="INTEGER" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+		<result column="class_name" property="className" jdbcType="VARCHAR" />
+		<result column="status_str" property="stuStatus" jdbcType="VARCHAR" />
+		<result column="is_free_tuition_str" property="stuIsFreeTuition" jdbcType="VARCHAR" />
+	</resultMap>
+	<!-- 赖继鹏 -->
+	<resultMap id="StudentToBeDividedDtoResultMap" type="com.dkt.school.stu.dto.StudentToBeDividedDto" extends="com.dkt.school.stu.dao.StudentMapper.BaseResultMap">
+		<result column="major_field_name" property="major_field_name" jdbcType="VARCHAR" />
+		<result column="major_field_id" property="major_field_id" jdbcType="INTEGER" />
+		<result column="newStu_id" property="newStu_id" jdbcType="INTEGER" />
+		<result column="newStu_name" property="newStu_name" jdbcType="VARCHAR" />
+		<result column="is_divide_class" property="is_divide_class" jdbcType="INTEGER" />		
+		<result column="is_divide_class_str" property="is_divide_class_str"
+			jdbcType="VARCHAR" />
+		<result column="status_str" property="status_str" jdbcType="VARCHAR" />
+		<result column="is_free_tuition_str" property="is_free_tuition_str" jdbcType="VARCHAR" />
+		<result column="class_name" property="class_name" jdbcType="VARCHAR" />	
+	</resultMap>
+	
+	<resultMap id="BaseResultMapExtend" type="com.dkt.school.stu.model.Student"
+		extends="com.dkt.school.stu.dao.StudentMapper.BaseResultMap">
+		<result column="major_field_class_name" property="majorFieldClassName" jdbcType="VARCHAR" />
+		 <result column="class_name" property="finClassName" jdbcType="VARCHAR" /> 
+		<result column="grade_name" property="gradeName" jdbcType="VARCHAR" />
+		<result column="major_field_name" property="majorFieldName" jdbcType="VARCHAR" />
+		<result column="major_name" property="majorName" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<resultMap type="com.dkt.school.stu.dto.StudentDto" id="StudentDto" extends="BaseResultMapExtend">
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		ss.id,ss.name,ss.code,ss.class_id,ss.student_info_id,ss.status,ss.student_status,ss.is_free_tuition,ss.remark
+	</sql>
+	
+	<select id="findStudent" resultMap="StudentDto" parameterType="String">
+		select *
+		from stu_student
+		where code = #{code,jdbcType=VARCHAR}
+	</select>
+	
+	
+	
+	<select id="findAllStudents" resultMap="StudentDto">
+		select	id,name,code,class_id
+		from stu_student 
+			
+	</select>
+	<select id="findStudentBystuId" resultMap="StudentDto">
+		SELECT
+		stu_class.`name` as class_name,
+		stu_student.`name`,
+		stu_student.`code`,
+		sch_grade.`name` as grade_name,
+		sch_major_field.`name` as major_field_name,
+		sch_major.`name` AS major_name
+		FROM
+		stu_student
+		INNER JOIN stu_class ON stu_student.class_id = stu_class.id
+		INNER JOIN sch_grade ON stu_class.grade_id = sch_grade.id
+		INNER JOIN sch_major_field ON stu_class.major_field_id = sch_major_field.id
+		INNER JOIN sch_major ON sch_major_field.major_id = sch_major.id
+		where stu_student.id = ${studentId}
+
+			
+	</select>
+	
+	
+	<select id="selectStudentsByLimit" resultMap="StudentDto">
+		select	id,name,code,class_name,grade_name,major_field_name,major_name,
+		CONCAT(major_field_name,class_name) AS major_field_class_name from(
+		SELECT
+		stu_student.`name`,
+		stu_student.`code`,
+		stu_student.id ,
+		stu_class.`name` As class_name,
+		sch_grade.`name` AS grade_name,
+		sch_major_field.`name` As major_field_name,
+		sch_major.`name` as major_name
+		FROM
+		stu_student
+		INNER JOIN stu_class ON stu_student.class_id = stu_class.id
+		INNER JOIN sch_grade ON stu_class.grade_id = sch_grade.id
+		INNER JOIN sch_major_field ON stu_class.major_field_id = sch_major_field.id
+		INNER JOIN sch_major ON sch_major_field.major_id = sch_major.id
+		 )as tem_table
+		<where>
+			<if test="name != null and name !=''">
+				 name like '%${name}%'
+			</if>  
+ 			<if test="code != null and code != ''">
+				and code like '%${code}%'
+			</if>  
+		</where>
+		 <if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if> 
+		<!-- select	CONCAT(major_field_name,class_name) AS major_field_class_name,name,code from(select	smf.name As major_field_name,sc.name As class_name,ss.name As name,ss.code As code
+		from stu_student ss
+		LEFT JOIN stu_class sc ON sc.id = ss.class_id 
+		LEFT JOIN sch_major_field smf ON smf.id = sc.major_field_id  )as tem_table
+ 		<where>
+			<if test="name != null and name !=''">
+				 name like '%${name}%'
+			</if>  
+ 			<if test="code != null and code != ''">
+				and code like '%${code}%'
+			</if>  
+		</where>
+		 <if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>   -->
+					
+	</select>
+	
+	<!-- 根据条件和page查询student(模糊查询) -->
+	<select id="searchStudentByConditionWithPage" resultMap="BaseResultMap">
+		SELECT * FROM
+		stu_student
+		where
+		((name like '%${condition}%' or code like
+		'%${condition}%')
+		or (select name from sch_major_field where id =
+		(select major_field_id from stu_student_info where id =
+		stu_student.student_info_id)
+		) like '%${condition}%' or
+		stu_student.class_id = (select id from stu_class where name like
+		'%${condition}%'))
+		and status = 17001
+		<if test="limit != null">
+			limit #{limit.offset}, #{limit.rows}
+		</if>
+	</select>
+	<select id="getStudentCount" resultType="java.lang.Integer">
+		SELECT count(*) FROM
+		stu_student
+		<where>
+			<if test="name != null and name !=''">
+				 name like '%${name}%'
+			</if>  
+ 			<if test="code != null and code != ''">
+				and code like '%${code}%'
+			</if>  
+		</where>
+	</select>	
+	
+	<!-- 根据条件和page查询student(的记录的数量)(模糊查询) -->
+	<select id="searchCountOfStudentByConditionWithPage" resultType="java.lang.Integer">
+		SELECT count(*) FROM
+		stu_student
+		where
+		((name like '%${condition}%' or
+		code like '%${condition}%' or class_id like '%${condition}%')
+		or
+		(select name from sch_major_field where id =
+		(select major_field_id
+		from stu_student_info where id =
+		stu_student.student_info_id)
+		) like
+		'%${condition}%') and status =17001
+	</select>
+	
+	<!-- 根据班级姓名学号查询student count -->
+	<select id="searchStudentCountByThreeCondition" resultType="java.lang.Integer">
+		select count(*) from stu_student
+		where 1=1
+		<if test="className != '' and className != null">
+			and stu_student.class_id in (select id from stu_class where name like
+			'%${className}%')
+		</if>
+		<if test="studentName != '' and studentName != null">
+			and name like '%${studentName}%'
+		</if>
+		<if test="studentCode != '' and studentName != null">
+			and code like '%${studentCode}%'
+		</if>
+		
+		and status = 17001
+		
+	</select>
+	
+	<!-- 根据班级姓名学号查询student -->
+	<select id="searchStudentByThreeCondition" resultMap="BaseResultMap">
+		select * from stu_student
+		where 1=1
+		<if test="className != '' and className != null">
+			and stu_student.class_id in (select id from stu_class where name like
+			'%${className}%')
+		</if>
+		<if test="studentName != '' and studentName != null">
+			and name like '%${studentName}%'
+		</if>
+		<if test="studentCode != '' and studentName != null">
+			and code like '%${studentCode}%'
+		</if>
+		
+		and status = 17001
+		
+		<if test="limit != null">
+			limit #{limit.offset}, #{limit.rows}
+		</if>
+	</select>
+
+	<!-- 根据page查找student表 -->
+	<select id="searchStudentByPage" resultMap="BaseResultMap">
+		select * from
+		stu_student where status = 17001
+		
+		<if test="limit != null">
+			limit #{limit.offset}, #{limit.rows}
+		</if>
+	</select>
+
+	<!-- 根据page查找student表 (的记录的数量) -->
+	<select id="searchCountOfStudentByPage" resultType="java.lang.Integer">
+		select
+		count(*) from
+		stu_student where status = 17001
+		
+	</select>
+
+
+
+<!-- 吴俊鹏 -->
+
+    <!-- 根据班级、姓名、学号、是否免学费查询 -->
+	<select id="selectByLimit" resultMap="BaseResultMap">
+        select stu_student.*	,
+	    (SELECT NAME FROM sys_enumeration_value WHERE id=stu_student.status) AS status_str,
+        (SELECT NAME FROM sys_enumeration_value WHERE id=stu_student.is_free_tuition) AS is_free_tuition_str,
+        stu_class.name AS class_name
+        from stu_student
+                LEFT JOIN stu_class ON stu_student.class_id=stu_class.id
+		<where>
+		<if test="studentDto.name != '' and studentDto.name != null">
+			and stu_student.name like '%${studentDto.name}%'
+		</if>
+		<if test="studentDto.className != '' and studentDto.className != null">
+			and stu_class.name like '%${studentDto.className}%'
+		</if>
+		<if test="studentDto.code != '' and studentDto.code != null">
+			and stu_student.code like '%${studentDto.code}%'
+		</if>
+		<if test="studentDto.isFreeTuition != null">
+				AND is_free_tuition=#{studentDto.isFreeTuition}
+		</if>
+			
+		    and status = 17001
+		
+		</where>
+		<if test="limit != null">
+			limit #{limit.offset}, #{limit.rows}
+		</if>
+	</select>
+	
+	<!-- 根据班级、姓名、学号、是否免学费查询学生数量 -->
+	<select id="countByNameCodeClassNameTuition" resultType="java.lang.Integer">
+		select count(*) 
+		from stu_student
+		        LEFT JOIN stu_class ON stu_student.class_id=stu_class.id
+		<where>
+		<if test="studentDto.name != '' and studentDto.name != null">
+			and stu_student.name like '%${studentDto.name}%'
+		</if>
+		<if test="studentDto.className != '' and studentDto.className != null">
+			and stu_class.name like '%${studentDto.className}%'
+		</if>
+		<if test="studentDto.code != '' and studentDto.code != null">
+			and stu_student.code like '%${studentDto.code}%'
+		</if>
+		<if test="studentDto.isFreeTuition != null">
+				AND is_free_tuition=#{studentDto.isFreeTuition}
+		</if>
+			
+		     and status = 17001
+		   
+		</where>
+	</select>
+	
+	<!-- 一键设置免学费类型 -->
+	<update id="setTuitionFree">
+		UPDATE stu_student set is_free_tuition = 2001 where id in (
+		<foreach collection="setFreeIds" item="item" open="" separator=","
+			close="">
+			${item}
+		</foreach>
+		)
+	</update>
+	
+	<!-- 一键取消免学费类型 -->
+	<update id="cancelTuitionFree">
+		UPDATE stu_student set is_free_tuition = 2002 where id in (
+		<foreach collection="cancelFreeIds" item="item" open="" separator=","
+			close="">
+			${item}
+		</foreach>
+		)
+	</update>
+
+	<!-- 通过list批量更新student表 -->
+	<update id="updateFreeTuitionStudent">
+		update stu_student set
+			is_free_tuition = 2001
+		where id =#{dto.id}
+	
+	</update>
+	
+	<!-- 注册 -->
+	<update id="regist">
+		UPDATE stu_student set status = 17002 where id in (
+		<foreach collection="ids" item="item" open="" separator=","
+			close="">
+			${item}
+		</foreach>
+		)
+	</update>
+	
+	<!-- 炳坚 -->
+	<insert id="insertDivideClassByExcellFile" parameterType="java.util.List">
+		insert into stu_student value
+		<foreach collection="students" item="stu" separator=",">
+			(null,'${stu.name}','${stu.code}','${stu.classId}','${stu.studentInfoId}','${stu.status}','${stu.remark}')
+		</foreach>
+	</insert>
+	
+	<select id="getStudentByCode" resultMap="StudentDto">
+		select * from stu_student where code='${code}'
+	</select>
+
+
+
+  <!-- 赖继鹏 -->
+  <!-- 查询进行手动分班设置的学生列表 -->
+  <select id="selectStudentsToDivide" resultMap="StudentToBeDividedDtoResultMap">
+     SELECT sch_major_field.name AS major_field_name,
+       stu_student_info.major_field_id,
+       stu_student_info.is_divide_class,
+       stu_student_info.id AS newStu_id,
+       stu_student_info.name AS newStu_name,
+       (SELECT NAME FROM sys_enumeration_value WHERE id=stu_student_info.is_divide_class) AS is_divide_class_str,
+       stu_student.*,
+       (SELECT NAME FROM sys_enumeration_value WHERE id=stu_student.status) AS status_str,
+       (SELECT NAME FROM sys_enumeration_value WHERE id=stu_student.is_free_tuition) AS is_free_tuition_str,
+        stu_class.name AS class_name
+    FROM stu_student_info
+     LEFT JOIN stu_student ON stu_student_info.id =stu_student.student_info_id
+     LEFT JOIN sch_major_field ON stu_student_info.major_field_id=sch_major_field.id
+     LEFT JOIN stu_class ON stu_student.class_id=stu_class.id
+     <where>
+	  <if test="dto.major_field_id!=null">
+	     AND stu_student_info.major_field_id=${dto.major_field_id}
+	  </if> 
+	  <if test="dto.is_divide_class!=null">
+	     AND stu_student_info.is_divide_class=${dto.is_divide_class}
+	  </if> 
+	  <if test="dto.newStu_name!=null">
+	     AND stu_student_info.name LIKE '%${dto.newStu_name}%'
+	  </if>
+	</where>
+	ORDER BY major_field_name
+    <if test="limit != null">
+			limit #{limit.offset}, #{limit.rows}
+	</if>
+  </select>
+  
+  <select id="selectCountOfStudentsToDivide" resultType="java.lang.Integer">
+    SELECT COUNT(*)
+    FROM stu_student_info
+         LEFT JOIN stu_student ON stu_student_info.id =stu_student.student_info_id
+    <where>
+	  <if test="dto.major_field_id!=null">
+	     AND stu_student_info.major_field_id=${dto.major_field_id}
+	  </if>
+	  <if test="dto.is_divide_class!=null">
+	     AND stu_student_info.is_divide_class=${dto.is_divide_class}
+	  </if>  
+	  <if test="dto.newStu_name!=null">
+	     AND stu_student_info.name LIKE '%${dto.newStu_name}%'
+	  </if>
+	</where>     
+  </select>
+  
+  <!--  根据majorFieldId获取到学生的最大编号 -->
+  <select id="getLastStuIdByClassId" resultType="java.lang.Integer">
+    SELECT id
+    FROM stu_student
+    WHERE class_id=${classId}
+    ORDER BY id DESC 
+    LIMIT 0,1
+  </select>
+  
+   <!--  根据majorFieldId获取到学生的最大编号 -->
+  <select id="getStuCountByClassId" resultType="java.lang.Integer">
+    SELECT COUNT(*)
+    FROM stu_student
+    WHERE class_id=${classId}
+  </select>
+  
+  <!-- 批量插入学生信息 -->
+  <insert id="insertAllStudents" parameterType="java.util.List">
+    insert into stu_student(id,name,code,class_id,student_info_id,status,student_status,is_free_tuition,remark)
+    values 
+    <foreach collection="toInsertStudentsList" item="item" index="index" separator=",">
+        (null,'${item.name}','${item.code}','${item.classId}','${item.studentInfoId}','${item.status}','${item.studentStatus}','${item.isFreeTuition}','${item.remark}')
+    </foreach>
+  </insert> 
+
+  <!--  根据专业方向ID、年级ID获取符合条件的学生列表 -->
+  <select id="selectStudentByMultiCondition" resultMap="BaseResultMap">
+    SELECT stu_student.*
+    FROM stu_student
+         LEFT JOIN stu_student_info ON stu_student.student_info_id=stu_student_info.id
+         LEFT JOIN stu_class ON stu_class.id=stu_student.class_id
+      <where>
+	   <if test="gradeId!=null">
+	     AND stu_class.grade_id=${gradeId}
+	   </if>
+	   <if test="majorFieldId!=null">
+	     AND stu_student_info.major_field_id=${majorFieldId}
+	   </if>   
+	 </where>
+  </select>
+<!-- 赖继鹏 -->
+</mapper>

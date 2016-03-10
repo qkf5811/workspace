@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.fin.dao.StudentAccountCustomMapper">
+
+	<resultMap id="BaseResultMapExtend" type="com.dkt.school.fin.model.StudentAccount"
+		extends="com.dkt.school.fin.dao.StudentAccountMapper.BaseResultMap">
+	</resultMap>
+
+	<resultMap type="com.dkt.school.fin.dto.StudentAccountDto" id="StudentAccountDto"
+		extends="BaseResultMapExtend">
+		<result column="fin_stuName" property="finStuName"
+			jdbcType="VARCHAR" />
+		<result column="fin_stuCode" property="finStuCode" jdbcType="VARCHAR" />
+		<result column="fin_className" property="finClassName" jdbcType="VARCHAR" />
+		<result column="fin_grade" property="finGrade" jdbcType="VARCHAR" />
+		<result column="fin_field" property="finField" jdbcType="VARCHAR" />
+		<result column="fin_major" property="finMajor" jdbcType="VARCHAR" />
+	</resultMap>
+
+
+	<select id="getStudentAccountCount" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		fin_student_account
+		INNER JOIN stu_student ON fin_student_account.student_id = stu_student.id
+		INNER JOIN stu_class ON stu_student.class_id = stu_class.id
+		INNER JOIN sch_grade ON stu_class.grade_id = sch_grade.id
+		INNER JOIN sch_major_field ON stu_class.major_field_id = sch_major_field.id
+		INNER JOIN sch_major ON sch_major_field.major_id = sch_major.id
+		<where>
+				<if test="finStuName != null and finStuName !=''">
+					stu_student.name like '%${finStuName}%' 
+				</if>
+				<if test="finGrade != null and finGrade != 0">
+					and sch_grade.id = ${finGrade}
+				</if> 
+				<if test="finClassName != null and finClassName != ''">
+					and stu_class.name like '%${finClassName}%'
+				</if> 
+				<if test="finMajor != null and finMajor != 0">
+					and sch_major.id = ${finMajor}
+				</if> 
+				<if test="finField != null and finField != 0">
+					and sch_major_field.id = ${finField}
+				</if> 
+				
+		</where>	
+	</select>
+
+
+
+	<select id="selectByLimit" resultMap="StudentAccountDto">
+		SELECT
+		fin_student_account.`name`,
+		fin_student_account.account ,
+		fin_student_account.student_id,
+		fin_student_account.id,
+		stu_student.`name` as fin_stuName,
+		stu_student.`code` as fin_stuCode,
+		stu_class.`name` as fin_className,
+		sch_grade.`name` as fin_grade,
+		sch_major_field.`name`as fin_field, 
+		sch_major.`name` as fin_major
+		FROM
+		fin_student_account
+		INNER JOIN stu_student ON fin_student_account.student_id = stu_student.id
+		INNER JOIN stu_class ON stu_student.class_id = stu_class.id
+		INNER JOIN sch_grade ON stu_class.grade_id = sch_grade.id
+		INNER JOIN sch_major_field ON stu_class.major_field_id = sch_major_field.id
+		INNER JOIN sch_major ON sch_major_field.major_id = sch_major.id
+
+
+
+
+
+
+		<where>
+				<if test="finStuName != null and finStuName !=''">
+					stu_student.name like '%${finStuName}%' 
+				</if>
+				<if test="finGrade != null and finGrade != 0">
+					and sch_grade.id = ${finGrade}
+				</if>
+				<if test="finClassName != null and finClassName != ''">
+					and stu_class.name like '%${finClassName}%'
+				</if> 
+				<if test="finMajor != null and finMajor != 0">
+					and sch_major.id = ${finMajor}
+				</if> 
+				<if test="finField != null and finField != 0">
+					and sch_major_field.id = ${finField}
+				</if> 
+				
+		</where>	
+		<if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>
+
+
+	</select>
+	
+	<select id="getStudentAccounts" resultMap="StudentAccountDto">
+		SELECT
+		*
+		FROM
+		fin_student_account
+	</select>
+	
+	<select id="getStudentIdsByNotSettingStudentAccount" resultType="java.lang.Integer">
+		select s.id from stu_student s 
+		where s.id not in
+		(select ss.id 
+		from stu_student ss 
+		inner join fin_student_account fsa on ss.id=fsa.student_id)
+
+	</select>
+	
+	<select id="findSameAccount" resultType="java.lang.String">
+	SELECT
+	fin_student_account.account
+	FROM
+	fin_student_account
+	where account = '${account}'
+	and student_id != ${studentId}
+	
+
+
+	</select>
+	<select id="findStudentAccountByStudentId" resultMap="StudentAccountDto">
+		SELECT
+		*
+		FROM
+		fin_student_account fsa
+		where fsa.student_id = '${studentId}'
+		
+
+
+
+	</select>
+	
+	<!-- 批量添加学生账号 -->
+	<insert id="addStudentAccountByList">
+		insert into fin_student_account values 
+		<foreach collection="dtoList" item="dto" separator=",">
+			(null, '${dto.studentId}', '${dto.name}', '${dto.account}')
+		</foreach>
+	</insert>
+	
+	<!-- 通过list批量更新teacher表 -->
+	<update id="updateStudentAccountrByList">
+		update fin_student_account set
+		
+			name = case student_id
+			<foreach collection="dtoList" item="dto" separator=" ">
+			when '${dto.studentId}' then '${dto.name}'
+			</foreach>
+			end,
+			account = case student_id
+			<foreach collection="dtoList" item="dto" separator=" ">
+			when '${dto.studentId}' then '${dto.account}'
+			</foreach>
+			end
+			where student_id in (
+			<foreach collection="dtoList" item="dto" separator=" ,">
+				'${dto.studentId}'
+			</foreach>
+			)
+	</update>
+	<!-- 批量删除教师 -->
+	<delete id="deleteStudentAccountByList">
+		delete from fin_student_account where 
+		student_id in (
+		<foreach collection="dtoList" separator="," item="dto">
+			'${dto.studentId}'
+		</foreach>
+		)
+	</delete>
+
+
+</mapper>

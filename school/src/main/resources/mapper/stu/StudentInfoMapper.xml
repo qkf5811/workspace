@@ -1,0 +1,606 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.stu.dao.StudentInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.dkt.school.stu.model.StudentInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="student_number" property="studentNumber" jdbcType="VARCHAR" />
+    <result column="sex_type" property="sexType" jdbcType="INTEGER" />
+    <result column="birthday" property="birthday" jdbcType="DATE" />
+    <result column="id_card" property="idCard" jdbcType="VARCHAR" />
+    <result column="nation_type" property="nationType" jdbcType="INTEGER" />
+    <result column="political_feature_type" property="politicalFeatureType" jdbcType="INTEGER" />
+    <result column="health_type" property="healthType" jdbcType="INTEGER" />
+    <result column="is_hk_mc" property="isHkMc" jdbcType="INTEGER" />
+    <result column="native_place" property="nativePlace" jdbcType="VARCHAR" />
+    <result column="household_type" property="householdType" jdbcType="INTEGER" />
+    <result column="household_location" property="householdLocation" jdbcType="VARCHAR" />
+    <result column="family_address" property="familyAddress" jdbcType="VARCHAR" />
+    <result column="postcode" property="postcode" jdbcType="VARCHAR" />
+    <result column="family_phone" property="familyPhone" jdbcType="VARCHAR" />
+    <result column="examinee_type" property="examineeType" jdbcType="INTEGER" />
+    <result column="graduation_school" property="graduationSchool" jdbcType="VARCHAR" />
+    <result column="major_field_id" property="majorFieldId" jdbcType="INTEGER" />
+    <result column="exam_number" property="examNumber" jdbcType="VARCHAR" />
+    <result column="exam_total_score" property="examTotalScore" jdbcType="INTEGER" />
+    <result column="study_type" property="studyType" jdbcType="INTEGER" />
+    <result column="study_method" property="studyMethod" jdbcType="INTEGER" />
+    <result column="enter_school_type" property="enterSchoolType" jdbcType="INTEGER" />
+    <result column="edu_stage_type" property="eduStageType" jdbcType="INTEGER" />
+    <result column="admission_number" property="admissionNumber" jdbcType="VARCHAR" />
+    <result column="is_divide_class" property="isDivideClass" jdbcType="INTEGER" />
+    <result column="study_status" property="studyStatus" jdbcType="INTEGER" />
+    <result column="entrance_date" property="entranceDate" jdbcType="DATE" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, name, student_number, sex_type, birthday, id_card, nation_type, political_feature_type, 
+    health_type, is_hk_mc, native_place, household_type, household_location, family_address, 
+    postcode, family_phone, examinee_type, graduation_school, major_field_id, exam_number, 
+    exam_total_score, study_type, study_method, enter_school_type, edu_stage_type, admission_number, 
+    is_divide_class, study_status, entrance_date, remark
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.dkt.school.stu.model.StudentInfoExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from stu_student_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from stu_student_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from stu_student_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.dkt.school.stu.model.StudentInfoExample" >
+    delete from stu_student_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.dkt.school.stu.model.StudentInfo" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into stu_student_info (name, student_number, sex_type, 
+      birthday, id_card, nation_type, 
+      political_feature_type, health_type, is_hk_mc, 
+      native_place, household_type, household_location, 
+      family_address, postcode, family_phone, 
+      examinee_type, graduation_school, major_field_id, 
+      exam_number, exam_total_score, study_type, 
+      study_method, enter_school_type, edu_stage_type, 
+      admission_number, is_divide_class, study_status, 
+      entrance_date, remark)
+    values (#{name,jdbcType=VARCHAR}, #{studentNumber,jdbcType=VARCHAR}, #{sexType,jdbcType=INTEGER}, 
+      #{birthday,jdbcType=DATE}, #{idCard,jdbcType=VARCHAR}, #{nationType,jdbcType=INTEGER}, 
+      #{politicalFeatureType,jdbcType=INTEGER}, #{healthType,jdbcType=INTEGER}, #{isHkMc,jdbcType=INTEGER}, 
+      #{nativePlace,jdbcType=VARCHAR}, #{householdType,jdbcType=INTEGER}, #{householdLocation,jdbcType=VARCHAR}, 
+      #{familyAddress,jdbcType=VARCHAR}, #{postcode,jdbcType=VARCHAR}, #{familyPhone,jdbcType=VARCHAR}, 
+      #{examineeType,jdbcType=INTEGER}, #{graduationSchool,jdbcType=VARCHAR}, #{majorFieldId,jdbcType=INTEGER}, 
+      #{examNumber,jdbcType=VARCHAR}, #{examTotalScore,jdbcType=INTEGER}, #{studyType,jdbcType=INTEGER}, 
+      #{studyMethod,jdbcType=INTEGER}, #{enterSchoolType,jdbcType=INTEGER}, #{eduStageType,jdbcType=INTEGER}, 
+      #{admissionNumber,jdbcType=VARCHAR}, #{isDivideClass,jdbcType=INTEGER}, #{studyStatus,jdbcType=INTEGER}, 
+      #{entranceDate,jdbcType=DATE}, #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.dkt.school.stu.model.StudentInfo" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into stu_student_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="studentNumber != null" >
+        student_number,
+      </if>
+      <if test="sexType != null" >
+        sex_type,
+      </if>
+      <if test="birthday != null" >
+        birthday,
+      </if>
+      <if test="idCard != null" >
+        id_card,
+      </if>
+      <if test="nationType != null" >
+        nation_type,
+      </if>
+      <if test="politicalFeatureType != null" >
+        political_feature_type,
+      </if>
+      <if test="healthType != null" >
+        health_type,
+      </if>
+      <if test="isHkMc != null" >
+        is_hk_mc,
+      </if>
+      <if test="nativePlace != null" >
+        native_place,
+      </if>
+      <if test="householdType != null" >
+        household_type,
+      </if>
+      <if test="householdLocation != null" >
+        household_location,
+      </if>
+      <if test="familyAddress != null" >
+        family_address,
+      </if>
+      <if test="postcode != null" >
+        postcode,
+      </if>
+      <if test="familyPhone != null" >
+        family_phone,
+      </if>
+      <if test="examineeType != null" >
+        examinee_type,
+      </if>
+      <if test="graduationSchool != null" >
+        graduation_school,
+      </if>
+      <if test="majorFieldId != null" >
+        major_field_id,
+      </if>
+      <if test="examNumber != null" >
+        exam_number,
+      </if>
+      <if test="examTotalScore != null" >
+        exam_total_score,
+      </if>
+      <if test="studyType != null" >
+        study_type,
+      </if>
+      <if test="studyMethod != null" >
+        study_method,
+      </if>
+      <if test="enterSchoolType != null" >
+        enter_school_type,
+      </if>
+      <if test="eduStageType != null" >
+        edu_stage_type,
+      </if>
+      <if test="admissionNumber != null" >
+        admission_number,
+      </if>
+      <if test="isDivideClass != null" >
+        is_divide_class,
+      </if>
+      <if test="studyStatus != null" >
+        study_status,
+      </if>
+      <if test="entranceDate != null" >
+        entrance_date,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="studentNumber != null" >
+        #{studentNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="sexType != null" >
+        #{sexType,jdbcType=INTEGER},
+      </if>
+      <if test="birthday != null" >
+        #{birthday,jdbcType=DATE},
+      </if>
+      <if test="idCard != null" >
+        #{idCard,jdbcType=VARCHAR},
+      </if>
+      <if test="nationType != null" >
+        #{nationType,jdbcType=INTEGER},
+      </if>
+      <if test="politicalFeatureType != null" >
+        #{politicalFeatureType,jdbcType=INTEGER},
+      </if>
+      <if test="healthType != null" >
+        #{healthType,jdbcType=INTEGER},
+      </if>
+      <if test="isHkMc != null" >
+        #{isHkMc,jdbcType=INTEGER},
+      </if>
+      <if test="nativePlace != null" >
+        #{nativePlace,jdbcType=VARCHAR},
+      </if>
+      <if test="householdType != null" >
+        #{householdType,jdbcType=INTEGER},
+      </if>
+      <if test="householdLocation != null" >
+        #{householdLocation,jdbcType=VARCHAR},
+      </if>
+      <if test="familyAddress != null" >
+        #{familyAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="postcode != null" >
+        #{postcode,jdbcType=VARCHAR},
+      </if>
+      <if test="familyPhone != null" >
+        #{familyPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="examineeType != null" >
+        #{examineeType,jdbcType=INTEGER},
+      </if>
+      <if test="graduationSchool != null" >
+        #{graduationSchool,jdbcType=VARCHAR},
+      </if>
+      <if test="majorFieldId != null" >
+        #{majorFieldId,jdbcType=INTEGER},
+      </if>
+      <if test="examNumber != null" >
+        #{examNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="examTotalScore != null" >
+        #{examTotalScore,jdbcType=INTEGER},
+      </if>
+      <if test="studyType != null" >
+        #{studyType,jdbcType=INTEGER},
+      </if>
+      <if test="studyMethod != null" >
+        #{studyMethod,jdbcType=INTEGER},
+      </if>
+      <if test="enterSchoolType != null" >
+        #{enterSchoolType,jdbcType=INTEGER},
+      </if>
+      <if test="eduStageType != null" >
+        #{eduStageType,jdbcType=INTEGER},
+      </if>
+      <if test="admissionNumber != null" >
+        #{admissionNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="isDivideClass != null" >
+        #{isDivideClass,jdbcType=INTEGER},
+      </if>
+      <if test="studyStatus != null" >
+        #{studyStatus,jdbcType=INTEGER},
+      </if>
+      <if test="entranceDate != null" >
+        #{entranceDate,jdbcType=DATE},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.dkt.school.stu.model.StudentInfoExample" resultType="java.lang.Integer" >
+    select count(*) from stu_student_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update stu_student_info
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.name != null" >
+        name = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.studentNumber != null" >
+        student_number = #{record.studentNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sexType != null" >
+        sex_type = #{record.sexType,jdbcType=INTEGER},
+      </if>
+      <if test="record.birthday != null" >
+        birthday = #{record.birthday,jdbcType=DATE},
+      </if>
+      <if test="record.idCard != null" >
+        id_card = #{record.idCard,jdbcType=VARCHAR},
+      </if>
+      <if test="record.nationType != null" >
+        nation_type = #{record.nationType,jdbcType=INTEGER},
+      </if>
+      <if test="record.politicalFeatureType != null" >
+        political_feature_type = #{record.politicalFeatureType,jdbcType=INTEGER},
+      </if>
+      <if test="record.healthType != null" >
+        health_type = #{record.healthType,jdbcType=INTEGER},
+      </if>
+      <if test="record.isHkMc != null" >
+        is_hk_mc = #{record.isHkMc,jdbcType=INTEGER},
+      </if>
+      <if test="record.nativePlace != null" >
+        native_place = #{record.nativePlace,jdbcType=VARCHAR},
+      </if>
+      <if test="record.householdType != null" >
+        household_type = #{record.householdType,jdbcType=INTEGER},
+      </if>
+      <if test="record.householdLocation != null" >
+        household_location = #{record.householdLocation,jdbcType=VARCHAR},
+      </if>
+      <if test="record.familyAddress != null" >
+        family_address = #{record.familyAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="record.postcode != null" >
+        postcode = #{record.postcode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.familyPhone != null" >
+        family_phone = #{record.familyPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.examineeType != null" >
+        examinee_type = #{record.examineeType,jdbcType=INTEGER},
+      </if>
+      <if test="record.graduationSchool != null" >
+        graduation_school = #{record.graduationSchool,jdbcType=VARCHAR},
+      </if>
+      <if test="record.majorFieldId != null" >
+        major_field_id = #{record.majorFieldId,jdbcType=INTEGER},
+      </if>
+      <if test="record.examNumber != null" >
+        exam_number = #{record.examNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="record.examTotalScore != null" >
+        exam_total_score = #{record.examTotalScore,jdbcType=INTEGER},
+      </if>
+      <if test="record.studyType != null" >
+        study_type = #{record.studyType,jdbcType=INTEGER},
+      </if>
+      <if test="record.studyMethod != null" >
+        study_method = #{record.studyMethod,jdbcType=INTEGER},
+      </if>
+      <if test="record.enterSchoolType != null" >
+        enter_school_type = #{record.enterSchoolType,jdbcType=INTEGER},
+      </if>
+      <if test="record.eduStageType != null" >
+        edu_stage_type = #{record.eduStageType,jdbcType=INTEGER},
+      </if>
+      <if test="record.admissionNumber != null" >
+        admission_number = #{record.admissionNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="record.isDivideClass != null" >
+        is_divide_class = #{record.isDivideClass,jdbcType=INTEGER},
+      </if>
+      <if test="record.studyStatus != null" >
+        study_status = #{record.studyStatus,jdbcType=INTEGER},
+      </if>
+      <if test="record.entranceDate != null" >
+        entrance_date = #{record.entranceDate,jdbcType=DATE},
+      </if>
+      <if test="record.remark != null" >
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update stu_student_info
+    set id = #{record.id,jdbcType=INTEGER},
+      name = #{record.name,jdbcType=VARCHAR},
+      student_number = #{record.studentNumber,jdbcType=VARCHAR},
+      sex_type = #{record.sexType,jdbcType=INTEGER},
+      birthday = #{record.birthday,jdbcType=DATE},
+      id_card = #{record.idCard,jdbcType=VARCHAR},
+      nation_type = #{record.nationType,jdbcType=INTEGER},
+      political_feature_type = #{record.politicalFeatureType,jdbcType=INTEGER},
+      health_type = #{record.healthType,jdbcType=INTEGER},
+      is_hk_mc = #{record.isHkMc,jdbcType=INTEGER},
+      native_place = #{record.nativePlace,jdbcType=VARCHAR},
+      household_type = #{record.householdType,jdbcType=INTEGER},
+      household_location = #{record.householdLocation,jdbcType=VARCHAR},
+      family_address = #{record.familyAddress,jdbcType=VARCHAR},
+      postcode = #{record.postcode,jdbcType=VARCHAR},
+      family_phone = #{record.familyPhone,jdbcType=VARCHAR},
+      examinee_type = #{record.examineeType,jdbcType=INTEGER},
+      graduation_school = #{record.graduationSchool,jdbcType=VARCHAR},
+      major_field_id = #{record.majorFieldId,jdbcType=INTEGER},
+      exam_number = #{record.examNumber,jdbcType=VARCHAR},
+      exam_total_score = #{record.examTotalScore,jdbcType=INTEGER},
+      study_type = #{record.studyType,jdbcType=INTEGER},
+      study_method = #{record.studyMethod,jdbcType=INTEGER},
+      enter_school_type = #{record.enterSchoolType,jdbcType=INTEGER},
+      edu_stage_type = #{record.eduStageType,jdbcType=INTEGER},
+      admission_number = #{record.admissionNumber,jdbcType=VARCHAR},
+      is_divide_class = #{record.isDivideClass,jdbcType=INTEGER},
+      study_status = #{record.studyStatus,jdbcType=INTEGER},
+      entrance_date = #{record.entranceDate,jdbcType=DATE},
+      remark = #{record.remark,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.dkt.school.stu.model.StudentInfo" >
+    update stu_student_info
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="studentNumber != null" >
+        student_number = #{studentNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="sexType != null" >
+        sex_type = #{sexType,jdbcType=INTEGER},
+      </if>
+      <if test="birthday != null" >
+        birthday = #{birthday,jdbcType=DATE},
+      </if>
+      <if test="idCard != null" >
+        id_card = #{idCard,jdbcType=VARCHAR},
+      </if>
+      <if test="nationType != null" >
+        nation_type = #{nationType,jdbcType=INTEGER},
+      </if>
+      <if test="politicalFeatureType != null" >
+        political_feature_type = #{politicalFeatureType,jdbcType=INTEGER},
+      </if>
+      <if test="healthType != null" >
+        health_type = #{healthType,jdbcType=INTEGER},
+      </if>
+      <if test="isHkMc != null" >
+        is_hk_mc = #{isHkMc,jdbcType=INTEGER},
+      </if>
+      <if test="nativePlace != null" >
+        native_place = #{nativePlace,jdbcType=VARCHAR},
+      </if>
+      <if test="householdType != null" >
+        household_type = #{householdType,jdbcType=INTEGER},
+      </if>
+      <if test="householdLocation != null" >
+        household_location = #{householdLocation,jdbcType=VARCHAR},
+      </if>
+      <if test="familyAddress != null" >
+        family_address = #{familyAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="postcode != null" >
+        postcode = #{postcode,jdbcType=VARCHAR},
+      </if>
+      <if test="familyPhone != null" >
+        family_phone = #{familyPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="examineeType != null" >
+        examinee_type = #{examineeType,jdbcType=INTEGER},
+      </if>
+      <if test="graduationSchool != null" >
+        graduation_school = #{graduationSchool,jdbcType=VARCHAR},
+      </if>
+      <if test="majorFieldId != null" >
+        major_field_id = #{majorFieldId,jdbcType=INTEGER},
+      </if>
+      <if test="examNumber != null" >
+        exam_number = #{examNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="examTotalScore != null" >
+        exam_total_score = #{examTotalScore,jdbcType=INTEGER},
+      </if>
+      <if test="studyType != null" >
+        study_type = #{studyType,jdbcType=INTEGER},
+      </if>
+      <if test="studyMethod != null" >
+        study_method = #{studyMethod,jdbcType=INTEGER},
+      </if>
+      <if test="enterSchoolType != null" >
+        enter_school_type = #{enterSchoolType,jdbcType=INTEGER},
+      </if>
+      <if test="eduStageType != null" >
+        edu_stage_type = #{eduStageType,jdbcType=INTEGER},
+      </if>
+      <if test="admissionNumber != null" >
+        admission_number = #{admissionNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="isDivideClass != null" >
+        is_divide_class = #{isDivideClass,jdbcType=INTEGER},
+      </if>
+      <if test="studyStatus != null" >
+        study_status = #{studyStatus,jdbcType=INTEGER},
+      </if>
+      <if test="entranceDate != null" >
+        entrance_date = #{entranceDate,jdbcType=DATE},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.dkt.school.stu.model.StudentInfo" >
+    update stu_student_info
+    set name = #{name,jdbcType=VARCHAR},
+      student_number = #{studentNumber,jdbcType=VARCHAR},
+      sex_type = #{sexType,jdbcType=INTEGER},
+      birthday = #{birthday,jdbcType=DATE},
+      id_card = #{idCard,jdbcType=VARCHAR},
+      nation_type = #{nationType,jdbcType=INTEGER},
+      political_feature_type = #{politicalFeatureType,jdbcType=INTEGER},
+      health_type = #{healthType,jdbcType=INTEGER},
+      is_hk_mc = #{isHkMc,jdbcType=INTEGER},
+      native_place = #{nativePlace,jdbcType=VARCHAR},
+      household_type = #{householdType,jdbcType=INTEGER},
+      household_location = #{householdLocation,jdbcType=VARCHAR},
+      family_address = #{familyAddress,jdbcType=VARCHAR},
+      postcode = #{postcode,jdbcType=VARCHAR},
+      family_phone = #{familyPhone,jdbcType=VARCHAR},
+      examinee_type = #{examineeType,jdbcType=INTEGER},
+      graduation_school = #{graduationSchool,jdbcType=VARCHAR},
+      major_field_id = #{majorFieldId,jdbcType=INTEGER},
+      exam_number = #{examNumber,jdbcType=VARCHAR},
+      exam_total_score = #{examTotalScore,jdbcType=INTEGER},
+      study_type = #{studyType,jdbcType=INTEGER},
+      study_method = #{studyMethod,jdbcType=INTEGER},
+      enter_school_type = #{enterSchoolType,jdbcType=INTEGER},
+      edu_stage_type = #{eduStageType,jdbcType=INTEGER},
+      admission_number = #{admissionNumber,jdbcType=VARCHAR},
+      is_divide_class = #{isDivideClass,jdbcType=INTEGER},
+      study_status = #{studyStatus,jdbcType=INTEGER},
+      entrance_date = #{entranceDate,jdbcType=DATE},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

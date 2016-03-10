@@ -1,0 +1,569 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.edu.dao.CourseScheduleCustomMapper">
+	<resultMap id="CourseSchedule" type="com.dkt.school.edu.model.CourseSchedule"
+		extends="com.dkt.school.edu.dao.CourseScheduleMapper.BaseResultMap"></resultMap>
+	<resultMap id="MajorField" type="com.dkt.school.sch.model.MajorField">
+		<result column="name" property="name" jdbcType="VARCHAR" />
+	</resultMap>
+	<resultMap id="Clazz" type="com.dkt.school.stu.model.Clazz">
+		<result column="name" property="name" jdbcType="VARCHAR" />
+	</resultMap>
+	<resultMap id="Course" type="com.dkt.school.edu.model.Course" 
+		extends="com.dkt.school.edu.dao.CourseMapper.BaseResultMap"></resultMap>
+	<resultMap id="CourseScheduleDto" type="com.dkt.school.edu.dto.CourseScheduleDto"
+		extends="CourseSchedule">
+		<result column="schoolYearId" property="schoolYearId" jdbcType="VARCHAR" />
+		<result column="termTypeStr" property="termTypeStr" jdbcType="VARCHAR" />
+		<result column="teacherName" property="teacherName" jdbcType="VARCHAR" />
+		<result column="majorStr" property="majorStr" jdbcType="VARCHAR" />
+		<result column="fieldStr" property="fieldStr" jdbcType="VARCHAR" />
+		<result column="grade" property="grade" jdbcType="VARCHAR" />
+		<result column="classes" property="classes" jdbcType="VARCHAR" />
+		<result column="courseTypeStr" property="courseTypeStr"
+			jdbcType="VARCHAR" />
+		<result column="examineTypeStr" property="examineTypeStr"
+			jdbcType="VARCHAR" />
+		<result column="classroom" property="classroom" jdbcType="VARCHAR" />
+		<result column="hours" property="hours" jdbcType="INTEGER" />
+		<result column="credit" property="credit" jdbcType="FLOAT" />
+		<result column="courseName" property="courseName" jdbcType="VARCHAR" />
+		<result column="scoreTypeStr" property="scoreTypeStr" jdbcType="VARCHAR" />
+		<result column="examDateStr" property="examDateStr" jdbcType="VARCHAR" />
+	</resultMap>
+	<!-- 冯其康 -->
+	<resultMap id="CourseOfTeaCourseTable"
+		type="com.dkt.school.edu.dto.CourseInTeaCourseTableDto">
+		<result column="schedule_id" property="courseScheduleId"
+			jdbcType="INTEGER"></result>
+		<result column="course_plan_id" property="coursePlanId"
+			jdbcType="INTEGER"></result>
+		<result column="teach_course_id" property="teachCourseId"
+			jdbcType="INTEGER"></result>
+		<result column="name" property="name" jdbcType="VARCHAR"></result>
+		<result column="week_day" property="weekDay" jdbcType="INTEGER"></result>
+		<result column="weeks" property="weeks" jdbcType="VARCHAR"></result>
+		<result column="week_ids" property="weekIds" jdbcType="VARCHAR"></result>
+		<result column="class_room_name" property="classRoom" jdbcType="VARCHAR"></result>
+		<result column="section_type" property="sectionType" jdbcType="INTEGER"></result>
+		<result column="classes" property="classes" jdbcType="VARCHAR"></result>
+		<result column="major_id" property="majorId" jdbcType="INTEGER"></result>
+		<result column="field_id" property="fieldId" jdbcType="INTEGER"></result>
+		<result column="code" property="courseCode" jdbcType="VARCHAR"></result>
+		<result column="teacher_id" property="teacherId" jdbcType="INTEGER"></result>
+		<result column="tea_name" property="teaName" jdbcType="VARCHAR"></result>
+		<result column="campus_id" property="campusId" jdbcType="INTEGER"></result>
+		<result column="building_id" property="buildingId" jdbcType="INTEGER"></result>
+		<result column="building" property="building" jdbcType="VARCHAR"></result>
+		<result column="class_room_id" property="classRoomId" jdbcType="INTEGER"></result>
+		<result column="course_type" property="courseType" jdbcType="INTEGER"></result>
+		<result column="examine_type" property="examineType" jdbcType="INTEGER"></result>
+		<result column="credit" property="credit" jdbcType="REAL" />
+		<result column="hours" property="hours" jdbcType="INTEGER"></result>
+		<result column="course_seq" property="courseSeq" jdbcType="INTEGER"></result>
+	</resultMap>
+	
+	<!-- 冯其康 -->
+	<!-- 选择课程的mapper -->
+	<resultMap id="CoursePlanOfCourseScheduleDto" type="com.dkt.school.edu.dto.CoursePlanOfCourseScheduleDto">
+		<result column="plan_id" property="planId" jdbcType="INTEGER"/>
+		<result column="major_id" property="majorId" jdbcType="INTEGER"/>
+		<result column="major_name" property="majorName" jdbcType="VARCHAR"/>
+		<result column="field_id" property="fieldId" jdbcType="INTEGER"/>
+		<result column="field_name" property="fieldName" jdbcType="VARCHAR"/>
+		<result column="grade_id" property="gradeId" jdbcType="INTEGER"/>
+		<result column="course_id" property="courseId" jdbcType="INTEGER"/>
+		<result column="course_name" property="courseName" jdbcType="VARCHAR"/>
+		<result column="code" property="code" jdbcType="VARCHAR"/>
+		<result column="teach_course_id" property="teachCourseId" jdbcType="INTEGER"/>
+	</resultMap>
+	
+	<resultMap id="BaseResultMap" type="com.dkt.school.edu.model.CourseSchedule">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="teach_course_id" property="teachCourseId"
+			jdbcType="INTEGER" />
+		<result column="class_room_id" property="classRoomId" jdbcType="INTEGER" />
+		<result column="week_day" property="weekDay" jdbcType="INTEGER" />
+		<result column="section_type" property="sectionType" jdbcType="INTEGER" />
+		<result column="week_ids" property="weekIds" jdbcType="VARCHAR" />
+		<result column="weeks" property="weeks" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		cs.class_room_id,cs.week_day,cs.section_type,cs.teacher_id,cs.week_ids,cs.weeks
+	</sql>
+
+	<select id="getFieldByMajor" parameterType="java.lang.Integer"
+		resultMap="MajorField"></select>
+
+	<update id="updateByCourseSchedule">
+		update `edu_course_schedule`
+		set class_room_id = #{schedule.classRoomId} , week_day =
+		#{schedule.weekDay}, section_type = #{schedule.sectionType},
+		week_ids = #{schedule.weekIds}, weeks = #{schedule.weeks}
+		where id = #{schedule.id}
+	</update>
+
+	<select id="getPersonalCourseScheduleByUserId" resultMap="CourseScheduleDto">
+		SELECT DISTINCT
+		<include refid="Base_Column_List" />, 
+		tc.study_year_id,
+		tc.term_type,
+		tc.classes,
+		tc.score_type,
+		cp.grade_id,
+		cp.course_type,
+		cp.examine_type,
+		cp.credit,
+		cp.hours,
+		tt.class_id AS classId,
+		g.`name` AS grade,
+		c.`name` AS courseName,
+		t.`name` AS teacherName,
+		sch_class_room.`name` AS classroom
+		FROM edu_course_schedule cs
+		LEFT JOIN edu_teach_course tc ON tc.id = cs.teach_course_id
+		LEFT JOIN edu_teach_task  tt ON tt.teach_course_id = tc.id
+		LEFT JOIN edu_course_plan cp ON cp.id = tt.course_plan_id
+		LEFT JOIN edu_course c ON tc.course_id = c.id
+		LEFT JOIN sch_class_room ON cs.class_room_id = sch_class_room.id
+		LEFT JOIN sch_grade g ON g.id = cp.grade_id
+		LEFT JOIN tea_teacher t ON t.id = cs.teacher_id
+		<where>
+			<if test="userId != null and userId != '' ">
+				t.user_id = #{userId}
+			</if>
+		</where>
+	</select>
+	
+	<select id="findCourseSchedule" resultMap="CourseScheduleDto">
+	
+		SELECT DISTINCT(tc.course_seq),
+		<include refid="Base_Column_List" />, 
+		tc.study_year_id,
+		tc.term_type,
+		tc.classes,
+		tc.course_seq,
+		tc.score_type,
+		cp.grade_id,
+		cp.course_type,
+		cp.examine_type,
+		cp.credit,
+		cp.hours,
+		tt.class_id AS classId,
+		stu_class.id AS classId,
+		g.`name` AS grade,
+		m.`name` AS majorStr,
+		mf.`name` AS fieldStr,
+		c.`name` AS courseName,
+		t.`name` AS teacherName,
+		sch_class_room.`name` AS classroom
+		FROM edu_course_schedule cs
+		INNER JOIN
+		edu_teach_course tc ON tc.id = cs.teach_course_id
+		INNER JOIN edu_teach_task  tt ON tt.teach_course_id = tc.id
+		INNER JOIN edu_course_plan cp ON cp.id = tt.course_plan_id
+		INNER JOIN edu_course c ON tc.course_id = c.id
+		INNER JOIN sch_class_room ON cs.class_room_id = sch_class_room.id
+		INNER JOIN tea_teacher t
+		INNER JOIN sch_major m ON cp.major_id = m.id
+		INNER JOIN sch_major_field mf ON cp.field_id = mf.id
+		INNER JOIN sch_grade g ON g.id = cp.grade_id
+		INNER JOIN edu_course_teacher ct ON ct.teacher_id = t.id
+		AND ct.teach_course_id = tc.id
+		INNER JOIN stu_class ON stu_class.id = tt.class_id
+		  
+		<where>
+			<if test="gradeId != null and gradeId != '' ">
+				cp.grade_id = #{gradeId}
+			</if>
+			<if test="classes != null and classes !='' ">
+				AND tc.classes like '%${classes}%'
+			</if>
+			<if test="teacherName != null and teacherName != '' ">
+				AND t.`name` = #{teacherName}
+			</if>
+		</where>
+		GROUP BY cs.id
+	</select>
+	
+	<!-- 冯其康 -->
+	<select id="selectCourseByClassId" resultMap="CourseOfTeaCourseTable">
+		select
+		DISTINCT(edu_teach_course.course_seq),
+		edu_course_schedule.id as schedule_id,
+		edu_course_plan.id as
+		course_plan_id,
+		edu_teach_course.id as teach_course_id,
+		edu_course.name
+		,
+		edu_course_schedule.week_day,
+		edu_course_schedule.weeks,
+		edu_course_schedule.week_ids,
+		sch_class_room.`name` as class_room_name,
+		edu_course_schedule.section_type,
+		edu_teach_course.classes,
+		edu_course_plan.major_id,
+		edu_course_plan.field_id,
+		edu_course.`code`,
+		edu_course_teacher.teacher_id,
+		tea_teacher.name as tea_name,
+		sch_class_room.id as class_room_id,
+		sch_building.id as building_id,
+		sch_building.name as building,
+		sch_campus.id as campus_id,
+		edu_course_plan.course_type,
+		edu_course_plan.examine_type,
+		edu_course_plan.credit,
+		edu_course_plan.hours
+		from edu_course_schedule
+		inner join
+		edu_teach_course on edu_teach_course.id =
+		edu_course_schedule.teach_course_id
+		inner join edu_teach_task on edu_teach_task.teach_course_id =
+		edu_teach_course.id
+		inner join edu_course_plan on edu_course_plan.id =
+		edu_teach_task.course_plan_id
+
+		inner join edu_course on edu_teach_course.course_id = edu_course.id
+
+		inner
+		join sch_class_room on edu_course_schedule.class_room_id =
+		sch_class_room.id
+		inner join sch_building on sch_building.id =
+		sch_class_room.building_id
+		inner join sch_campus on sch_campus.id =
+		sch_building.campus_id
+		inner join tea_teacher
+		inner join sch_major_field
+		on edu_course_plan.field_id = sch_major_field.id
+		inner join
+		edu_course_teacher on edu_course_teacher.teacher_id = tea_teacher.id
+		and edu_course_teacher.teach_course_id = edu_teach_course.id
+		inner join stu_class on stu_class.id = ${classId}
+		where
+		edu_course_schedule.teach_course_id = edu_teach_course.id
+		and
+		edu_teach_course.classes REGEXP stu_class.name
+		ORDER
+		BY
+		edu_course_schedule.id
+	</select>
+
+	<select id="selectCountOfCoursePlanInCourseSchedule" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM edu_course_plan, edu_course, sch_major, sch_major_field,
+		edu_teach_course,stu_class
+		where edu_course_plan.course_id = edu_course.id
+		and edu_course_plan.field_id = sch_major_field.id
+		and edu_course_plan.major_id = sch_major.id
+		and edu_teach_course.course_id = edu_course.id
+		and edu_teach_course.classes regexp stu_class.name
+		and stu_class.name = '${className}'
+		<if test="majorId != 0 and majorId != null">
+			and edu_course_plan.major_id = ${majorId}
+		</if>
+		
+		<if test="fieldId != 0 and fieldId != null">
+			and edu_course_plan.field_id = ${fieldId}
+		</if>
+		
+		<if test="courseName != '' and courseName != null">
+			and edu_course.name like '%${courseName}%'
+		</if>
+		
+	</select>
+	
+	<select id="selectCoursePlanInCourseSchedule" resultMap="CoursePlanOfCourseScheduleDto">
+		SELECT
+		edu_course_plan.id as plan_id,
+		edu_course_plan.major_id,
+		sch_major.`name` as major_name,
+		edu_course_plan.field_id,
+		sch_major_field.name as field_name,
+		edu_course_plan.grade_id,
+		edu_course_plan.course_id,
+		edu_course.`name` as course_name,
+		edu_course.`code`,
+		edu_teach_course.id as teach_course_id
+		FROM edu_course_plan, edu_course, sch_major, sch_major_field,
+		edu_teach_course,stu_class
+		where edu_course_plan.course_id = edu_course.id
+		and edu_course_plan.field_id = sch_major_field.id
+		and edu_course_plan.major_id = sch_major.id
+		and edu_teach_course.course_id = edu_course.id
+		and edu_teach_course.classes regexp stu_class.name
+		and stu_class.name = '${className}'
+		<if test="majorId != 0 and majorId != null">
+			and edu_course_plan.major_id = ${majorId}
+		</if>
+		
+		<if test="fieldId != 0 and fieldId != null">
+			and edu_course_plan.field_id = ${fieldId}
+		</if>
+		
+		<if test="courseName != '' and courseName != null">
+			and edu_course.name like '%${courseName}%'
+		</if>
+		
+		<if test="limit != null">
+			limit ${limit.offset}, ${limit.rows}
+		</if>
+	</select>
+	
+	 <select id="showClassSchedule" resultMap="CourseScheduleDto">
+	 	SELECT DISTINCT
+			<include refid="Base_Column_List"/>,
+		 
+			edu_teach_course.study_year_id,
+			edu_teach_course.term_type,
+			edu_teach_course.classes,
+			edu_teach_course.score_type,
+			edu_course_plan.grade_id,
+			edu_course_plan.course_type,
+			edu_course_plan.examine_type,
+			edu_course_plan.credit,
+			edu_course_plan.hours,
+			edu_teach_task.class_id AS classId,
+			stu_class.id AS classId,
+			edu_course.`name` AS courseName,
+			tea_teacher.`name` AS teacherName
+		FROM
+			edu_course_schedule AS cs
+		INNER JOIN edu_teach_course ON cs.teach_course_id = edu_teach_course.id
+		INNER JOIN edu_course_plan ON edu_teach_course.course_plan_id = edu_course_plan.id
+		INNER JOIN edu_teach_task ON edu_course_plan.id = edu_teach_task.course_plan_id
+		INNER JOIN stu_class ON edu_teach_task.class_id = stu_class.id
+		INNER JOIN edu_course ON edu_course_plan.course_id = edu_course.id
+		INNER JOIN tea_teacher ON edu_course.major_id = tea_teacher.major_id
+		
+		<where>
+			<if test="gradeId != null and gradeId != ''">
+				edu_course_plan.grade_id = #{gradeId}
+			</if>
+			<if test="classId != null and classId !='' ">
+				AND edu_teach_task.class_id = #{classId}
+			</if>
+		</where>
+	 </select>
+	 
+	 <!-- 根据学年名称获取学年id -->
+	 <select id="getStudyYearIdByStudyYear" resultType="java.lang.Integer">
+	 	SELECT s.id FROM sch_study_year AS s
+	 	<where>
+	 		s.`name` = #{studyYear}
+	 	</where>
+	 </select>
+	 
+	 <!-- 根据专业获取专业的id -->
+	 <select id="getMajorIdByMajor" resultType="java.lang.Integer">
+	 	SELECT m.id FROM sch_major AS m
+	 	<where>
+	 		m.`name` = #{major}
+	 	</where>
+	 </select>
+	 
+	 <!-- 根据专业方向名称获取专业方向id -->
+	 <select id="getFieldIdByField" resultType="java.lang.Integer">
+	 	SELECT f.id FROM sch_major_field AS f
+	 	<where>
+	 		f.`name` = #{field}
+	 	</where>
+	 </select>
+	 
+	 <!-- 根据教室名称获取教室id -->
+	 <select id="getClassRoomIdByClassRoom" resultType="java.lang.Integer">
+	 	SELECT r.id FROM sch_class_room AS r
+	 	<where>
+	 		r.`name` = #{classroom}
+	 	</where>
+	 </select>
+	 
+	 <!-- 根据学期获取学期的类型枚举值 -->
+	 <select id="getTermTypeByTerm" resultType="java.lang.Integer">
+	 	SELECT s.id FROM sys_enumeration_value AS s
+	 	<where>
+	 		s.`name` = #{term}
+	 	</where>
+	 </select>
+	
+	<!-- 根据课程名称获取课程id -->
+	 <select id="getCourseIdByCourse" resultType="java.lang.Integer">
+	 	SELECT c.id FROM edu_course AS c
+	 	<where>
+	 		c.`name` = #{course}
+	 	</where>
+	 </select>	
+	 
+	 <!-- 根据课程类型获取课程类型枚举值 -->
+	 <select id="getCourseTypeByCourse" resultType="java.lang.Integer">
+	 	SELECT s.id FROM sys_enumeration_value AS s
+	 	<where>
+	 		s.`name` = #{courseType}
+	 	</where>
+	 </select>
+	 
+	 <!-- 根据年级名称找到年级id  -->
+	 <select id="getGradeIdByGrade" resultType="java.lang.Integer">
+	 	SELECT g.id FROM sch_grade AS g
+	 	<where>
+	 		g.`name` = #{grade}
+	 	</where>
+	 </select>
+	 <!-- 根据教师查找教师id -->
+	 <select id="getTeacherIdByTeacher" resultType="java.lang.Integer">
+	 	SELECT t.id FROM tea_teacher AS t
+	 	<where>
+	 		t.`name` = #{teacher}
+	 	</where>
+	 </select>
+
+	 <select id="getClassIdByClass" resultType="java.lang.Integer">
+		SELECT c.id FROM stu_class AS c
+		<where>
+			c.`name` = #{class}
+		</where>	 	
+	 </select>
+	 <!-- 根据星期查找星期枚举值  -->
+	 <select id="getWeekDayIdByWeekDay" resultType="java.lang.Integer">
+	 	SELECT w.id FROM sys_enumeration_value AS w
+	 	<where>
+	 		w.`name` = #{weekday}
+	 	</where>
+	 </select>
+	 <!-- 根据节次获取节次枚举值 -->
+	 <select id="getSectionTypeBySection" resultType="java.lang.Integer">
+	 	SELECT s.id FROM sys_enumeration_value AS s
+	 	<where>
+	 		s.`name` = #{section}
+	 	</where>
+	 </select>
+	 <!-- 获得考试类型枚举值-->
+	 <select id="getExamTypeByExam" resultType="java.lang.Integer">
+	 		SELECT s.id FROM sys_enumeration_value AS s
+	 	<where>
+	 		s.`name` = #{exam}
+	 	</where>
+	 </select>
+	 
+	 <!-- 通过多个字段获取course_plan_id -->
+	 <select id="getCoursePlanIdByFields" resultType="java.lang.Integer">
+	 	SELECT cp.id FROM edu_course_plan cp
+	 	<where>
+	 		<if test="majorId != null">
+		 		cp.major_id = #{majorId}
+	 		</if>
+	 		<if test="fieldId != null">
+		 		AND cp.field_id = #{fieldId} 		
+	 		</if>
+	 		<if test="gradeId != null">
+		 		AND cp.grade_id = #{gradeId} 		
+	 		</if>
+	 		<if test="termType != null">
+		 		AND cp.term_type = #{termType}
+	 		</if>
+	 		<if test="courseId != null">
+		 		AND cp.course_id = #{courseId}
+	 		</if>
+	 	</where>
+	 </select>
+	<!-- 通过多个字段获取teach_course_id -->
+	 <select id="getTeacherCourseIdByFields" resultType="java.lang.Integer">
+	 	SELECT tc.id FROM edu_teach_course AS tc
+	 	<where>
+	 		<if test="studyYearId != null">
+	 			tc.study_year_id = #{studyYearId}
+	 		</if>
+	 		<if test="termType != null">
+	 			AND tc.term_type = #{termType}
+	 		</if>
+	 		<if test="coursePlanId != null">
+		 		AND tc.course_plan_id = #{coursePlanId}
+	 		</if>
+	 		<if test="courseId != null">
+	 			AND tc.course_id = #{courseId}
+	 		</if>
+	 		<if test="classes != null">
+	 			AND tc.classes = #{classes}
+	 		</if>
+	 	</where>
+	 </select>
+	 <!-- 获取最后的id -->
+	  <select id="selectLastId" resultType="java.lang.Integer">
+		SELECT tc.id FROM edu_teach_course tc
+		ORDER BY tc.id DESC 
+		LIMIT 1
+	</select>
+	 <!-- 从一份excel里取数据插入多个表 -->
+	 <insert id="insertTeachCourse">
+	 	<selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+     		 SELECT LAST_INSERT_ID()
+    	</selectKey>
+	 	INSERT INTO edu_teach_course VALUES 
+	 	(null,#{tc.studyYearId},#{tc.termType},#{tc.courseId},
+	 			#{tc.coursePlanId},null,#{tc.classes},null,null,null,NOW())
+	 </insert>
+	 <insert id="insertCourseSchedule">
+	 	INSERT INTO edu_course_schedule VALUES
+	 	(null,#{cs.teachCourseId},#{cs.classRoomId},#{cs.weekDay},
+	 	#{cs.sectionType},#{cs.weekIds},#{cs.weeks})
+	 </insert>
+	 <insert id="insertCoursePlan">
+	 	INSERT INTO edu_course_plan VALUES
+	 	(null,#{cp.majorId},#{cp.fieldId},#{cp.gradeId},
+	 	#{cp.termType},#{cp.courseId},#{cp.courseType},
+	 	#{cp.examineType},#{cp.credit},#{cp.hours},#{cp.remark})
+	 </insert>
+	 <!-- 上课班级中如果有多个对应的要插入多个TeachTask记录 -->
+	 <insert id="insertTeachTaskList" parameterType="java.util.List">
+	 	INSERT INTO edu_teach_task VALUES 
+	 	<foreach collection="list" item="tt" separator=",">
+	 	(null,#{tt.studyYearId},#{tt.termType},#{tt.coursePlanId},#{tt.courseId},
+	 			#{tt.classId},null,#{tt.teachCourseId})
+	 	</foreach>
+	 </insert>
+	 <insert id="insertCourseTeacher">
+	 	INSERT INTO edu_course_teacher VALUES
+	 	(null,#{ct.teachCourseId},#{ct.teacherId})
+	 </insert>
+	 
+	 <!-- 更新teach_course的班级记录 -->
+	 <update id="updateTeachCourse">
+	 	UPDATE edu_teach_course tc
+	 	SET tc.classes = #{classes}
+	 	<where>
+	 		tc.id = #{teachCourseId}
+	 	</where>
+	 </update>
+	 
+	 <!-- 导入课程表的过程中要检查连续周次时间上的冲突 -->
+	 <select id="findConflictCourseWeeks" resultMap="Course">
+	 	SELECT DISTINCT 
+	 	c.`name`
+	 	FROM edu_course c
+	 	INNER JOIN edu_course_plan cp ON c.id = cp.course_id
+	 	INNER JOIN edu_teach_course tc ON cp.id = tc.course_plan_id
+	 	INNER JOIN edu_course_schedule cs ON tc.id = cs.teach_course_id 
+	 	INNER JOIN edu_course_teacher ct ON cs.teach_course_id = ct.teach_course_id
+	 	<where>
+	 		cs.week_day = #{weekDay} AND cs.section_type = #{sectionType}
+	 		AND cs.weeks = #{weeks}  AND ct.teacher_id = #{teacherId}
+	 	</where>
+	 </select>
+	  <!-- 导入课程表的过程中要检查分散周次时间上的冲突 -->
+	  <select id="findConflictCourseWeekIds" resultMap="Course">
+	 	SELECT DISTINCT 
+	 	c.`name`
+	 	FROM edu_course c
+	 	INNER JOIN edu_course_plan cp ON c.id = cp.course_id
+	 	INNER JOIN edu_teach_course tc ON cp.id = tc.course_plan_id
+	 	INNER JOIN edu_course_schedule cs ON tc.id = cs.teach_course_id 
+	 	INNER JOIN edu_course_teacher ct ON cs.teach_course_id = ct.teach_course_id
+	 	<where>
+	 		cs.week_day = #{weekDay} AND cs.section_type = #{sectionType}
+	 		AND cs.week_ids = #{weekIds} AND ct.teacher_id = #{teacherId}
+	 	</where>
+	 
+	 </select>
+</mapper>

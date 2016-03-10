@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.user.dao.DepartmentCustomMapper">
+	<resultMap type="com.dkt.school.user.model.Department" id="Department" extends="com.dkt.school.user.dao.DepartmentMapper.BaseResultMap">
+	
+	</resultMap>
+	<sql id="Base_Column_List">
+		ud.id,ud.parent_id,ud.name,ud.remark
+	</sql>
+
+	<select id="hasChildrenDepartment" resultType="java.lang.Integer">
+		select 1 from usr_department
+		<where>
+			<if test="departmentId != null and departmentId != ''">
+				parent_id=#{departmentId}
+
+			</if>
+
+		</where>
+		limit 1
+
+	</select>
+
+	<select id="hasDepartmentByName" resultType="java.lang.Integer">
+
+		select count(*) from usr_department
+		<where>
+			<if test="name != null and name != ''">
+				name=#{name}
+
+			</if>
+
+		</where>
+
+	</select>
+	
+	<select id="getDepartmentCount" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		usr_department
+		
+		
+		<where>
+			<if test="name != null and name !=''">
+				usr_department.name like '%${name}%'
+			</if>  
+			 
+		</where>
+	</select>
+	
+	
+	
+	<select id="getDepartmentByPage" resultMap="Department">
+		SELECT
+		usr_department.id,
+		usr_department.parent_id,
+		usr_department.`name`,
+		usr_department.remark
+		FROM
+		usr_department
+		<where>
+			<if test="name != null and name !=''">
+				usr_department.name like '%${name}%'
+			</if>  
+			 
+		</where>
+		<if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>  
+		
+					
+	</select>
+
+</mapper>

@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.equ.dao.EquipmentItemCustomMapper">
+	<resultMap id="BaseResultMap" type="com.dkt.school.equ.model.EquipmentItem">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="code" property="code" jdbcType="VARCHAR" />
+		<result column="equipment_id" property="equipmentId" jdbcType="INTEGER" />
+		<result column="source" property="source" jdbcType="INTEGER" />
+		<result column="buy_detail_id" property="buyDetailId" jdbcType="INTEGER" />
+		<result column="buy_date" property="buyDate" jdbcType="TIMESTAMP" />
+		<result column="storage_id" property="storageId" jdbcType="INTEGER" />
+		<result column="use_status" property="useStatus" jdbcType="INTEGER" />
+		<result column="use_user_id" property="useUserId" jdbcType="INTEGER" />
+		<result column="use_date" property="useDate" jdbcType="TIMESTAMP" />
+		<result column="use_dealine" property="useDealine" jdbcType="TIMESTAMP" />
+		<result column="return_date" property="returnDate" jdbcType="TIMESTAMP" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<resultMap id="EquipmentItemDtoResultMap" type="com.dkt.school.equ.dto.EquipmentItemDto"
+		extends="BaseResultMap">
+	</resultMap>
+	
+	<resultMap type="com.dkt.school.equ.model.EquipmentItem" id="EquipmentItem" extends="com.dkt.school.equ.dao.EquipmentItemMapper.BaseResultMap"></resultMap>
+	<resultMap type="com.dkt.school.equ.model.Category" id="category" extends="com.dkt.school.equ.dao.CategoryMapper.BaseResultMap"></resultMap>
+	<resultMap type="com.dkt.school.equ.model.Storage" id="storage" extends="com.dkt.school.equ.dao.StorageMapper.BaseResultMap"></resultMap>
+	<resultMap type="com.dkt.school.equ.dto.EquipmentItemDto" id="EquipmentItemDto" 
+		extends="com.dkt.school.equ.dao.EquipmentItemMapper.BaseResultMap">
+		<result column="category" property="category" jdbcType="VARCHAR"/>
+		<result column="equ_name" property="name" jdbcType="VARCHAR"/>
+		<result column="equ_brand" property="brand" jdbcType="VARCHAR"/>
+		<result column="equ_model" property="model" jdbcType="VARCHAR"/>
+		<result column="equ_building" property="building" jdbcType="VARCHAR"/>
+		<result column="equ_store" property="store" jdbcType="VARCHAR"/>
+		<result column="equ_room" property="room" jdbcType="VARCHAR"/>
+		<result column="buy_time" property="buyTime" jdbcType="VARCHAR"/>
+	</resultMap>
+	<resultMap type="com.dkt.school.equ.dto.EquipmentUseDto" id="EquipmentUseDto">
+		<result column="equ_name" property="equName" jdbcType="VARCHAR"/>
+		<result column="use_name" property="username" jdbcType="VARCHAR"/>
+		<result column="use_depart" property="department" jdbcType="VARCHAR"/>
+		<result column="use_mobile" property="mobile" jdbcType="VARCHAR"/>
+		<result column="use_addr" property="address" jdbcType="VARCHAR"/>
+		<result column="use_email" property="email" jdbcType="VARCHAR"/>
+		<result column="equ_use_status" property="equUseStatus" jdbcType="VARCHAR"/>
+		<!--  <result column="use_sex" property="sex" jdbcType="VARCHAR"/>
+		-->
+	</resultMap>
+
+	<select id="selectByCode" parameterType="java.lang.String"
+		resultMap="BaseResultMap">
+		select * from equ_equipment_item where code = #{code}
+	</select>
+
+	<select id="getEquipmentItemCount" parameterType="java.lang.Integer"
+		resultType="java.lang.Integer">
+		select COUNT(*) from equ_equipment_item where equipment_id
+		= #{equipment_id}
+	</select>
+	
+	<select id="getEquipmentItemCountWithFree" parameterType="java.lang.Integer"
+		resultType="java.lang.Integer">
+		select COUNT(*) from equ_equipment_item where equipment_id
+		= #{equipment_id} and use_status = 16001
+	</select>
+
+	<select id="getEquipmentItemByPage" resultMap="EquipmentItemDtoResultMap">
+		select * from equ_equipment_item
+		<where>
+			<if test="equipmentId != null">
+				equipment_id = ${equipmentId}
+			</if>
+			<if test="isFree == true">
+				and use_status = 16001
+			</if>
+		</where>
+		<if test="limit != null">
+			limit #{limit.offset}, #{limit.rows}
+		</if>
+	</select>
+
+	<select id="getEquipmentItemCountByConditions" resultType="java.lang.Integer">
+		select COUNT(*) from equ_equipment_item
+		<where>
+			<if test="1 == 1">
+				(use_status = 16002 or use_status = 16003)
+			</if>
+			<if test="equipmentId != 0">
+				and equipment_id = ${equipmentId}
+			</if>
+			<if test="code != null">
+				and code = '${code}'
+			</if>
+			<if test="userId != 0 ">
+				and use_user_id = ${userId}
+			</if>
+		</where>
+	</select>
+	
+	<select id="getEquipmentItemByCode" resultMap="EquipmentItemDtoResultMap">
+		select * from equ_equipment_item
+		<where>
+			<if test="code != null">
+				code = '${code}'
+			</if>
+			<if test="limit != null">
+				limit #{limit.offset}, #{limit.rows}
+			</if>
+		</where>
+	</select>
+
+	<select id="getEquipmentItemByConditions" resultMap="EquipmentItemDtoResultMap">
+		select * from equ_equipment_item
+		<where>
+			<if test="1 == 1">
+				(use_status = 16002 or use_status = 16003)
+			</if>
+			<if test="equipmentId != 0">
+				and equipment_id = ${equipmentId}
+			</if>
+			<if test="code != null">
+				and code = '${code}'
+			</if>
+			<if test="userId != 0 ">
+				and use_user_id = ${userId}
+			</if>
+			<if test="limit != null">
+				limit #{limit.offset}, #{limit.rows}
+			</if>
+		</where>
+	</select>
+	
+	<sql id="Base_Column_List">
+		equ_item.id,equ_item.code,equ_item.remark,equ_item.source,equ_item.use_status
+	</sql>
+
+	<select id="selectEquipmentItemCount" resultType="java.lang.Integer">
+		SELECT 
+			Count(*)
+		FROM
+			equ_equipment_item AS equ_item
+		INNER JOIN equ_equipment ON equ_item.equipment_id = equ_equipment.id
+		INNER JOIN equ_category AS c ON equ_equipment.category_id = c.id
+		<where>
+			<if test="category != null and category != '' ">
+				c.`name` like '%${category}%'
+			</if>
+			<if test="source != null and source != '' ">
+				AND equ_item.source= ${source}
+			</if>
+			<if test="useStatus != null and useStatus != '' ">
+				AND equ_item.use_status= ${useStatus}
+			</if>
+			<if test="buyTime != null and buyTime != '' ">
+				AND equ_item.buy_date like '%${buyTime}%' 
+			</if>
+		</where>
+	</select>
+	
+	<select id="selectEquipmentItemDtoByLimit" resultMap="EquipmentItemDto">
+		SELECT DISTINCT
+			<include refid="Base_Column_List"/>,
+			equ.`name` AS equ_name,
+			equ.brand AS equ_brand,
+			equ.model AS equ_model,
+			DATE_FORMAT(equ_item.buy_date,'%Y-%m-%d') AS buy_time,
+			s.`name` AS equ_store,
+			b.name AS equ_building,
+			cr.name AS equ_room,
+			c.`name` AS category
+		FROM
+			equ_equipment_item AS equ_item
+		LEFT JOIN equ_equipment AS equ ON equ_item.equipment_id = equ.id
+		LEFT JOIN equ_category AS c ON equ.category_id = c.id
+		LEFT JOIN equ_storage AS s ON equ_item.storage_id = s.id
+		LEFT JOIN sch_building AS b ON b.id = s.building_id
+		LEFT JOIN sch_class_room cr ON cr.id = s.room_id
+		<where>
+			<if test="category != null and category != '' ">
+				 c.`name` like '%${category}%'
+			</if> 
+			<if test="useStatus != null and useStatus != '' ">
+				AND equ_item.use_status= ${useStatus}
+			</if>
+			<if test="source != null and source != '' ">
+				AND equ_item.source= ${source}
+			</if>
+			<if test="buyTime != null and buyTime != '' ">
+				AND equ_item.buy_date like '%${buyTime}%' 
+			</if>
+		</where>
+			<if test="limit != null and limit != '' ">
+				LIMIT #{limit.offset},#{limit.rows}
+			</if>
+	</select>
+	
+	<select id="getEquipmentUseDtoById" parameterType="java.lang.Integer" resultMap="EquipmentUseDto">
+		SELECT DISTINCT
+			equ_item.code,
+			e.name AS equ_name, 
+			equ_item.use_status AS useStatus,
+			equ_item.return_date AS returnDate,
+			equ_item.use_dealine AS useDealine,
+			equ_item.use_date AS useDate,
+			u.`name` AS use_name,
+			depart.`name` AS use_depart,
+			u.mobile,
+			u.email AS use_email,
+			u.address AS use_addr,
+		(select ev.name from sys_enumeration_value ev where ev.id=equ_item.use_status) AS equ_use_status
+		FROM
+			equ_equipment_item AS equ_item
+		LEFT JOIN equ_equipment AS e ON e.id = equ_item.equipment_id
+		LEFT JOIN usr_user AS u ON equ_item.use_user_id = u.id
+		LEFT JOIN usr_department AS depart ON u.department_id = depart.id
+		<where>
+			equ_item.id = ${id}
+		</where>
+	</select>
+	
+	<insert id="insertByList" parameterType="com.dkt.school.equ.dto.EquipmentItemDto">
+		insert into equ_equipment_item(code, equipment_id, source, buy_date, storage_id, use_status, remark) values 
+		<foreach collection="list" separator="," item="dto">
+			(
+				'${dto.code}', ${dto.equipmentId}, ${dto.source}, '${dto.buyDateString}', ${dto.storageId}, ${dto.useStatus}, '${dto.remark}' 
+			)
+		</foreach>
+	</insert>
+</mapper>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.system.dao.SysConfigCustomMapper">
+    <resultMap id="SysConfig" type="com.dkt.school.system.model.SysConfig" extends="com.dkt.school.system.dao.SysConfigMapper.BaseResultMap"/>
+    <sql id="Base_Column_List">
+        sc.id,sc.name,sc.code,sc.default_value,sc.value,sc.remark
+    </sql>
+
+    <select id="countBySearch" resultType="java.lang.Integer">
+        select count(*) from sys_config
+
+        <where>
+            <if test="name != null and name != ''">
+                name  like '%${name}%'
+            </if>
+
+        </where>
+
+    </select>
+
+
+    <select id="selectByLimit" resultMap="SysConfig">
+        select <include refid="Base_Column_List"/>
+        from sys_config sc
+
+        <where>
+            <if test="name != null and name != ''">
+                name  like '%${name}%'
+            </if>
+
+        </where>
+
+        <if test="limit != null">
+            limit #{limit.offset},#{limit.rows}
+        </if>
+    </select>
+</mapper>

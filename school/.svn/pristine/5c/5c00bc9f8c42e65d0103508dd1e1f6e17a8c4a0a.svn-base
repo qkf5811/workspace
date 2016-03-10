@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.sch.dao.BuildingCustomMapper" >
+  <resultMap id="BaseResultMap" type="com.dkt.school.sch.model.Building" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="campus_id" property="campusId" jdbcType="INTEGER" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <resultMap type="com.dkt.school.sch.dto.BuildingDto" id="BuildingDtoResultMap" extends="BaseResultMap">
+     <result column="campusName" property="campusName" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <select id="selectBuildByCampusId" resultMap="BaseResultMap">
+  	select * from sch_building where campus_id = ${id}
+  </select>
+  
+  <!-- 查询符合条件的教学楼信息 -->
+  <select id="selectTotalInfoOfBuilding" resultMap="BuildingDtoResultMap">
+    SELECT sch_building.* ,sch_campus.name AS campusName
+    FROM sch_building
+    LEFT JOIN sch_campus ON sch_building.campus_id=sch_campus.id
+    <where>
+	  <if test="dto.campusId!=null">
+	     AND sch_building.campus_id=${dto.campusId}
+	  </if>
+	  <if test="dto.name!=null">
+	     AND sch_building.name LIKE '%${dto.name}%'
+	  </if>
+	</where>
+    <if test="limit != null">
+		limit #{limit.offset},#{limit.rows}
+	</if>
+  </select>
+  
+  <!-- 查询符合条件的教学楼数量 -->
+  <select id="selectCountOfBuilding" resultType="java.lang.Integer">
+  SELECT COUNT(*)
+  FROM sch_building
+  LEFT JOIN sch_campus ON sch_building.campus_id=sch_campus.id
+    <where>
+	  <if test="dto.campusId!=null">
+	     AND sch_building.campus_id=${dto.campusId}
+	  </if>
+	  <if test="dto.name!=null">
+	     AND sch_building.name LIKE '%${dto.name}%'
+	  </if>
+	</where>
+  </select>
+  
+  <!-- 吴俊鹏 -->
+  <select id="getClassRoomByBuildingId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		SELECT c.id,c.name FROM stu_class_room AS c 
+		<where>
+			c.building_id = #{buildingId}
+		</where>
+	</select>
+</mapper>

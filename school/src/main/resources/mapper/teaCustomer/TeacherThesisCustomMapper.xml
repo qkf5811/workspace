@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.tea.dao.TeacherThesisCustomMapper" >
+	
+	<resultMap id="BaseResultMapExtend" type="com.dkt.school.tea.model.TeacherThesis"
+		extends="com.dkt.school.tea.dao.TeacherThesisMapper.BaseResultMap">
+	</resultMap>
+	
+	<resultMap type="com.dkt.school.tea.dto.TeacherThesisDto" id="TeacherThesisDto" extends="BaseResultMapExtend">
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="thesis_type_str" property="thesisTypeStr" jdbcType="VARCHAR"/>
+		<result column="code" property="code" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	
+	<select id="getAllThesisCount" resultType="java.lang.Integer">
+		select count(*) 
+		from tea_teacher_thesis ttt
+		LEFT JOIN tea_teacher tt ON tt.id = ttt.teacher_id  
+		
+ 		<where>
+			<if test="name != null and name !=''">
+				 tt.name like '%${name}%'
+			</if>  
+ 			<if test="code != null and code != ''">
+				and tt.code like '%${code}%'
+			</if> 
+			<if test="thesisType != null and thesisType != ''">
+				and ttt.thesis_type like '%${thesisType}%'
+			</if>  
+		</where>
+	</select>
+	
+	
+	<select id="getTeacherThesisCount" resultType="java.lang.Integer">
+		select count(*) 
+		from tea_teacher_thesis
+		where teacher_id = #{teacherId,jdbcType=INTEGER} 
+	</select>
+	<select id="selectByLimit" resultMap="TeacherThesisDto">
+		select	
+		(select ev.name from sys_enumeration_value ev where ev.id=ttt.thesis_type) AS thesis_type_str,
+		ttt.id,ttt.teacher_id,ttt.thesis_name,ttt.publication,ttt.author_order,ttt.remark,ttt.publish_date,ttt.thesis_type,
+		tt.name,tt.code
+		from tea_teacher_thesis ttt
+		LEFT JOIN tea_teacher tt ON tt.id = ttt.teacher_id  
+		
+ 		<where>
+			<if test="name != null and name !=''">
+				 tt.name like '%${name}%'
+			</if>  
+ 			<if test="code != null and code != ''">
+				and tt.code like '%${code}%'
+			</if> 
+			<if test="thesisType != null and thesisType != ''">
+				and ttt.thesis_type like '%${thesisType}%'
+			</if>  
+		</where>
+		 <if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>  
+		
+					
+	</select>
+	<select id="selectByLimitAndTeacherId" resultMap="TeacherThesisDto">
+		select	
+		(select ev.name from sys_enumeration_value ev where ev.id=ttt.thesis_type) AS thesis_type_str,
+		ttt.id,ttt.teacher_id,ttt.thesis_name,ttt.publication,ttt.author_order,ttt.remark,ttt.publish_date,ttt.thesis_type,
+		tt.name,tt.code
+		from tea_teacher_thesis ttt
+		LEFT JOIN tea_teacher tt ON tt.id = ttt.teacher_id  
+		
+ 		<where>
+			<if test="teacherId != null and teacherId !=''">
+				 ttt.teacher_id like '%${teacherId}%'
+			</if>  
+			<if test="thesisType != null and thesisType != ''">
+				and ttt.thesis_type like '%${thesisType}%'
+			</if>  
+		</where>
+		 <if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>  
+		
+					
+	</select>
+	
+	<select id="getTeacherThesisById" resultMap="TeacherThesisDto">
+		select * 
+		from tea_teacher_thesis
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+</mapper>

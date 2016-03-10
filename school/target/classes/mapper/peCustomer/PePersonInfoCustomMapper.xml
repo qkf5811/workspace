@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.pe.dao.PePersonInfoCustomMapper">
+	<!-- ResultMap -->
+	<!-- <resultMap id="BaseResultMap" type="com.dkt.school.pe.model.PePersonInfo"> 
+		<id column="id" property="id" jdbcType="INTEGER" /> <result column="tea_info_id" 
+		property="teaInfoId" jdbcType="INTEGER" /> <result column="position" property="position" 
+		jdbcType="TINYINT" /> <result column="duty" property="duty" jdbcType="VARCHAR" 
+		/> <result column="remark" property="remark" jdbcType="VARCHAR" /> </resultMap> -->
+	<resultMap id="PePersonInfoDtoMap" type="com.dkt.school.pe.dto.PePersonInfoDto"
+		extends="com.dkt.school.pe.dao.PePersonInfoMapper.BaseResultMap">
+		<result column="name" property="name" jdbcType="INTEGER" />
+		<result column="position_str" property="positionStr" jdbcType="TINYINT" />
+		<result column="sex" property="sex" jdbcType="VARCHAR" />
+		<result column="code" property="code" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<!-- SQL -->
+	<select id="selectAllPePosition" resultType="java.util.HashMap">
+		SELECT id, name FROM
+		sys_enumeration_value as sev WHERE sev.enumeration_id=21100
+	</select>
+	
+	<select id="selectPersonInfoCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM
+		(SELECT *,
+		(SELECT code FROM tea_teacher WHERE id=(SELECT teacher_id FROM tea_teacher_info WHERE id = ppi.tea_info_id)) as code,
+		(SELECT name FROM tea_teacher_info WHERE id=ppi.tea_info_id) as name,
+		(SELECT name FROM sys_enumeration_value WHERE id=(SELECT sex_type FROM
+		tea_teacher_info WHERE id=ppi.tea_info_id)) as sex,
+		(SELECT name FROM sys_enumeration_value WHERE id=ppi.position) as
+		position_str
+		FROM pe_person_info as ppi) AS tmp_table
+		<where>
+			<if test="position != null and position != 0">
+				tmp_table.position=${position}
+			</if>
+			
+			<if test="name != null">
+				and tmp_table.`name` like '%${name}%'
+			</if>
+		</where>
+	</select>
+	
+	<select id="selectPersonInfoList" resultMap="PePersonInfoDtoMap">
+		SELECT * FROM
+		(SELECT *,
+		(SELECT code FROM tea_teacher WHERE id=(SELECT teacher_id FROM tea_teacher_info WHERE id = ppi.tea_info_id)) as code,
+		(SELECT name FROM tea_teacher_info WHERE id=ppi.tea_info_id) as name,
+		(SELECT name FROM sys_enumeration_value WHERE id=(SELECT sex_type FROM
+		tea_teacher_info WHERE id=ppi.tea_info_id)) as sex,
+		(SELECT name FROM sys_enumeration_value WHERE id=ppi.position) as
+		position_str
+		FROM pe_person_info as ppi) AS tmp_table
+		<where>
+			<if test="position != null and position != 0">
+				tmp_table.position=${position}
+			</if>
+			
+			<if test="name != null">
+				and tmp_table.`name` like '%${name}%'
+			</if>
+		</where>
+		<if test="limit != null">
+			limit ${limit.offset},${limit.rows}
+		</if>
+	</select>
+	
+	<!-- 根据工号检查是否已经存在该人员信息 -->
+	<select id="selectPePersonInfoByTeaCode" resultMap="com.dkt.school.pe.dao.PePersonInfoMapper.BaseResultMap">
+		SELECT * FROM pe_person_info AS ppi WHERE  tea_info_id = 
+		(SELECT id FROM tea_teacher_info WHERE teacher_id = 
+		(SELECT id FROM tea_teacher WHERE code='${code}'))
+	</select>
+	
+	<select id="selectTeaInfoIdByCode" resultType="java.lang.Integer">
+		SELECT id FROM tea_teacher_info WHERE teacher_id = 
+		(SELECT id FROM tea_teacher WHERE code='${code}')
+	</select>
+</mapper>

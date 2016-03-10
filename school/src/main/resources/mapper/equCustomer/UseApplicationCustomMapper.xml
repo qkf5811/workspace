@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.equ.dao.UseApplicationCustomMapper" >
+	
+	<resultMap id="BaseResultMapExtend" type="com.dkt.school.equ.model.UseApplication"
+		extends="com.dkt.school.equ.dao.UseApplicationMapper.BaseResultMap">
+	</resultMap>
+	
+	<resultMap type="com.dkt.school.equ.dto.UseApplicationDto" id="UseApplicationDto" extends="BaseResultMapExtend">
+		<result column="apv_application_name" property="apvApplicationName" jdbcType="VARCHAR"/>
+		<result column="application_type" property="applicationType" jdbcType="INTEGER"/>
+		<result column="reason" property="reason" jdbcType="VARCHAR"/>
+		<result column="depart_id" property="departId" jdbcType="INTEGER"/>
+		<result column="user_id" property="userId" jdbcType="INTEGER"/> 
+		<result column="application_status_str" property="applicationStatusStr" jdbcType="VARCHAR"/>
+		<result column="application_status" property="applicationStatus" jdbcType="INTEGER"/>
+		<result column="app_time" property="appTime" jdbcType="TIMESTAMP"/>
+		<result column="node_id" property="nodeId" jdbcType="INTEGER"/>
+		<result column="apv_application_remark" property="apvApplicationRemark" jdbcType="VARCHAR"/>
+		<result column="apv_application_id" property="apvApplicationId" jdbcType="INTEGER"/> 
+		<result column="depart_name" property="departName" jdbcType="VARCHAR"/> 
+	</resultMap>
+		
+	
+	
+	<select id="getUseApplicationCount" resultType="java.lang.Integer">
+		SELECT
+		count(*) 
+		FROM
+		equ_use_application
+		LEFT JOIN apv_application ON equ_use_application.application_id = apv_application.id
+		LEFT JOIN usr_department ON apv_application.depart_id = usr_department.id
+		LEFT JOIN usr_user ON apv_application.user_id = usr_user.id
+   
+		
+ 		<where>
+ 			usr_user.id = ${userId} 
+			<if test="name != null and name !=''">
+				and apv_application.name like '%${name}%'
+			</if>  
+			<if test="equipName != null and equipName != ''">
+				and equ_use_application.equip_name like '%${equipName}%'
+			</if> 
+			<if test="applicationStatus != null and applicationStatus != ''">
+				and apv_application.application_status = ${applicationStatus}
+			</if> 
+			
+		</where>
+	</select>
+	
+	<select id="getUseApplicationByPage" resultMap="UseApplicationDto">
+		SELECT
+		equ_use_application.id ,
+		equ_use_application.application_id,
+		equ_use_application.equip_name,
+		equ_use_application.model,
+		equ_use_application.amount,
+		equ_use_application.remark,
+		apv_application.`name` as apv_application_name,
+		apv_application.application_type,
+		apv_application.reason,
+		apv_application.depart_id,
+		apv_application.user_id,
+		(select ev.name from sys_enumeration_value ev where ev.id=apv_application.application_status) AS application_status_str,
+		apv_application.application_status,
+		apv_application.app_time,
+		apv_application.node_id,
+		apv_application.remark as apv_application_remark,
+		apv_application.id as apv_application_id,
+		usr_department.`name` as depart_name
+		FROM
+		equ_use_application
+		LEFT JOIN apv_application ON equ_use_application.application_id = apv_application.id
+		LEFT JOIN usr_department ON apv_application.depart_id = usr_department.id
+		LEFT JOIN usr_user ON apv_application.user_id = usr_user.id
+
+		
+ 		<where>
+ 			usr_user.id = ${userId} 
+			<if test="name != null and name !=''">
+				and apv_application.name like '%${name}%'
+			</if>  
+			<if test="equipName != null and equipName != ''">
+				and equ_use_application.equip_name like '%${equipName}%'
+			</if> 
+			<if test="applicationStatus != null and applicationStatus != ''">
+				and apv_application.application_status = ${applicationStatus}
+			</if> 
+			
+		</where>
+		 <if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>  
+		
+					
+	</select>
+	
+	
+</mapper>

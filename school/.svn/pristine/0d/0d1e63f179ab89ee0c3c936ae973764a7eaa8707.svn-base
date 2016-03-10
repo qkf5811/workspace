@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.sch.dao.ClassRoomCustomMapper" >
+  <resultMap id="ClassRoom" type="com.dkt.school.sch.model.ClassRoom" extends="com.dkt.school.sch.dao.ClassRoomMapper.BaseResultMap">
+
+  </resultMap>
+
+  <resultMap id="ClassRoomDto" type="com.dkt.school.sch.dto.ClassRoomDto" extends="ClassRoom">
+    <result column="building_name" property="buildingName" jdbcType="VARCHAR"/>
+    <result column="room_type_string" property="roomTypeString" jdbcType="VARCHAR"/>
+    <result column="campus_name" property="campusName" jdbcType="VARCHAR"/>
+    <result column="campus_id" property="campusId" jdbcType="INTEGER"/>
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    scr.id,scr.name,scr.building_id,scr.floor,scr.capacity,scr.room_type,scr.remark
+  </sql>
+
+  <select id="selectClassRoomByBuildingId" resultMap="ClassRoom">
+  	select * from sch_class_room where building_id = ${id}
+  </select>
+
+  <select id="countBySearch" resultType="java.lang.Integer">
+    select count(*) from sch_class_room scr
+    inner join sch_building sb on scr.building_id=sb.id
+    inner join sch_campus sc on sb.campus_id=sc.id
+
+    <where>
+      <if test="name != null and name != ''">
+        scr.name like '%${name}%'
+
+      </if>
+
+      <if test="campusId != null and campusId != ''">
+        and sc.id =#{campusId}
+
+      </if>
+
+      <if test="buildingId != null and buildingId != ''">
+        and scr.building_id =#{buildingId}
+
+      </if>
+      <if test="roomType != null and roomType != ''">
+        and scr.room_type =#{roomType}
+      </if>
+
+
+    </where>
+  </select>
+
+  <select id="selectByLimit" resultMap="ClassRoomDto">
+    select <include refid="Base_Column_List"/>,
+    sb.name AS building_name,
+    sc.name AS campus_name,
+    (select ev.name from sys_enumeration_value ev where ev.id=scr.room_type) AS room_type_string
+    from sch_class_room scr
+    inner join sch_building sb on scr.building_id=sb.id
+    inner join sch_campus sc on sb.campus_id=sc.id
+
+    <where>
+      <if test="name != null and name != ''">
+        scr.name like '%${name}%'
+
+      </if>
+
+      <if test="campusId != null and campusId != ''">
+        and sc.id =#{campusId}
+
+      </if>
+
+      <if test="buildingId != null and buildingId != ''">
+        and scr.building_id =#{buildingId}
+
+      </if>
+      <if test="roomType != null and roomType != ''">
+        and scr.room_type =#{roomType}
+      </if>
+
+
+    </where>
+    <if test="limit != null">
+      limit #{limit.offset},#{limit.rows}
+    </if>
+  </select>
+
+  <select id="selectClassRoomDtoByClassRoomId" resultMap="ClassRoomDto">
+    select <include refid="Base_Column_List"/>,
+    (select sb.campus_id from sch_building sb where sb.id=scr.building_id) AS campus_id
+    from sch_class_room scr
+
+    <where>
+    <if test="id != null and id != ''">
+      scr.id =#{id}
+
+    </if>
+    </where>
+  </select>
+  <select id="getClassByBuildingIdForStorage" resultMap="ClassRoom">
+  	select sch_class_room.* 
+  	from sch_class_room 
+  	where building_id = ${id} and room_type = 5003
+  </select>
+</mapper>

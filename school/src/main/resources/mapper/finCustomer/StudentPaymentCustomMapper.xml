@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.fin.dao.StudentPaymentCustomMapper">
+    <resultMap type="com.dkt.school.fin.model.StudentPayment" id="StudentPayment" 
+    	extends="com.dkt.school.fin.dao.StudentPaymentMapper.BaseResultMap"></resultMap>
+	<resultMap type="com.dkt.school.fin.dto.StudentPaymentDto" id="StudentPaymentDto"
+		extends="StudentPayment">
+		<result property="stuPayId" column="studentPayId" jdbcType="INTEGER"/>
+		<result property="stuPayName" column="stuPayName" jdbcType="VARCHAR"/>
+		<result property="stuPayCode" column="stuPayCode" jdbcType="VARCHAR"/>
+		<result property="stuPayAccount" column="stuPayAccount" jdbcType="VARCHAR"/>
+		<result property="tuitionFee" column="tuitionFee" jdbcType="FLOAT"/>
+		<result property="roomFee" column="roomFee" jdbcType="FLOAT"/>
+		<result property="bookFee" column="bookFee" jdbcType="FLOAT"/>
+		<result property="paidTuitionFee" column="paidTuitionFee" jdbcType="FLOAT"/>
+		<result property="paidRoomFee" column="paidRoomFee" jdbcType="FLOAT"/>
+		<result property="paidBookFee" column="paidBookFee" jdbcType="FLOAT"/>
+		<result property="deductRemark" column="deductRemark" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		sp.id AS stuPayId,sp.pay_money,sp.pay_type,sp.pay_time,sp.pay_order,sp.remark
+	</sql>
+	
+	<select id="getStuPayList" resultMap="StudentPaymentDto">
+		SELECT DISTINCT 
+			<include refid="Base_Column_List"/>,
+			sc.term_type,
+			sc.tuition_fee AS tuitionFee,
+			sc.room_fee AS roomFee,
+			sc.book_fee AS bookFee,
+			sc.total_fee AS totalFee,
+			sc.paid_tuition_fee AS paidTuitionFee,
+			sc.paid_room_fee AS paidRoomFee,
+			sc.paid_book_fee AS paidBookFee,
+			sc.paid_total_fee AS paidTotalFee,
+			sc.deduct_remark AS deductRemark,
+			s.`name` AS stuPayName,
+			s.`code` AS stuPayCode,
+			s.is_free_tuition 
+		FROM
+			fin_student_payment AS sp
+		INNER JOIN fin_student_charge AS sc ON sp.charge_id = sc.id
+		INNER JOIN stu_student AS s ON sc.student_id = s.id
+		<where>
+			<if test="stuPayName != '' and stuPayName != null">
+				s.`name` like '%${stuPayName}%'
+			</if>
+			<if test="stuPayCode != '' and stuPayCode != null ">
+				s.`code` like '%${stuPayCode}%'
+			</if>
+		</where>
+		ORDER BY sp.pay_time DESC 
+		<if test="limit != null and limit != '' ">
+			LIMIT #{limit.offset},#{limit.rows}
+		</if>
+	</select>
+	
+	<select id="getStuPayCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM 
+			fin_student_payment sp
+		INNER JOIN fin_student_charge sc ON sp.charge_id = sc.id
+		INNER JOIN stu_student s ON sc.student_id = s.id 
+		<where>
+			<if test="stuPayName != '' and stuPayName != null">
+				s.`name` like '%${stuPayName}%'
+			</if>
+			<if test="stuPayCode != '' and stuPayCode != null ">
+				s.`code` like '%${stuPayCode}%'
+			</if>
+		</where>
+	</select>
+	
+	<select id="exportStuPayList" parameterType="java.util.List" resultMap="StudentPaymentDto">
+		SELECT DISTINCT 
+			<include refid="Base_Column_List"/>,
+			sc.term_type,
+			sc.tuition_fee AS tuitionFee,
+			sc.room_fee AS roomFee,
+			sc.book_fee AS bookFee,
+			sc.total_fee AS totalFee,
+			sc.paid_tuition_fee AS paidTuitionFee,
+			sc.paid_room_fee AS paidRoomFee,
+			sc.paid_book_fee AS paidBookFee,
+			sc.paid_total_fee AS paidTotalFee,
+			sc.deduct_remark AS deductRemark,
+			s.`name` AS stuPayName,
+			s.`code` AS stuPayCode,
+			s.is_free_tuition 
+		FROM
+			fin_student_payment AS sp
+		INNER JOIN fin_student_charge AS sc ON sp.charge_id = sc.id
+		INNER JOIN stu_student AS s ON sc.student_id = s.id
+		<where>
+			s.`code` IN
+			<foreach collection="list" item="listItem" open="(" close=")" separator=",">
+				#{listItem}
+			</foreach>
+		</where>
+	</select>
+		
+	<insert id="insertStuPayList" parameterType="java.util.List">
+		INSERT INTO fin_student_payment sp VALUES
+		<foreach collection="list" item="s" separator=",">
+		</foreach>
+	</insert>
+	
+	<insert id="insertStuChargeList" parameterType="java.util.List">
+		INSERT INTO fin_student_charge sc VALUES 
+		<foreach collection="list" item="s" separator=",">
+		</foreach>
+	</insert>
+</mapper>

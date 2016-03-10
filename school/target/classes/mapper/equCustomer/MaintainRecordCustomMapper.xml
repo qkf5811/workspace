@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.equ.dao.MaintainRecordCustomMapper">
+
+	<resultMap type="com.dkt.school.equ.model.MaintainRecord" id="MaintainRecord"
+		extends="com.dkt.school.equ.dao.MaintainRecordMapper.BaseResultMap">
+	</resultMap>
+	<resultMap type="com.dkt.school.equ.dto.MaintainRecordDto" id="MaintainRecordDto" extends="MaintainRecord">
+		<result column="item_code" property="itemCode" jdbcType="VARCHAR"/>
+		<result column="equ_name" property="equName" jdbcType="VARCHAR"/>
+		<result column="equ_brand" property="equBrand" jdbcType="VARCHAR"/>
+		<result column="equ_model" property="equModel" jdbcType="VARCHAR"/>
+		<result column="maintain_user_name" property="maintainUserName" jdbcType="VARCHAR"/>
+		<result column="maintain_record_time" property="maintainRecordSTime" jdbcType="VARCHAR"/>	
+		<!--  jdbcType="DATE" javaType="java.util.Date" -->
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		er.id,er.item_id,er.maintain_user_id,er.maintain_date,er.remark
+	</sql>
+	
+	<select id="countBySearch" resultType="java.lang.Integer">
+		select count(*) from equ_maintain_record
+		<where>
+			<if test="itemCode!=null and itemCode!=''">
+				item_id in (select id from equ_equipment_item where code like '%${itemCode}%')
+			</if>
+			<if test="maintainUserName != null and maintainUserName != ''">
+				and maintain_user_id in (select id from usr_user where name like '%${maintainUserName}%')
+			</if>
+		</where>
+	</select>
+	
+	<select id="selectByLimit" resultMap="MaintainRecordDto">
+		select (select ei.code from equ_equipment_item ei where ei.id=er.item_id) AS item_code,
+		(select eq.name from equ_equipment eq where eq.id in (select ei.equipment_id from equ_equipment_item ei where ei.id=er.item_id)) AS equ_name,
+		(select eq.brand from equ_equipment eq where eq.id in (select ei.equipment_id from equ_equipment_item ei where ei.id=er.item_id)) AS equ_brand,
+		(select eq.model from equ_equipment eq where eq.id in (select ei.equipment_id from equ_equipment_item ei where ei.id=er.item_id)) AS equ_model,
+		(select u.name from usr_user u where u.id=er.maintain_user_id) AS maintain_user_name,
+		<include refid="Base_Column_List"></include>
+		from equ_maintain_record er 
+		left join equ_equipment_item ei on ei.id=er.item_id
+		left join equ_equipment eq on eq.id=ei.equipment_id
+		<where>
+			<if test="itemCode!=null and itemCode!=''">
+				item_id in (select id from equ_equipment_item where code like '%${itemCode}%') 
+			</if>
+			<if test="maintainUserName != null and maintainUserName != ''">
+				and maintain_user_id in (select id from usr_user where name like '%${maintainUserName}%')
+			</if>
+			<if test="equName != null and equName != ''">
+				and eq.name like '%${equName}%'
+			</if>
+			<if test="equBrand != null and equBrand != ''">
+				and eq.brand like '%${equBrand}%'
+			</if>
+		</where>
+		<if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>			
+	</select>
+	
+	<select id="selectMaintainRecordDtoByMaintainRecordId" resultMap="MaintainRecordDto">
+		select (select ei.code from equ_equipment_item ei where ei.id=er.item_id) AS item_code,
+		(select eq.name from equ_equipment eq where eq.id in (select ei.equipment_id from equ_equipment_item ei where ei.id=er.item_id)) AS equ_name,
+		(select eq.brand from equ_equipment eq where eq.id in (select ei.equipment_id from equ_equipment_item ei where ei.id=er.item_id)) AS equ_brand,
+		(select eq.model from equ_equipment eq where eq.id in (select ei.equipment_id from equ_equipment_item ei where ei.id=er.item_id)) AS equ_model,
+		(select u.name from usr_user u where u.id=er.maintain_user_id) AS maintain_user_name,
+		<include refid="Base_Column_List"></include>
+		from equ_maintain_record er 
+		where er.id='${maintainRecordId}'
+	</select>
+</mapper>

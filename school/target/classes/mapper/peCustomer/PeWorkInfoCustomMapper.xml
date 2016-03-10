@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.pe.dao.PeWorkInfoCustomMapper" >
+  <resultMap id="BaseResultMap" type="com.dkt.school.pe.model.PeWorkInfo" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="start_datetime" property="startDatetime" jdbcType="TIMESTAMP" />
+    <result column="end_datetime" property="endDatetime" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+     <result column="mission" property="mission" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap type="com.dkt.school.pe.dto.PeWorkTaskDto" id="taskDto" extends="com.dkt.school.pe.dao.PeWorkTaskMapper.BaseResultMap">
+  	<result column="name" property="name" jdbcType="VARCHAR" />
+  	<result column="mission" property="mission" jdbcType="VARCHAR" />
+  	<result column="start_datetime" property="startDatetime" jdbcType="TIMESTAMP" />
+    <result column="end_datetime" property="endDatetime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <select id="selectPeWorkInfoCount" resultType="java.lang.Integer">
+  		SELECT COUNT(*) FROM `pe_work_info` 
+  		<where>
+  			<if test="info.startDatetimeStr != null and info.startDatetimeStr != '' ">
+  				start_datetime <![CDATA[>=]]> '${info.startDatetimeStr}'
+  			</if>
+  			<if test="info.endDatetimeStr != null and info.endDatetimeStr != '' ">
+  				AND end_datetime <![CDATA[<=]]> '${info.endDatetimeStr}' 
+  			</if> 
+  		</where>
+  </select>
+  
+  <!-- DATE_FORMAT(${info.startDatetime},'%Y-%m-%d %H-%i-%s') -->
+  <!-- DATE_FORMAT(${info.endDatetime},'%Y-%m-%d %H-%i-%s') -->
+    <select id="selectPeWorkInfoList" resultMap="BaseResultMap">
+  		SELECT * FROM `pe_work_info` 
+  		<where>
+  			<if test="info.startDatetimeStr != null and info.startDatetimeStr != '' ">
+  				start_datetime <![CDATA[>= ]]> '${info.startDatetimeStr}'
+  			</if>
+  			<if test="info.endDatetimeStr != null and info.endDatetimeStr != '' ">
+  				AND end_datetime <![CDATA[<= ]]> '${info.endDatetimeStr}'
+  			</if> 
+  		</where>
+  		<if test="limit != null">
+  			limit ${limit.offset}, ${limit.rows}
+  		</if>
+  </select>
+  
+  <select id="selectPeWorkTaskCount" resultType="java.lang.Integer">
+  	SELECT COUNT(*) FROM pe_work_task  as main
+	LEFT JOIN pe_work_info ON (pe_work_info.id = main.work_info_id)
+	LEFT JOIN tea_teacher_info ON (tea_teacher_info.id = main.person_info_id)
+	LEFT JOIN pe_person_info ON (pe_person_info.tea_info_id = tea_teacher_info.id)
+	WHERE work_info_id in (
+	SELECT id FROM pe_work_info 
+	<where>
+		<if test="dto.mission != null and dto.mission != '' ">
+			mission like '%${dto.mission}%'
+		</if>
+		<if test="dto.startDatetimeStr != null and dto.startDatetimeStr != '' ">
+			AND start_datetime <![CDATA[>= ]]> '${dto.startDatetimeStr}' 
+		</if>
+		<if test="dto.endDatetimeStr != null and dto.endDatetimeStr != '' ">
+			AND end_datetime <![CDATA[<= ]]> '${dto.endDatetimeStr}'
+		</if>
+	</where>
+	)
+  </select>
+  
+  <select id="selectPeWorkTaskList" resultMap="taskDto">
+  	SELECT main.id, work_info_id, person_info_id, mission, start_datetime, end_datetime, name, main.remark
+  	FROM pe_work_task  as main
+	LEFT JOIN pe_work_info ON (pe_work_info.id = main.work_info_id)
+	LEFT JOIN tea_teacher_info ON (tea_teacher_info.id = main.person_info_id)
+	LEFT JOIN pe_person_info ON (pe_person_info.tea_info_id = tea_teacher_info.id)
+	WHERE work_info_id in (
+	SELECT id FROM pe_work_info 
+	<where>
+		<if test="dto.mission != null and dto.mission != '' ">
+			mission like '%${dto.mission}%'
+		</if>
+		<if test="dto.startDatetimeStr != null and dto.startDatetimeStr != '' ">
+			AND start_datetime <![CDATA[>= ]]> '${dto.startDatetimeStr}' 
+		</if>
+		<if test="dto.endDatetimeStr != null and dto.endDatetimeStr != '' ">
+			AND end_datetime <![CDATA[<= ]]> '${dto.endDatetimeStr}'
+		</if>
+	</where>
+	)
+	<if test="limit != null">
+		limit ${limit.offset}, ${limit.rows}
+	</if>
+  </select>
+</mapper>

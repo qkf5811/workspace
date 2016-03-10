@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.edu.dao.TeachTaskCustomMapper">
+
+	<resultMap id="BaseResultMapExtend" type="com.dkt.school.edu.model.TeachTask"
+		extends="com.dkt.school.edu.dao.TeachTaskMapper.BaseResultMap">
+	</resultMap>
+
+    <!-- Lai JiPeng -->
+    <resultMap type="com.dkt.school.edu.dto.CourseToQueryScoByHTDto" id="CourseToQueryScoByHTDtoResultMap" 
+               extends="BaseResultMapExtend">
+        <result column="courseCode" property="courseCode" jdbcType="VARCHAR" />
+        <result column="courseName" property="courseName" jdbcType="VARCHAR" />
+        <result column="className" property="className" jdbcType="VARCHAR" />
+		<result column="study_year_str" property="studyYearStr" jdbcType="VARCHAR"/>
+		<result column="term_type_str" property="termTypeStr" jdbcType="VARCHAR"/>	       
+    </resultMap>
+
+	<resultMap type="com.dkt.school.edu.dto.TeachTaskDto" id="TeachTaskDto"
+		extends="BaseResultMapExtend">
+		<result column="course_type_str" property="courseTypeStr"
+			jdbcType="VARCHAR" />
+		<result column="term_type_str" property="termTypeStr" jdbcType="VARCHAR"/>	
+		<result column="examine_type_str" property="examineTypeStr" jdbcType="VARCHAR" />
+		<result column="credit" property="credit" jdbcType="REAL" />
+		<result column="hours" property="hours" jdbcType="INTEGER" />
+		<result column="course_name" property="courseName" jdbcType="VARCHAR" />
+		<result column="grade" property="grade" jdbcType="VARCHAR" />
+		<result column="major" property="major" jdbcType="VARCHAR" />
+		<result column="class_name" property="className" jdbcType="VARCHAR" />
+		<result column="field" property="field" jdbcType="VARCHAR" />
+		<result column="study_year_name" property="studyYearName" jdbcType="VARCHAR"/>
+		<result column="start_date" property="startDate" jdbcType="DATE"/>
+		<result column="end_date" property="endDate" jdbcType="DATE"/>
+	</resultMap>
+
+
+	<select id="getTeachTaskCount" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		edu_teach_task
+		INNER JOIN edu_course_plan ON edu_teach_task.course_plan_id = edu_course_plan.id
+		INNER JOIN stu_class ON edu_teach_task.class_id = stu_class.id
+		INNER JOIN sch_grade ON edu_course_plan.grade_id = sch_grade.id
+		INNER JOIN sch_major_field ON edu_course_plan.field_id = sch_major_field.id
+		INNER JOIN edu_course ON edu_teach_task.course_id = edu_course.id
+		INNER JOIN sch_major ON edu_course_plan.major_id = sch_major.id
+		<!-- where edu_teach_task.term_type=
+		${termType} and edu_teach_task.study_year_id=
+		${studyYearId} -->
+		
+		<where>
+			<if test="termType != null and termType != 0">
+				edu_teach_task.term_type = ${termType}
+			</if>
+			<if test="studyYearId != null and studyYearId !=0">
+				and edu_teach_task.study_year_id = ${studyYearId}
+			</if>
+			<if test="courseName != null and courseName != ''">
+				and edu_course.name like '%${courseName}%'
+			</if> 
+			<if test="major != null and major != 0">
+				and sch_major.id = ${major}
+			</if> 
+			<if test="grade != null and grade !=0 ">
+				and sch_grade.id = ${grade}
+			</if> 
+			<if test="field != null and field != 0">
+				and sch_major_field.id = ${field}
+			</if> 
+		</where>
+	</select>
+
+
+
+	<select id="selectByLimit" resultMap="TeachTaskDto">
+		SELECT
+		edu_teach_task.id,
+		edu_teach_task.study_year_id,
+		edu_teach_task.term_type,
+		(select ev.name from sys_enumeration_value ev where ev.id=edu_teach_task.term_type) AS term_type_str,
+		stu_class.`name` AS class_name,
+		sch_major_field.`name` AS field,
+		sch_grade.`name` AS grade,
+		edu_course.`name` AS course_name,
+		sch_major.`name` AS major,
+		edu_course_plan.hours AS hours,
+		edu_course_plan.credit AS credit,
+		sch_study_year.`name` AS study_year_name,
+		sch_study_year.start_date AS start_date,
+		sch_study_year.end_date AS end_date,
+		(select ev.name from sys_enumeration_value ev where ev.id=edu_course_plan.course_type) AS course_type_str,
+		(select ev.name from sys_enumeration_value ev where ev.id=edu_course_plan.examine_type) AS examine_type_str,
+		edu_teach_task.course_seq,
+		edu_teach_task.course_plan_id,
+		edu_teach_task.course_id,
+		edu_teach_task.class_id,
+		edu_teach_task.teach_course_id
+		FROM
+		edu_teach_task
+		INNER JOIN edu_course_plan ON edu_teach_task.course_plan_id = edu_course_plan.id
+		INNER JOIN stu_class ON edu_teach_task.class_id = stu_class.id
+		INNER JOIN sch_grade ON edu_course_plan.grade_id = sch_grade.id
+		INNER JOIN sch_major_field ON edu_course_plan.field_id = sch_major_field.id
+		INNER JOIN edu_course ON edu_teach_task.course_id = edu_course.id
+		INNER JOIN sch_major ON edu_course_plan.major_id = sch_major.id
+		INNER JOIN sch_study_year ON edu_teach_task.study_year_id = sch_study_year.id
+
+		<!-- where edu_teach_task.term_type=
+		#{termType,jdbcType=INTEGER} and edu_teach_task.study_year_id=
+		#{studyYearId,jdbcType=INTEGER} -->
+
+
+
+		<where>
+			<if test="termType != null and termType !=0">
+				edu_teach_task.term_type = ${termType}
+			</if>
+			<if test="studyYearId != null and studyYearId !=0">
+				and edu_teach_task.study_year_id = ${studyYearId}
+			</if>
+			<if test="courseName != null and courseName != ''">
+				and edu_course.name like '%${courseName}%'
+			</if> 
+			<if test="major != null and major != 0">
+				and sch_major.id = ${major}
+			</if> 
+			<if test="grade != null and grade !=0 ">
+				and sch_grade.id = ${grade}
+			</if> 
+			<if test="field != null and field != 0">
+				and sch_major_field.id = ${field}
+			</if> 
+		</where>
+		<if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>
+
+
+	</select>
+	
+	<select id="findTeachTaskByTermTypeAndStudyYearId" resultMap="TeachTaskDto">
+		SELECT
+		ett.term_type,
+		ett.id,
+		ett.study_year_id,
+		ett.course_plan_id,
+		ett.course_id,
+		ett.class_id,
+		ett.course_seq,
+		ett.teach_course_id
+		FROM
+		edu_teach_task ett
+		INNER JOIN sch_study_year ssy ON ett.study_year_id = ssy.id
+		 where ett.term_type=
+		${termType} and ssy.id=
+		${studyYearId} 
+
+
+
+	</select>
+	
+	
+	<!-- Lai JiPeng -->
+	<select id="selectCourseToQueryScoByHT" resultMap="CourseToQueryScoByHTDtoResultMap">
+	  SELECT edu_teach_task.*,
+             edu_course.code AS courseCode,
+             edu_course.name AS courseName,
+      		(SELECT NAME FROM sch_study_year WHERE id= edu_teach_task.study_year_id) AS study_year_str,
+      		(SELECT NAME FROM sys_enumeration_value WHERE id= edu_teach_task.term_type) AS term_type_str,
+      		stu_class.name AS className
+	  FROM edu_teach_task
+	  LEFT JOIN edu_course ON edu_course.id=edu_teach_task.course_id
+	  LEFT JOIN stu_class ON stu_class.id=edu_teach_task.class_id
+      <where> 
+            <if test="dto.classId != null and dto.classId != ''">
+			    AND edu_teach_task.class_id=${dto.classId}
+			</if> 
+            <if test="dto.studyYearId != null and dto.studyYearId != ''">
+			    AND edu_teach_task.study_year_id=${dto.studyYearId}
+			</if> 
+            <if test="dto.termType != null and dto.termType != ''">
+			    AND edu_teach_task.term_type=${dto.termType}
+			</if>
+			<if test="dto.courseName != null and dto.courseName != ''">
+				AND edu_course.name like '%${dto.courseName}%'
+			</if>  
+	  </where>
+	  ORDER BY edu_teach_task.study_year_id DESC,edu_teach_task.term_type DESC
+	  <if test="limit != null">
+		limit #{limit.offset},#{limit.rows}
+	  </if>
+	</select>
+	
+	<select id="selectCountOfCourseToQueryScoByHT" resultType="java.lang.Integer">
+	  SELECT COUNT(*)
+	  FROM edu_teach_task
+	  LEFT JOIN edu_course ON edu_course.id=edu_teach_task.course_id
+	  <where> 
+            <if test="dto.classId != null and dto.classId != ''">
+			    AND edu_teach_task.class_id=${dto.classId}
+			</if> 
+            <if test="dto.studyYearId != null and dto.studyYearId != ''">
+			    AND edu_teach_task.study_year_id=${dto.studyYearId}
+			</if> 
+            <if test="dto.termType != null and dto.termType != ''">
+			    AND edu_teach_task.term_type=${dto.termType}
+			</if>
+			<if test="dto.courseName != null and dto.courseName != ''">
+				AND edu_course.name like '%${dto.courseName}%'
+			</if>  
+	  </where>
+	</select>
+
+
+</mapper>

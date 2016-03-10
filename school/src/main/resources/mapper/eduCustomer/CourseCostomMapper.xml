@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.edu.dao.CourseCustomMapper">
+	<resultMap type="com.dkt.school.edu.dto.CourseDto" id="CourseResultMap">
+	   <id column="id" property="id" jdbcType="INTEGER" />
+	   <result column="name" property="name" jdbcType="VARCHAR" />
+	   <result column="code" property="code" jdbcType="VARCHAR" />
+	   <result column="major_id" property="majorId" jdbcType="INTEGER" />
+	   <result column="remark" property="remark" jdbcType="VARCHAR" />
+	   <result column="major_str" property="majorStr" jdbcType="VARCHAR" />
+    </resultMap>
+	<!-- <resultMap type="com.dkt.school.edu.dto.CourseDto" id="CourseDto" extends="Course"></resultMap> -->
+
+
+	<resultMap type="com.dkt.school.edu.model.Course" id="Course"
+		extends="com.dkt.school.edu.dao.CourseMapper.BaseResultMap"></resultMap>
+	<resultMap type="com.dkt.school.edu.dto.CourseDto" id="CourseDto"
+		extends="Course"></resultMap>
+
+	<!-- 冯其康 -->
+	<resultMap id="BaseResultMap" type="com.dkt.school.edu.model.Course">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="code" property="code" jdbcType="VARCHAR" />
+		<result column="major_id" property="majorId" jdbcType="INTEGER" />
+		<result column="field_id" property="fieldId" jdbcType="INTEGER" />
+		<result column="course_type" property="courseType" jdbcType="INTEGER" />
+		<result column="examine_type" property="examineType" jdbcType="INTEGER" />
+		<result column="credit" property="credit" jdbcType="REAL" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+	</resultMap>
+	<!-- 冯其康 -->
+	<resultMap id="CourseOfTeaCourseTable"
+		type="com.dkt.school.edu.dto.CourseInTeaCourseTableDto">
+		<result column="schedule_id" property="courseScheduleId"
+			jdbcType="INTEGER"></result>
+		<result column="course_plan_id" property="coursePlanId"
+			jdbcType="INTEGER"></result>
+		<result column="teach_course_id" property="teachCourseId"
+			jdbcType="INTEGER"></result>
+		<result column="name" property="name" jdbcType="VARCHAR"></result>
+		<result column="week_day" property="weekDay" jdbcType="INTEGER"></result>
+		<result column="weeks" property="weeks" jdbcType="VARCHAR"></result>
+		<result column="week_ids" property="weekIds" jdbcType="VARCHAR"></result>
+		<result column="class_room_name" property="classRoom" jdbcType="VARCHAR"></result>
+		<result column="section_type" property="sectionType" jdbcType="INTEGER"></result>
+		<result column="classes" property="classes" jdbcType="VARCHAR"></result>
+		<result column="major_id" property="majorId" jdbcType="INTEGER"></result>
+		<result column="field_id" property="fieldId" jdbcType="INTEGER"></result>
+		<result column="code" property="courseCode" jdbcType="VARCHAR"></result>
+		<result column="teacher_id" property="teacherId" jdbcType="INTEGER"></result>
+		<result column="tea_name" property="teaName" jdbcType="VARCHAR"></result>
+		<result column="campus_id" property="campusId" jdbcType="INTEGER"></result>
+		<result column="building_id" property="buildingId" jdbcType="INTEGER"></result>
+		<result column="building" property="building" jdbcType="VARCHAR"></result>
+		<result column="class_room_id" property="classRoomId" jdbcType="INTEGER"></result>
+		<result column="course_type" property="courseType" jdbcType="INTEGER"></result>
+		<result column="examine_type" property="examineType" jdbcType="INTEGER"></result>
+		<result column="credit" property="credit" jdbcType="REAL" />
+		<result column="hours" property="hours" jdbcType="INTEGER"></result>
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, name, code, major_id, remark
+	</sql>
+	<select id="countByNameAndMajorId" resultType="java.lang.Integer">
+		select count(*) from edu_course
+		<where>
+		    <if test="courseDto.name != null">
+				AND edu_course.name like '%${courseDto.name}%'
+			</if>
+			<if test="courseDto.majorId != null">
+				AND major_id=#{courseDto.majorId}
+			</if>
+		</where>
+	</select>
+
+	<select id="selectByLimit" resultMap="CourseResultMap">
+		select edu_course.*,
+		sch_major.name as major_str		
+		from edu_course
+		left join sch_major on edu_course.major_id=sch_major.id		
+		<where>
+	        <if test="courseDto.name != null">
+				AND edu_course.name like '%${courseDto.name}%'
+			</if>
+			<if test="courseDto.majorId != null">
+				AND major_id=#{courseDto.majorId}
+			</if>
+		</where>
+		<if test="limit != null">
+			LIMIT #{limit.offset}, #{limit.rows}
+		</if>
+	</select>
+
+	<select id="selectCourseDtoByCourseId" resultMap="CourseDto">
+		select
+		<include refid="Base_Column_List" />
+		from edu_course
+		<where>
+			<if test="courseId != null and courseId != ''">
+				id=#{courseId}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 以下 冯其康 -->
+	<!-- 根据教师id得到该见识所有课程信息 -->
+	<select id="selectCourseOfTeacherByTeacherId" resultMap="CourseOfTeaCourseTable">
+		select
+		DISTINCT(edu_teach_course.course_seq),
+		edu_course_schedule.id as schedule_id,
+		edu_course_plan.id as course_plan_id,
+		edu_teach_course.id as teach_course_id,
+		edu_course.name ,
+		edu_course_schedule.week_day,
+		edu_course_schedule.weeks,
+		edu_course_schedule.week_ids,
+		sch_class_room.`name` as class_room_name,
+		edu_course_schedule.section_type,
+		edu_teach_course.classes,
+		edu_course_plan.major_id,
+		edu_course_plan.field_id,
+		edu_course.`code`,
+		edu_course_teacher.teacher_id,
+		tea_teacher.name as tea_name,
+		sch_class_room.id as class_room_id,
+		sch_building.id as building_id,
+		sch_building.name as building,
+		sch_campus.id as campus_id,
+		edu_course_plan.course_type,
+		edu_course_plan.examine_type,
+		edu_course_plan.credit,
+		edu_course_plan.hours
+		from edu_course_schedule
+		inner join
+		edu_teach_course on edu_teach_course.id = edu_course_schedule.teach_course_id 
+		inner join edu_teach_task on edu_teach_task.teach_course_id = edu_teach_course.id
+		inner join edu_course_plan on edu_course_plan.id = edu_teach_task.course_plan_id
+		
+		inner join edu_course on edu_teach_course.course_id = edu_course.id
+
+		inner join sch_class_room on edu_course_schedule.class_room_id = sch_class_room.id
+		inner join sch_building on sch_building.id = sch_class_room.building_id
+		inner join sch_campus on sch_campus.id = sch_building.campus_id
+		inner join tea_teacher on tea_teacher.id = ${id}
+		
+		inner join edu_course_teacher on edu_course_teacher.teacher_id = ${id} 
+							and edu_course_teacher.teach_course_id = edu_teach_course.id 
+				<!-- 			and edu_course_teacher.teach_task_id = edu_teach_task.id -->
+		where edu_course_schedule.teach_course_id = edu_teach_course.id
+		ORDER
+		BY edu_course_schedule.id
+	</select>
+	
+	<!-- 根据dto更新课程计划表的专业和专业方向 -->
+	<update id="updateMajorAndFieldByDto">
+		update edu_course_plan set major_id = ${dto.majorId}, field_id = ${dto.fieldId}
+		where id = ${dto.coursePlanId}
+	</update>
+	
+	<!-- 根据dto更新排课表的上课时间和上课地点 -->
+	<update id="updateCourseTimeAndAddressByDto">
+		update edu_course_schedule set class_room_id = ${dto.classRoomId}, week_day = ${dto.weekDay},
+									   section_type = ${dto.sectionType}, week_ids = '${dto.weekIds}',
+									   weeks = '${dto.weeks}' 
+		where id = ${dto.courseScheduleId}
+	</update>
+	
+	<!-- 根据dto更新teach_course表里的上课班级 -->
+	<update id="updateCourseClassesByDto">
+		update edu_teach_course set classes = '${dto.classes}' 
+		where id = ${dto.teachCourseId}
+	</update>
+	
+	<!-- 查询出所有有冲突的课程 -->
+	<select id="selectCourseWithTimeConflictAndAddressConflict" resultMap="CourseOfTeaCourseTable">
+		select
+		edu_course_schedule.id as schedule_id,
+		edu_course_plan.id as course_plan_id,
+		edu_teach_course.id as teach_course_id,
+		edu_course.name ,
+		edu_course_schedule.week_day,
+		edu_course_schedule.weeks,
+		edu_course_schedule.week_ids,
+		sch_class_room.`name` as class_room_name,
+		edu_course_schedule.section_type,
+		edu_teach_course.classes,
+		edu_course_plan.major_id,
+		edu_course_plan.field_id,
+		edu_course.`code`,
+		edu_course_teacher.teacher_id,
+		tea_teacher.name as tea_name,
+		sch_class_room.id as class_room_id,
+		sch_building.id as building_id,
+		sch_building.name as building,
+		sch_campus.id as campus_id,
+		edu_course_plan.course_type,
+		edu_course_plan.examine_type,
+		edu_course_plan.credit,
+		edu_course_plan.hours
+		from edu_course_schedule
+		inner join
+		edu_teach_course on edu_teach_course.id = edu_course_schedule.teach_course_id 
+		inner join edu_teach_task on edu_teach_task.teach_course_id = edu_teach_course.id
+		inner join edu_course_plan on edu_course_plan.id = edu_teach_task.course_plan_id
+		
+		inner join edu_course on edu_teach_course.course_id = edu_course.id
+
+		inner join sch_class_room on edu_course_schedule.class_room_id = sch_class_room.id
+		inner join sch_building on sch_building.id = sch_class_room.building_id
+		inner join sch_campus on sch_campus.id = sch_building.campus_id
+		inner join tea_teacher
+		
+		inner join edu_course_teacher on edu_course_teacher.teacher_id = tea_teacher.id
+							and edu_course_teacher.teach_course_id = edu_teach_course.id 
+					<!-- 		and edu_course_teacher.teach_task_id = edu_teach_task.id -->
+		where edu_course_schedule.teach_course_id = edu_teach_course.id
+		and class_room_id = ${classRoomId}
+		and week_day = ${weekDay} 
+		and section_type = ${sectionType}
+		<if test="scheduleId != null">
+			and tea_teacher.id != ${scheduleId}
+		</if>
+		
+		and ( 1=1
+		<if test="dtoWeeksStart != 0 and dtoWeeksEnd != 0">
+			and
+			(
+					(SUBSTR(RTRIM(LTRIM(weeks)) FROM 1 FOR POSITION('-' IN RTRIM(LTRIM(weeks)))) <![CDATA[<=]]> ${dtoWeeksStart} and 
+						SUBSTR(RTRIM(LTRIM(weeks)) FROM POSITION('-' IN RTRIM(LTRIM(weeks)))+1 FOR length(weeks)) <![CDATA[>=]]> ${dtoWeeksStart} and
+						SUBSTR(RTRIM(LTRIM(weeks)) FROM POSITION('-' IN RTRIM(LTRIM(weeks)))+1 FOR length(weeks)) <![CDATA[<=]]> ${dtoWeeksEnd}
+					) or (
+						SUBSTR(RTRIM(LTRIM(weeks)) FROM 1 FOR POSITION('-' IN RTRIM(LTRIM(weeks)))) <![CDATA[>=]]> ${dtoWeeksStart} and 
+						SUBSTR(RTRIM(LTRIM(weeks)) FROM 1 FOR POSITION('-' IN RTRIM(LTRIM(weeks)))) <![CDATA[<=]]> ${dtoWeeksEnd}
+					)
+				) 
+		</if>
+		<if test="dtoWeekIds != null">
+			<if test="dtoWeeksStart != 0 and dtoWeeksEnd != 0">
+				or
+			</if>
+			<if test="dtoWeeksStart == 0 or dtoWeeksEnd == 0">
+				and
+			</if>
+			(
+		<foreach collection="dtoWeekIds" item="item" separator="or">
+			week_ids REGEXP '${item}' 
+			or
+			(SUBSTR(RTRIM(LTRIM(weeks)) FROM 1 FOR POSITION('-' IN RTRIM(LTRIM(weeks)))) <![CDATA[<=]]>   ${item} 
+			and
+			SUBSTR(RTRIM(LTRIM(weeks)) FROM POSITION('-' IN RTRIM(LTRIM(weeks)))+1 FOR length(weeks)) <![CDATA[>=]]> ${item})
+		</foreach>
+		)
+		</if>
+		)
+		ORDER
+		BY edu_course_schedule.id
+	</select>
+	
+	</mapper>

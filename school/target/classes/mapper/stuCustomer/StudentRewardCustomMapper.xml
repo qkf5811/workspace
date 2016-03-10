@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.stu.dao.StudentRewardCustomMapper">
+	<resultMap id="StudentReward" type="com.dkt.school.stu.model.StudentReward" 
+			   extends="com.dkt.school.stu.dao.StudentRewardMapper.BaseResultMap"></resultMap>
+	<resultMap id="StudentRewardDto" type="com.dkt.school.stu.dto.StudentRewardDto" extends="StudentReward">
+		<result column="code" property="code" jdbcType="VARCHAR"/>
+		<result column="class_id" property="classId" jdbcType="INTEGER"/>
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="className" property="className" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<select id="getAllRewardStuList" resultMap="StudentRewardDto">
+		SELECT DISTINCT 
+			s.id AS studentId,
+			s.`code` AS code,
+			s.name AS name,
+			s.class_id,
+			c.major_field_id,
+			CONCAT(mf.`name`,c.`name`) AS className
+		FROM 
+			stu_student AS s
+		INNER JOIN stu_class AS c ON c.id = s.class_id
+		INNER JOIN sch_major_field AS mf ON c.major_field_id = mf.id
+		<where>
+			<if test="name != null and name != '' ">
+				 s.`name` like '%${name}%'
+			</if>
+			<if test="code != null and code !='' ">
+				AND s.code like '%${code}%'
+			</if>
+		</where>
+		<if test="limit != null and limit != '' ">
+			LIMIT #{limit.offset},#{limit.rows}
+		</if>	
+	</select>
+	
+	<select id="getStudentRewardDtoList" resultMap="StudentRewardDto">
+		SELECT DISTINCT
+			r.id,
+			r.student_id,
+			r.reward_type,
+			r.content,
+			r.remark,
+			s.class_id AS classId,
+			s.`code` AS `code`,
+			s.`name` AS `name`,
+			c.major_field_id,
+			CONCAT(mf.`name`,c.`name`) AS className
+		FROM
+			stu_student_reward AS r
+		INNER JOIN stu_student AS s ON r.student_id = s.id
+		INNER JOIN stu_class AS c ON s.class_id = c.id
+		INNER JOIN sch_major_field AS mf ON c.major_field_id = mf.id
+		<where>
+			r.content IS NOT NULL
+			<if test=" code != null and code != ''"> 
+				AND s.code like '%${code}%'
+			</if>
+			<if test="rewardType != null and rewardType != ''">
+				AND r.reward_type = ${rewardType}
+			</if>
+			<if test="name != null and name != '' ">
+				AND s.`name` like '%${name}%'
+			</if>
+		</where>
+		<if test="limit != null and limit != '' ">
+			LIMIT #{limit.offset},#{limit.rows}
+		</if>	
+	</select>
+	
+	<select id="getStudentRewardCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) 
+		FROM stu_student_reward AS r
+		INNER JOIN stu_student AS s ON r.student_id = s.id
+		<where>
+			r.content IS NOT NULL
+			<if test="code != null and code !='' ">
+				AND s.code like '%${code}%'
+			</if>
+			<if test="rewardType != null and rewardType != '' ">
+				AND r.reward_type = ${rewardType}
+			</if>
+			<if test="name != null and name != '' ">
+				AND s.`name` like '%${name}%'
+			</if>
+		</where>
+	</select>
+	
+	<!-- 这里是获取奖励页面所有在籍生数量 -->
+	<select id="getAllRewardStuCount" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM 
+			stu_student AS s
+		INNER JOIN stu_class AS c ON c.id = s.class_id
+		INNER JOIN sch_major_field AS mf ON c.major_field_id = mf.id
+		<where>
+			<if test="name != null and name != '' ">
+				 s.`name` like '%${name}%'
+			</if>
+			<if test="code != null and code !='' ">
+				AND s.code like '%${code}%'
+			</if>
+		</where>
+	</select>
+	
+	<select id="getStudentRewardDtoById" resultMap="StudentRewardDto">
+		SELECT DISTINCT
+			r.id,
+			r.student_id,
+			r.reward_type AS rewardType,
+			r.content,
+			r.remark,
+			s.`code` AS code,
+			s.name AS name,
+			s.class_id,
+			c.`name` AS className
+		FROM
+			stu_student_reward AS r
+		INNER JOIN stu_student AS s ON r.student_id = s.id
+		INNER JOIN stu_class AS c ON c.id = s.class_id
+		<where>
+			r.student_id = #{studentId}
+			AND r.id = #{id}
+		</where>
+	</select>
+	
+	<update id="updateRewardInfo" parameterType="com.dkt.school.stu.dto.StudentRewardDto">
+		UPDATE stu_student_reward r 
+		SET 
+		r.reward_type = #{sr.rewardType},
+		r.content = #{sr.content}, r.remark = #{sr.remark}
+		<where>
+			r.id = #{sr.id}
+		</where>
+	</update>
+	
+	<delete id="deleteByStudentId" parameterType="java.lang.Integer">
+		DELETE FROM 
+			stu_student_reward  
+		<where>
+			id = #{id}
+		</where>	
+	</delete>
+</mapper>

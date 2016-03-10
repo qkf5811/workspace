@@ -1,0 +1,10 @@
+#jdbc_driverClassName=com.mysql.jdbc.Driver
+#jdbc_url=jdbc:mysql://localhost:3306/school?useUnicode=true&amp;characterEncoding=utf-8
+#jdbc_username=root
+#jdbc_password=dkt3866169
+#
+jdbc_driverClassName=com.mysql.jdbc.Driver
+jdbc_url=jdbc:mysql://localhost:3306/school_meijing?useUnicode=true&amp;characterEncoding=utf-8
+jdbc_username=root
+jdbc_password=85468546
+

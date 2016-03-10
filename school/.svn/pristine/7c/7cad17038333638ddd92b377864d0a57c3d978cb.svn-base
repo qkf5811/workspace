@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.user.dao.RoleCustomMapper">
+	<resultMap type="com.dkt.school.user.model.Role" id="Role" extends="com.dkt.school.user.dao.RoleMapper.BaseResultMap"></resultMap>
+	<resultMap type="com.dkt.school.user.dto.RoleDto" id="RoleDto" extends="Role"></resultMap>
+	
+	<sql id="Base_Column_List">
+		id, name, remark
+	</sql>
+	
+	<select id="findRoleByRoleName" resultType="java.lang.Integer">
+		select count(*) from usr_role where name=#{roleName}
+	</select>
+	
+	<select id="countByName" resultType="java.lang.Integer">
+		select count(*) from usr_role
+		<where>
+			<if test="name != null and name != ''">
+				name like '%${name}%'
+			</if>
+		</where>
+	</select>
+	
+	<select id="selectByLimit" resultMap="Role">
+		select <include refid="Base_Column_List"/>
+		from usr_role
+		<where>
+			<if test="name != null and name != ''">
+				name like '%${name}%'
+			</if>
+		</where>
+		<if test="limit != null">
+				LIMIT #{limit.offset}, #{limit.rows}
+			</if>
+	</select>
+	
+	<select id="selectRoleDtoByRoleId" resultMap="RoleDto">
+		select <include refid="Base_Column_List"/>
+		from usr_role
+		<where>
+			<if test="roleId != null and roleId != ''">
+				id=#{roleId}
+			</if>
+		</where>
+	</select>
+</mapper>

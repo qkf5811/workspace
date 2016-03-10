@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration>
+	<classPathEntry location="${classPathEntry.location}" />
+	<context id="context">
+		<commentGenerator>
+			<property name="suppressAllComments" value="true" />
+			<property name="suppressDate" value="true" />
+		</commentGenerator>
+		<!-- jdbc连接信息 -->
+		<jdbcConnection driverClass="${jdbc.driverClass}"
+			connectionURL="${jdbc.connectionURL}" userId="${jdbc.user}" password="${jdbc.password}" />
+			
+		<!-- 生成对象 -->
+		<javaModelGenerator targetProject="${model.target.dir}" targetPackage="com.dkt.school.stu.model">
+			<property name="enableSubPackages" value="true" />
+		</javaModelGenerator>
+		<!-- 生成用于查询的Example对象 -->
+		<sqlMapGenerator targetProject="${mapper.target.dir}" targetPackage="mapper.stu">
+			<property name="enableSubPackages" value="true" />
+		</sqlMapGenerator>
+		<!-- 生成DAO的类文件以及配置文件 -->
+		<javaClientGenerator targetProject="${dao.target.dir}" targetPackage="com.dkt.school.stu.dao" 
+			type="XMLMAPPER">
+			<property name="enableSubPackages" value="true" />
+		</javaClientGenerator>
+		
+		<!-- 想要生成的数据库表,自动化工具会根据该表的结构生成相应的vo对象 -->
+		<table domainObjectName="StudentInfo" tableName="stu_student_info">
+			<generatedKey column="id" sqlStatement="MySql" identity="true" />
+		</table>
+		<!--<table domainObjectName="AdmissionScore" tableName="stu_admission_score">
+			<generatedKey column="id" sqlStatement="MySql" identity="true" />
+		</table>
+		<table domainObjectName="Clazz" tableName="stu_class">
+			<generatedKey column="id" sqlStatement="MySql" identity="true" />
+		</table> -->
+		<!-- 
+		<table domainObjectName="Student" tableName="stu_student">
+			<generatedKey column="id" sqlStatement="MySql" identity="true" />
+		</table> -->
+		<!--<table domainObjectName="StudentFamily" tableName="stu_student_family">
+			<generatedKey column="id" sqlStatement="MySql" identity="true" />
+		</table> 
+		<table domainObjectName="StudentReward" tableName="stu_student_reward">
+			<generatedKey column="id" sqlStatement="MySql" identity="true" />
+		</table> 
+		<table domainObjectName="StudentPunishment" tableName="stu_student_punishment">
+			<generatedKey column="id" sqlStatement="MySql" identity="true" />
+		</table>
+		<table domainObjectName="StudentChange" tableName="stu_student_change">
+			<generatedKey column="id" sqlStatement="MySql" identity="true" />
+		</table>
+		<table domainObjectName="StuChangeClass" tableName="stu_student_change_class">
+			<generatedKey column="id" sqlStatement="MySql" identity="true" />
+		</table>-->
+		
+		
+	</context>
+</generatorConfiguration>

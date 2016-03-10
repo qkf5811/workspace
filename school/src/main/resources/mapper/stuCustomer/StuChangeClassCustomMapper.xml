@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.stu.dao.StuChangeClassCustomMapper" >
+	
+	<resultMap id="BaseResultMapExtend" type="com.dkt.school.stu.model.StuChangeClass"
+		extends="com.dkt.school.stu.dao.StuChangeClassMapper.BaseResultMap">
+	</resultMap>
+	
+	<resultMap type="com.dkt.school.stu.dto.StudentChangeDto" id="StudentChangeDto" extends="BaseResultMapExtend">
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="change_type_str" property="changeTypeStr" jdbcType="VARCHAR"/>
+		<result column="code" property="code" jdbcType="VARCHAR"/>
+		<result column="out_class_major_name" property="OutClassMajorName" jdbcType="VARCHAR"/>
+		<result column="into_class_major_name" property="IntoClassMajorName" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	
+	<select id="getStuChangeClassCount" resultType="java.lang.Integer">
+		select count(*) 
+		from stu_student_change_class ssc
+		LEFT JOIN stu_student ss ON ss.id = ssc.student_id 
+		<where>
+			<if test="dto.name != null and dto.name !=''">
+				 ss.name like '%${dto.name}%'
+			</if>  
+ 			<if test="dto.code != null and dto.code != ''">
+				and ss.code like '%${dto.code}%'
+			</if>  
+		</where>
+	</select>
+	
+	<select id="getStuChangeClassListData" resultMap="StudentChangeDto">
+		select	change_type_str,id,cause,out_class_id,out_class_date,into_class_id,into_class_date,oper_user,remark,name,code,
+			CONCAT(out_major_field_name,out_class_name) AS out_class_major_name ,
+			CONCAT(into_major_field_name,into_class_name) AS into_class_major_name from(select
+				(select ev.name from sys_enumeration_value ev where ev.id=ssc.change_type) AS change_type_str,			
+				ssc.id AS id,ssc.cause AS cause,ssc.out_class_id AS out_class_id,ssc.out_class_date AS out_class_date,ssc.into_class_id AS into_class_id,ssc.into_class_date AS into_class_date,ssc.oper_user AS oper_user,ssc.remark AS remark,
+				ss.name,ss.code,	
+				(select sc.name from stu_class sc where sc.id=ssc.out_class_id) AS out_class_name,
+				(select sc.name from stu_class sc where sc.id=ssc.into_class_id) AS into_class_name,
+				(select smf.name from stu_class sc ,sch_major_field smf 
+					where sc.id=ssc.out_class_id and  smf.id=sc.major_field_id) AS out_major_field_name,
+				(select smf.name from stu_class sc ,sch_major_field smf 
+					where sc.id=ssc.into_class_id and  smf.id=sc.major_field_id) AS into_major_field_name
+				from stu_student_change_class ssc
+				LEFT JOIN stu_student ss ON ss.id = ssc.student_id  )as tem_table
+		
+ 		<where>
+			<if test="dto.name != null and dto.name !=''">
+				 name like '%${dto.name}%'
+			</if>  
+ 			<if test="dto.code != null and dto.code != ''">
+				and code like '%${dto.code}%'
+			</if>  
+		</where>
+		 <if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>  
+	</select>
+	
+	
+	 <select id="findStudentChangeByCode" resultMap="StudentChangeDto" >
+    	select	ssc.id,ssc.change_type,ssc.cause,ssc.out_class_id,ssc.out_class_date,ssc.into_class_id,ssc.into_class_date,ssc.oper_user,ssc.remark,
+		ss.name,ss.code
+		from stu_student_change_class ssc
+		LEFT JOIN stu_student ss ON ss.id = ssc.student_id  
+    	where ss.code = #{code,jdbcType=VARCHAR}
+  	</select>
+ 	 
+</mapper>

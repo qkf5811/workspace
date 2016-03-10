@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.equ.dao.StorageCustomMapper" >
+	<resultMap type="com.dkt.school.equ.model.Storage" id="StorageMapper">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="building_id" property="buildingId" jdbcType="INTEGER"/>
+		<result column="room_id" property="roomId" jdbcType="INTEGER"/>
+		<result column="remark" property="remark" jdbcType="VARCHAR"/>
+	</resultMap>
+	<select id="getAllStoragesInfo" resultType="com.dkt.school.equ.model.Storage">
+		select * from equ_storage
+	</select>
+	
+	<select id="getStorageNameById" parameterType="java.lang.Integer" resultType="java.lang.String">
+		select name from equ_storage where id=#{id}
+	</select>
+	
+	<resultMap type="com.dkt.school.equ.dto.StorageDto" id="StorageDtoResultMap" extends="StorageMapper">
+     <result column="roomName" property="roomName" jdbcType="VARCHAR" />
+     <result column="buildingName" property="buildingName" jdbcType="VARCHAR" />
+  </resultMap>
+	<!-- 查询符合条件的仓库信息 -->
+  <select id="getStorageByPage" resultMap="StorageDtoResultMap">
+    SELECT equ_storage.* ,sch_class_room.name AS roomName,sch_building.name AS buildingName
+    FROM equ_storage
+    LEFT JOIN sch_class_room ON equ_storage.room_id=sch_class_room.id
+     LEFT JOIN sch_building ON equ_storage.building_id=sch_building.id
+    <where>
+    <if test="storageDto.buildingId!=null">
+	     AND equ_storage.building_id=${storageDto.buildingId}
+	  </if>
+	  <if test="storageDto.roomId!=null">
+	     AND equ_storage.room_id=${storageDto.roomId}
+	  </if>
+	  <if test="storageDto.name!=null">
+	     AND equ_storage.name LIKE '%${storageDto.name}%'
+	  </if>
+	</where>
+    <if test="limit != null">
+		limit #{limit.offset},#{limit.rows}
+	</if>
+  </select>
+  
+  <!-- 查询符合条件的仓库数量 -->
+  <select id="getStorageCount" resultType="java.lang.Integer">
+  SELECT COUNT(*)
+  FROM equ_storage
+  LEFT JOIN sch_class_room ON equ_storage.room_id=sch_class_room.id
+  LEFT JOIN sch_building ON equ_storage.building_id=sch_building.id
+    <where>
+     <if test="storageDto.buildingId!=null">
+	     AND equ_storage.building_id=${storageDto.buildingId}
+	  </if>
+	  <if test="storageDto.roomId!=null">
+	     AND equ_storage.room_id=${storageDto.roomId}
+	  </if>
+	  <if test="storageDto.name!=null">
+	     AND equ_storage.name LIKE '%${storageDto.name}%'
+	  </if>
+	</where>
+  </select>
+</mapper>

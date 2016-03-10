@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.sch.dao.MajorFieldCustomMapper">
+	<resultMap id="BaseResultMap" type="com.dkt.school.sch.dto.MajorFieldDto">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="major_id" property="majorId" jdbcType="INTEGER" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<select id="getMajorFieldByMajorId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		select * from sch_major_field where major_id = #{majorId}
+	</select>
+	
+	<select id="getAllMajorFieldInfo" resultMap="BaseResultMap">
+		select * from sch_major_field
+	</select>
+	
+	<select id="getMajorFieldCountByMajorId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+		select count(*) from sch_major_field where major_id = #{majorId}
+	</select>
+	
+	<select id="getMajorFieldCount"  resultType="java.lang.Integer">
+		select count(*) from sch_major_field
+	</select>
+	
+	<select id="getAllMajorFieldInfoByPage"  resultMap="BaseResultMap">
+		select * from sch_major_field order by major_id
+		<if test="limit != null">
+			limit #{limit.offset}, #{limit.rows}
+		</if>
+	</select>
+	
+	<select id="getMajorFieldInfoByPage"  resultMap="BaseResultMap">
+		select * from sch_major_field where major_id = #{majorId}
+		<if test="limit != null">
+			limit #{limit.offset}, #{limit.rows}
+		</if>
+	</select>
+	
+	<delete id="deleteByMajorId" parameterType="java.lang.Integer">
+		delete from sch_major_field where major_id = #{id}
+	</delete>
+	
+	<update id="editMajorFieldName">
+		update sch_major_field set name = '${newName}' where id = ${majorFieldId}
+	</update>
+	
+	<!-- 炳坚 -->
+	<select id="getMajorFieldIdByName" resultType="java.lang.Integer">
+		select id from sch_major_field where name='${majorFieldName}'
+	</select>
+</mapper>

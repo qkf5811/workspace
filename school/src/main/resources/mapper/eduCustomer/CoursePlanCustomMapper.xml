@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.edu.dao.CoursePlanCustomMapper" >
+
+<resultMap id="selectTotalInfoOfCoursePlanResultMap" type="com.dkt.school.edu.dto.CoursePlanDto">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="major_id" property="majorId" jdbcType="INTEGER" />
+		<result column="field_id" property="fieldId" jdbcType="INTEGER" />
+		<result column="grade_id" property="gradeId" jdbcType="INTEGER" />		
+		<result column="course_id" property="courseId" jdbcType="INTEGER" />
+		<result column="term_type" property="termType" jdbcType="INTEGER" />
+		<result column="term_type_str" property="termTypeStr" jdbcType="VARCHAR" />
+		<result column="course_type" property="courseType" jdbcType="INTEGER" />
+		<result column="course_type_str" property="courseTypeStr" jdbcType="VARCHAR" />
+		<result column="examine_type" property="examineType" jdbcType="INTEGER" />
+		<result column="examine_type_str" property="examineTypeStr" jdbcType="VARCHAR" />
+		<result column="credit" property="credit" jdbcType="FLOAT" />
+		<result column="hours" property="hours" jdbcType="INTEGER" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+		
+		<result column="major_name" property="majorName" jdbcType="VARCHAR" />
+		<result column="major_field_name" property="majorFieldName" jdbcType="VARCHAR" />
+		<result column="grade_name" property="gradeName" jdbcType="VARCHAR" />
+		<result column="course_name" property="courseName" jdbcType="VARCHAR" />
+		<result column="course_code" property="courseCode" jdbcType="VARCHAR" />
+		
+		<result column="class_id" property="classId" jdbcType="INTEGER" />		
+	</resultMap>
+  
+  <!-- 查询课程计划信息 -->
+  <select id="selectTotalInfoOfCoursePlan" resultMap="selectTotalInfoOfCoursePlanResultMap">
+	SELECT sch_major.name AS major_name,
+	       sch_major_field.name AS major_field_name,
+	       sch_grade.name AS grade_name,
+	       edu_course.name AS course_name,
+	       edu_course.code AS course_code,
+	       edu_course_plan.*,	
+	       (SELECT NAME FROM sys_enumeration_value WHERE id=edu_course_plan.term_type) AS term_type_str,
+	       (SELECT NAME FROM sys_enumeration_value WHERE id=edu_course_plan.course_type) AS course_type_str,
+	       (SELECT NAME FROM sys_enumeration_value WHERE id=edu_course_plan.examine_type) AS examine_type_str	       
+	FROM edu_course_plan
+	     LEFT JOIN edu_course ON edu_course_plan.course_id=edu_course.id
+	     LEFT JOIN sch_grade ON edu_course_plan.grade_id=sch_grade.id
+	     LEFT JOIN sch_major ON edu_course_plan.major_id=sch_major.id
+	     LEFT JOIN sch_major_field ON edu_course_plan.field_id=sch_major_field.id	
+	<where>
+	<!-- 
+	  <if test="dto。gradeName!=null">
+	     AND sch_grade.name LIKE '%${dto.gradeName}%'
+	  </if> -->
+	  <if test="dto.majorName!=null">
+	     AND sch_major.name LIKE '%${dto.majorName}%'
+	  </if>
+	  <if test="dto.majorFieldName!=null">
+	     AND sch_major_field.name LIKE '%${dto.majorFieldName}%'
+	  </if>
+	</where>
+	    ORDER BY major_name,major_field_name,grade_name,term_type_str
+	<if test="limit != null">
+		limit #{limit.offset},#{limit.rows}
+	</if> 
+	    
+  </select>
+  
+ 	<!--  振佳 -->
+   <select id="findAllByTermType" resultMap="selectTotalInfoOfCoursePlanResultMap">
+	SELECT
+	stu_class.id as class_id,
+	edu_course_plan.id ,
+	edu_course_plan.course_id ,
+	edu_course_plan.term_type
+	FROM
+	edu_course_plan
+	INNER JOIN sch_grade ON edu_course_plan.grade_id = sch_grade.id
+	INNER JOIN sch_major_field ON edu_course_plan.field_id = sch_major_field.id
+	INNER JOIN stu_class ON sch_grade.id = stu_class.grade_id AND sch_major_field.id = stu_class.major_field_id
+	where edu_course_plan.term_type=
+		${termType} 
+	
+	    
+  </select>
+  
+  <!-- 查询课程计划记录数 -->
+  <select id="selectCountOfCoursePlan" resultType="java.lang.Integer">
+	SELECT COUNT(*)
+	FROM edu_course_plan
+         LEFT JOIN sch_major ON edu_course_plan.major_id=sch_major.id
+         LEFT JOIN sch_major_field ON edu_course_plan.field_id=sch_major_field.id
+         LEFT JOIN sch_grade ON edu_course_plan.grade_id = sch_grade.id
+	<where>	
+	<!-- 
+	  <if test="dto。gradeName!=null">
+	     AND sch_grade.name LIKE '%${dto.gradeName}%'
+	  </if> -->
+	  <if test="dto.majorName!=null">
+	     AND sch_major.name LIKE '%${dto.majorName}%'
+	  </if>
+	  <if test="dto.majorFieldName!=null">
+	     AND sch_major_field.name LIKE '%${dto.majorFieldName}%'
+	  </if>
+	</where>
+  </select>
+  
+</mapper>

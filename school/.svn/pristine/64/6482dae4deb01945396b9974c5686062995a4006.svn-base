@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.equ.dao.UseRecordCustomMapper" >
+	
+	<resultMap id="BaseResultMapExtend" type="com.dkt.school.equ.model.UseRecord"
+		extends="com.dkt.school.equ.dao.UseRecordMapper.BaseResultMap">
+	</resultMap>
+	
+	<resultMap type="com.dkt.school.equ.dto.UseRecordDto" id="UseRecordDto" extends="BaseResultMapExtend">
+		<result column="mobile" property="mobile" jdbcType="VARCHAR"/>
+		<result column="email" property="email" jdbcType="VARCHAR"/>
+		<result column="address" property="address" jdbcType="VARCHAR"/>
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="item_name" property="itemName" jdbcType="VARCHAR"/>
+	</resultMap>
+	<sql id="Base_Column_List">id,item_id,use_user_id,use_date,use_dealine,remark</sql>
+	
+	<select id="findUseRecordById" resultMap="BaseResultMapExtend"
+		parameterType="java.lang.Integer">		
+		select 
+    	<include refid="Base_Column_List" />
+    	from equ_use_record 
+   		where id = #{id,jdbcType=INTEGER}
+	</select>
+	
+	<select id="getUseReportCount" resultType="java.lang.Integer">
+		select count(*) 
+		from equ_use_record e
+		LEFT JOIN usr_user u ON u.id = e.use_user_id   
+		
+ 		<where>
+			<if test="itemId != null and itemId !=''">
+				 e.item_id like '%${itemId}%'
+			</if>  
+ 			<if test="name != null and name != ''">
+				and u.name like '%${name}%'
+			</if>  
+		</where>
+	</select>
+	
+	<select id="selectUseRecordDtoByItemId" resultMap="UseRecordDto">
+		select	(select ee.name from equ_equipment ee where ee.id=e.item_id) AS item_name, 
+		e.item_id,e.use_user_id,u.email,u.name,u.mobile,u.address,e.use_date,e.use_dealine,e.remark
+		from equ_use_record e
+		LEFT JOIN usr_user u 
+		ON u.id = e.use_user_id
+		where item_id='${itemId}'
+	</select>
+
+				
+				
+	<select id="selectByLimit" resultMap="UseRecordDto">
+		select	(select ee.name from equ_equipment ee where ee.id=e.item_id) AS item_name, 
+		e.item_id,e.use_user_id,u.email,u.name,u.mobile,u.address,e.use_date,e.use_dealine,e.remark
+		from equ_use_record e
+		LEFT JOIN usr_user u ON u.id = e.use_user_id   
+		
+ 		<where>
+			<if test="itemId != null and itemId !=''">
+				 e.item_id like '%${itemId}%'
+			</if>  
+ 			<if test="name != null and name != ''">
+				and u.name like '%${name}%'
+			</if>  
+		</where>
+		 <if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>  
+		
+					
+	</select>
+	
+	<select id="selectUseRecordDtoByUseRecordId" resultMap="UseRecordDto">
+		select	(select ee.name from equ_equipment ee where ee.id=e.item_id) AS item_name, 
+		e.item_id,e.use_user_id,u.email,u.name,u.mobile,u.address,e.use_date,e.use_dealine,e.remark
+		from equ_use_record e , usr_user u 
+		where u.id = e.use_user_id
+		and e.id='${useRecordId}'
+	</select>
+	
+	<delete id="deleteUseRecordByItemId" parameterType="java.lang.Integer" >
+    	delete from equ_use_record
+    	where item_id = #{itemId,jdbcType=INTEGER}
+  	</delete>
+  	
+  	<update id="updateUseRecord" parameterType="com.dkt.school.equ.dto.UseRecordDto" >
+    	update equ_use_record
+    	set item_id = #{itemId,jdbcType=INTEGER},
+      	use_user_id = #{useUserId,jdbcType=INTEGER},
+      	use_date = #{useDate,jdbcType=TIMESTAMP},
+     	 use_dealine = #{useDealine,jdbcType=TIMESTAMP},
+     	 remark = #{remark,jdbcType=VARCHAR}
+    	where item_id = #{itemId,jdbcType=INTEGER}
+  </update>
+</mapper>

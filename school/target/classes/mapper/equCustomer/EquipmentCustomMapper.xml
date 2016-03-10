@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.equ.dao.EquipmentCustomMapper" >
+	<resultMap type="com.dkt.school.equ.model.Equipment" id="EquipmentMapper">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="brand" property="brand" jdbcType="VARCHAR"/>
+		<result column="model" property="model" jdbcType="VARCHAR"/>
+		<result column="category_id" property="categoryId" jdbcType="INTEGER"/>
+		<result column="remark" property="remark" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<select id="getEquipmentsByCategoryId" parameterType="java.lang.Integer" resultMap="EquipmentMapper">
+		select * from equ_equipment where category_id = #{categoryId}
+	</select>
+	
+	<select id="getEquipmentCount" resultType="java.lang.Integer">
+		select COUNT(*) from equ_equipment
+	</select>
+	
+	<select id="getEquipmentByName" resultMap="EquipmentMapper">
+		select * from equ_equipment 
+		where 1 = 1
+		<if test="categoryId != null and categoryId > 0">
+			and category_id = ${categoryId}
+		</if>
+		<if test="name != null and name != ''">
+			and name = '${name}'
+		</if>
+	</select>
+	
+	
+	<resultMap type="com.dkt.school.equ.dto.EquipmentDto" id="EquipmentDtoResultMap" extends="EquipmentMapper">
+     <result column="categoryName" property="categoryName" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <select id="selectEquipmentByCategoryId" resultMap="EquipmentMapper">
+  	select * from equ_equipment where category_id = ${id}
+  </select>
+  
+  <!-- 查询符合条件的设备种类 -->
+  <select id="selectTotalInfoOfEquipment" resultMap="EquipmentDtoResultMap">
+    SELECT equ_equipment.* ,equ_category.name AS categoryName
+    FROM equ_equipment
+    LEFT JOIN equ_category ON equ_equipment.category_id=equ_category.id
+    <where>
+	  <if test="dto.categoryId!=null">
+	     AND equ_equipment.category_id=${dto.categoryId}
+	  </if>
+	  <if test="dto.name!=null">
+	     AND equ_equipment.name LIKE '%${dto.name}%'
+	  </if>
+	</where>
+    <if test="limit != null">
+		limit #{limit.offset},#{limit.rows}
+	</if>
+  </select>
+  
+  <!-- 查询符合条件的设备种类数量 -->
+  <select id="selectCountOfEquipment" resultType="java.lang.Integer">
+  SELECT COUNT(*)
+  FROM equ_equipment
+  LEFT JOIN equ_category ON equ_equipment.category_id=equ_category.id
+    <where>
+	  <if test="dto.categoryId!=null">
+	     AND equ_equipment.category_id=${dto.categoryId}
+	  </if>
+	  <if test="dto.name!=null">
+	     AND equ_equipment.name LIKE '%${dto.name}%'
+	  </if>
+	</where>
+  </select>
+</mapper>

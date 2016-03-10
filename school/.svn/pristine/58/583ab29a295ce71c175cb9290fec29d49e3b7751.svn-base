@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.equ.dao.BuyDetailCustomMapper" >
+
+	<resultMap type="com.dkt.school.equ.model.BuyDetail" id="BaseResultMap"
+			   extends="com.dkt.school.equ.dao.BuyDetailMapper.BaseResultMap"></resultMap>
+	<resultMap type="com.dkt.school.equ.dto.BuyDetailDto" id="BaseMap">
+		<id column="id" property="id" jdbcType="INTEGER"></id>
+		<result column="batch_id" property="batchId" jdbcType="INTEGER"/>
+		<result column="equipment_id" property="equipmentId" jdbcType="INTEGER"/>
+		<result column="price" property="price" jdbcType="FLOAT"/>
+		<result column="amount" property="amount" jdbcType="INTEGER"/>
+		<result column="remark" property="remark" jdbcType="VARCHAR"/>
+	</resultMap>
+	<select id="getDetailByEquipmentId" parameterType="java.lang.Integer" resultMap="BaseMap">
+		select * from equ_buy_detail where equipment_id = #{equipmentId}
+	</select>
+	
+	<select id="getAllPrice" resultMap="BaseMap">
+		select * from equ_buy_detail
+		<if test="limit != null">
+			limit #{limit.offset}, #{limit.rows}
+		</if>
+	</select>
+	
+	<select id="selectAllBuyDetail" resultMap="BaseResultMap">
+		select * from equ_buy_detail
+	</select>
+</mapper>

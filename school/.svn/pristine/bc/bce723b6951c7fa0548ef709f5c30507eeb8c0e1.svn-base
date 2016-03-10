@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.stu.dao.AdmissionScoreMapper" >
+  <resultMap id="BaseResultMap" type="com.dkt.school.stu.model.AdmissionScore" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="student_info_id" property="studentInfoId" jdbcType="INTEGER" />
+    <result column="exam_num" property="examNum" jdbcType="VARCHAR" />
+    <result column="chinese" property="chinese" jdbcType="INTEGER" />
+    <result column="math" property="math" jdbcType="INTEGER" />
+    <result column="english" property="english" jdbcType="INTEGER" />
+    <result column="politics" property="politics" jdbcType="INTEGER" />
+    <result column="phyhics" property="phyhics" jdbcType="INTEGER" />
+    <result column="chemistry" property="chemistry" jdbcType="INTEGER" />
+    <result column="history" property="history" jdbcType="INTEGER" />
+    <result column="geography" property="geography" jdbcType="INTEGER" />
+    <result column="biology" property="biology" jdbcType="INTEGER" />
+    <result column="sport" property="sport" jdbcType="INTEGER" />
+    <result column="total_score" property="totalScore" jdbcType="INTEGER" />
+    <result column="add_score" property="addScore" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, student_info_id, exam_num, chinese, math, english, politics, phyhics, chemistry, 
+    history, geography, biology, sport, total_score, add_score, remark
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.dkt.school.stu.model.AdmissionScoreExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from stu_admission_score
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from stu_admission_score
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from stu_admission_score
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.dkt.school.stu.model.AdmissionScoreExample" >
+    delete from stu_admission_score
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.dkt.school.stu.model.AdmissionScore" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into stu_admission_score (student_info_id, exam_num, chinese, 
+      math, english, politics, 
+      phyhics, chemistry, history, 
+      geography, biology, sport, 
+      total_score, add_score, remark
+      )
+    values (#{studentInfoId,jdbcType=INTEGER}, #{examNum,jdbcType=VARCHAR}, #{chinese,jdbcType=INTEGER}, 
+      #{math,jdbcType=INTEGER}, #{english,jdbcType=INTEGER}, #{politics,jdbcType=INTEGER}, 
+      #{phyhics,jdbcType=INTEGER}, #{chemistry,jdbcType=INTEGER}, #{history,jdbcType=INTEGER}, 
+      #{geography,jdbcType=INTEGER}, #{biology,jdbcType=INTEGER}, #{sport,jdbcType=INTEGER}, 
+      #{totalScore,jdbcType=INTEGER}, #{addScore,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.dkt.school.stu.model.AdmissionScore" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into stu_admission_score
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="studentInfoId != null" >
+        student_info_id,
+      </if>
+      <if test="examNum != null" >
+        exam_num,
+      </if>
+      <if test="chinese != null" >
+        chinese,
+      </if>
+      <if test="math != null" >
+        math,
+      </if>
+      <if test="english != null" >
+        english,
+      </if>
+      <if test="politics != null" >
+        politics,
+      </if>
+      <if test="phyhics != null" >
+        phyhics,
+      </if>
+      <if test="chemistry != null" >
+        chemistry,
+      </if>
+      <if test="history != null" >
+        history,
+      </if>
+      <if test="geography != null" >
+        geography,
+      </if>
+      <if test="biology != null" >
+        biology,
+      </if>
+      <if test="sport != null" >
+        sport,
+      </if>
+      <if test="totalScore != null" >
+        total_score,
+      </if>
+      <if test="addScore != null" >
+        add_score,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="studentInfoId != null" >
+        #{studentInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="examNum != null" >
+        #{examNum,jdbcType=VARCHAR},
+      </if>
+      <if test="chinese != null" >
+        #{chinese,jdbcType=INTEGER},
+      </if>
+      <if test="math != null" >
+        #{math,jdbcType=INTEGER},
+      </if>
+      <if test="english != null" >
+        #{english,jdbcType=INTEGER},
+      </if>
+      <if test="politics != null" >
+        #{politics,jdbcType=INTEGER},
+      </if>
+      <if test="phyhics != null" >
+        #{phyhics,jdbcType=INTEGER},
+      </if>
+      <if test="chemistry != null" >
+        #{chemistry,jdbcType=INTEGER},
+      </if>
+      <if test="history != null" >
+        #{history,jdbcType=INTEGER},
+      </if>
+      <if test="geography != null" >
+        #{geography,jdbcType=INTEGER},
+      </if>
+      <if test="biology != null" >
+        #{biology,jdbcType=INTEGER},
+      </if>
+      <if test="sport != null" >
+        #{sport,jdbcType=INTEGER},
+      </if>
+      <if test="totalScore != null" >
+        #{totalScore,jdbcType=INTEGER},
+      </if>
+      <if test="addScore != null" >
+        #{addScore,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.dkt.school.stu.model.AdmissionScoreExample" resultType="java.lang.Integer" >
+    select count(*) from stu_admission_score
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update stu_admission_score
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.studentInfoId != null" >
+        student_info_id = #{record.studentInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="record.examNum != null" >
+        exam_num = #{record.examNum,jdbcType=VARCHAR},
+      </if>
+      <if test="record.chinese != null" >
+        chinese = #{record.chinese,jdbcType=INTEGER},
+      </if>
+      <if test="record.math != null" >
+        math = #{record.math,jdbcType=INTEGER},
+      </if>
+      <if test="record.english != null" >
+        english = #{record.english,jdbcType=INTEGER},
+      </if>
+      <if test="record.politics != null" >
+        politics = #{record.politics,jdbcType=INTEGER},
+      </if>
+      <if test="record.phyhics != null" >
+        phyhics = #{record.phyhics,jdbcType=INTEGER},
+      </if>
+      <if test="record.chemistry != null" >
+        chemistry = #{record.chemistry,jdbcType=INTEGER},
+      </if>
+      <if test="record.history != null" >
+        history = #{record.history,jdbcType=INTEGER},
+      </if>
+      <if test="record.geography != null" >
+        geography = #{record.geography,jdbcType=INTEGER},
+      </if>
+      <if test="record.biology != null" >
+        biology = #{record.biology,jdbcType=INTEGER},
+      </if>
+      <if test="record.sport != null" >
+        sport = #{record.sport,jdbcType=INTEGER},
+      </if>
+      <if test="record.totalScore != null" >
+        total_score = #{record.totalScore,jdbcType=INTEGER},
+      </if>
+      <if test="record.addScore != null" >
+        add_score = #{record.addScore,jdbcType=VARCHAR},
+      </if>
+      <if test="record.remark != null" >
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update stu_admission_score
+    set id = #{record.id,jdbcType=INTEGER},
+      student_info_id = #{record.studentInfoId,jdbcType=INTEGER},
+      exam_num = #{record.examNum,jdbcType=VARCHAR},
+      chinese = #{record.chinese,jdbcType=INTEGER},
+      math = #{record.math,jdbcType=INTEGER},
+      english = #{record.english,jdbcType=INTEGER},
+      politics = #{record.politics,jdbcType=INTEGER},
+      phyhics = #{record.phyhics,jdbcType=INTEGER},
+      chemistry = #{record.chemistry,jdbcType=INTEGER},
+      history = #{record.history,jdbcType=INTEGER},
+      geography = #{record.geography,jdbcType=INTEGER},
+      biology = #{record.biology,jdbcType=INTEGER},
+      sport = #{record.sport,jdbcType=INTEGER},
+      total_score = #{record.totalScore,jdbcType=INTEGER},
+      add_score = #{record.addScore,jdbcType=VARCHAR},
+      remark = #{record.remark,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.dkt.school.stu.model.AdmissionScore" >
+    update stu_admission_score
+    <set >
+      <if test="studentInfoId != null" >
+        student_info_id = #{studentInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="examNum != null" >
+        exam_num = #{examNum,jdbcType=VARCHAR},
+      </if>
+      <if test="chinese != null" >
+        chinese = #{chinese,jdbcType=INTEGER},
+      </if>
+      <if test="math != null" >
+        math = #{math,jdbcType=INTEGER},
+      </if>
+      <if test="english != null" >
+        english = #{english,jdbcType=INTEGER},
+      </if>
+      <if test="politics != null" >
+        politics = #{politics,jdbcType=INTEGER},
+      </if>
+      <if test="phyhics != null" >
+        phyhics = #{phyhics,jdbcType=INTEGER},
+      </if>
+      <if test="chemistry != null" >
+        chemistry = #{chemistry,jdbcType=INTEGER},
+      </if>
+      <if test="history != null" >
+        history = #{history,jdbcType=INTEGER},
+      </if>
+      <if test="geography != null" >
+        geography = #{geography,jdbcType=INTEGER},
+      </if>
+      <if test="biology != null" >
+        biology = #{biology,jdbcType=INTEGER},
+      </if>
+      <if test="sport != null" >
+        sport = #{sport,jdbcType=INTEGER},
+      </if>
+      <if test="totalScore != null" >
+        total_score = #{totalScore,jdbcType=INTEGER},
+      </if>
+      <if test="addScore != null" >
+        add_score = #{addScore,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.dkt.school.stu.model.AdmissionScore" >
+    update stu_admission_score
+    set student_info_id = #{studentInfoId,jdbcType=INTEGER},
+      exam_num = #{examNum,jdbcType=VARCHAR},
+      chinese = #{chinese,jdbcType=INTEGER},
+      math = #{math,jdbcType=INTEGER},
+      english = #{english,jdbcType=INTEGER},
+      politics = #{politics,jdbcType=INTEGER},
+      phyhics = #{phyhics,jdbcType=INTEGER},
+      chemistry = #{chemistry,jdbcType=INTEGER},
+      history = #{history,jdbcType=INTEGER},
+      geography = #{geography,jdbcType=INTEGER},
+      biology = #{biology,jdbcType=INTEGER},
+      sport = #{sport,jdbcType=INTEGER},
+      total_score = #{totalScore,jdbcType=INTEGER},
+      add_score = #{addScore,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

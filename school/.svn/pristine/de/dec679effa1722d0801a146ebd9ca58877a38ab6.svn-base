@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.user.dao.RoleAuthorityCustomMapper">
+	<resultMap type="com.dkt.school.user.model.RoleAuthority" id="RoleAuthority" extends="com.dkt.school.user.dao.RoleAuthorityMapper.BaseResultMap">
+	
+	</resultMap>
+	
+	<select id="findAllAuthorityIdByRoleId" resultType="java.lang.Integer">
+		select authority_id from usr_role_authority where role_id=#{roleId}
+	</select>
+</mapper>

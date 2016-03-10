@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.fin.dao.ChargeStandardCustomMapper">
+    <resultMap type="com.dkt.school.fin.model.ChargeStandard" id="ChargeStandard" extends="com.dkt.school.fin.dao.ChargeStandardMapper.BaseResultMap">
+
+    </resultMap>
+
+    <resultMap type="com.dkt.school.fin.dto.ChargeStandardDto" id="ChargeStandardDto" extends="ChargeStandard">
+        <result column="grade_name" property="gradeName" jdbcType="VARCHAR"/>
+        <result column="term_type_string" property="termTypeString" jdbcType="VARCHAR"/>
+        <result column="major_name" property="majorName" jdbcType="VARCHAR"/>
+        <result column="major_field_name" property="majorFieldName" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        fcs.id,fcs.grade_id,fcs.term_type,fcs.major_id,fcs.field_id,fcs.tuition_fee,fcs.room_fee_girl,fcs.room_fee_boy,fcs.book_fee
+    </sql>
+
+    <select id="countBySearch" resultType="java.lang.Integer">
+        select count(*) from fin_charge_standard fcs
+        inner join sch_grade sg on fcs.grade_id=sg.id
+        inner join sch_major sm on fcs.major_id=sm.id
+        inner join sch_major_field smf on fcs.field_id=smf.id
+        <where>
+            <if test="gradeId != null and gradeId != ''">
+                fcs.grade_id=#{gradeId}
+            </if>
+            <if test="termType != null and termType != ''">
+                and fcs.term_type=#{termType}
+            </if>
+            <if test="majorId != null and majorId != ''">
+                and fcs.major_id=#{majorId}
+            </if>
+            <if test="majorFieldId != null and majorFieldId != ''">
+                and fcs.field_id=#{majorFieldId}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectByLimit" resultMap="ChargeStandardDto">
+        select <include refid="Base_Column_List"/>,
+        sg.name AS grade_name,
+        (select ev.name from sys_enumeration_value ev where ev.id=fcs.term_type) AS term_type_string,
+        sm.name AS major_name,
+        smf.name AS major_field_name
+        from fin_charge_standard fcs
+        inner join sch_grade sg on fcs.grade_id=sg.id
+        inner join sch_major sm on fcs.major_id=sm.id
+        inner join sch_major_field smf on fcs.field_id=smf.id
+
+        <where>
+            <if test="gradeId != null and gradeId != ''">
+                fcs.grade_id=#{gradeId}
+            </if>
+            <if test="termType != null and termType != ''">
+                and fcs.term_type=#{termType}
+            </if>
+            <if test="majorId != null and majorId != ''">
+                and fcs.major_id=#{majorId}
+            </if>
+            <if test="majorFieldId != null and majorFieldId != ''">
+                and fcs.field_id=#{majorFieldId}
+            </if>
+        </where>
+        <if test="limit != null">
+            limit #{limit.offset},#{limit.rows}
+        </if>
+    </select>
+
+    <select id="selectChargeStandardById" resultMap="ChargeStandardDto">
+        select <include refid="Base_Column_List"/>,
+        sg.name AS grade_name,
+        (select ev.name from sys_enumeration_value ev where ev.id=fcs.term_type) AS term_type_string,
+        sm.name AS major_name,
+        smf.name AS major_field_name
+        from fin_charge_standard fcs
+        inner join sch_grade sg on fcs.grade_id=sg.id
+        inner join sch_major sm on fcs.major_id=sm.id
+        inner join sch_major_field smf on fcs.field_id=smf.id
+
+        <where>
+        <if test="id != null and id != ''">
+            fcs.id=#{id}
+        </if>
+        </where>
+    </select>
+    
+    <!-- Lai JiPeng -->
+    <select id="selectChargeStandardByMultiC" resultMap="ChargeStandard">
+       SELECT *
+       FROM fin_charge_standard
+       <where>
+            <if test="gradeId != null and gradeId != ''">
+                 AND grade_id=#{gradeId}
+            </if>
+            <if test="termType != null and termType != ''">
+                 AND term_type=#{termType}
+            </if>
+            <if test="majorFieldId != null and majorFieldId != ''">
+                 AND field_id=#{majorFieldId}
+            </if>            
+       </where>
+    </select>
+</mapper>

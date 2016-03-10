@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.tea.dao.TeacherInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.dkt.school.tea.model.TeacherInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="teacher_id" property="teacherId" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="sex_type" property="sexType" jdbcType="INTEGER" />
+    <result column="birthday" property="birthday" jdbcType="DATE" />
+    <result column="id_card_type" property="idCardType" jdbcType="INTEGER" />
+    <result column="id_card" property="idCard" jdbcType="VARCHAR" />
+    <result column="country_id" property="countryId" jdbcType="INTEGER" />
+    <result column="nation_type" property="nationType" jdbcType="INTEGER" />
+    <result column="political_feature_type" property="politicalFeatureType" jdbcType="INTEGER" />
+    <result column="native_place" property="nativePlace" jdbcType="VARCHAR" />
+    <result column="marital_status" property="maritalStatus" jdbcType="INTEGER" />
+    <result column="household_type" property="householdType" jdbcType="INTEGER" />
+    <result column="degree_type" property="degreeType" jdbcType="INTEGER" />
+    <result column="family_address" property="familyAddress" jdbcType="VARCHAR" />
+    <result column="postcode" property="postcode" jdbcType="VARCHAR" />
+    <result column="family_phone" property="familyPhone" jdbcType="VARCHAR" />
+    <result column="office_phone" property="officePhone" jdbcType="VARCHAR" />
+    <result column="mobile_phone" property="mobilePhone" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, teacher_id, name, sex_type, birthday, id_card_type, id_card, country_id, nation_type, 
+    political_feature_type, native_place, marital_status, household_type, degree_type, 
+    family_address, postcode, family_phone, office_phone, mobile_phone, email, remark
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.dkt.school.tea.model.TeacherInfoExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from tea_teacher_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from tea_teacher_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from tea_teacher_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.dkt.school.tea.model.TeacherInfoExample" >
+    delete from tea_teacher_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.dkt.school.tea.model.TeacherInfo" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tea_teacher_info (teacher_id, name, sex_type, 
+      birthday, id_card_type, id_card, 
+      country_id, nation_type, political_feature_type, 
+      native_place, marital_status, household_type, 
+      degree_type, family_address, postcode, 
+      family_phone, office_phone, mobile_phone, 
+      email, remark)
+    values (#{teacherId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{sexType,jdbcType=INTEGER}, 
+      #{birthday,jdbcType=DATE}, #{idCardType,jdbcType=INTEGER}, #{idCard,jdbcType=VARCHAR}, 
+      #{countryId,jdbcType=INTEGER}, #{nationType,jdbcType=INTEGER}, #{politicalFeatureType,jdbcType=INTEGER}, 
+      #{nativePlace,jdbcType=VARCHAR}, #{maritalStatus,jdbcType=INTEGER}, #{householdType,jdbcType=INTEGER}, 
+      #{degreeType,jdbcType=INTEGER}, #{familyAddress,jdbcType=VARCHAR}, #{postcode,jdbcType=VARCHAR}, 
+      #{familyPhone,jdbcType=VARCHAR}, #{officePhone,jdbcType=VARCHAR}, #{mobilePhone,jdbcType=VARCHAR}, 
+      #{email,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.dkt.school.tea.model.TeacherInfo" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tea_teacher_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="teacherId != null" >
+        teacher_id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="sexType != null" >
+        sex_type,
+      </if>
+      <if test="birthday != null" >
+        birthday,
+      </if>
+      <if test="idCardType != null" >
+        id_card_type,
+      </if>
+      <if test="idCard != null" >
+        id_card,
+      </if>
+      <if test="countryId != null" >
+        country_id,
+      </if>
+      <if test="nationType != null" >
+        nation_type,
+      </if>
+      <if test="politicalFeatureType != null" >
+        political_feature_type,
+      </if>
+      <if test="nativePlace != null" >
+        native_place,
+      </if>
+      <if test="maritalStatus != null" >
+        marital_status,
+      </if>
+      <if test="householdType != null" >
+        household_type,
+      </if>
+      <if test="degreeType != null" >
+        degree_type,
+      </if>
+      <if test="familyAddress != null" >
+        family_address,
+      </if>
+      <if test="postcode != null" >
+        postcode,
+      </if>
+      <if test="familyPhone != null" >
+        family_phone,
+      </if>
+      <if test="officePhone != null" >
+        office_phone,
+      </if>
+      <if test="mobilePhone != null" >
+        mobile_phone,
+      </if>
+      <if test="email != null" >
+        email,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="teacherId != null" >
+        #{teacherId,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="sexType != null" >
+        #{sexType,jdbcType=INTEGER},
+      </if>
+      <if test="birthday != null" >
+        #{birthday,jdbcType=DATE},
+      </if>
+      <if test="idCardType != null" >
+        #{idCardType,jdbcType=INTEGER},
+      </if>
+      <if test="idCard != null" >
+        #{idCard,jdbcType=VARCHAR},
+      </if>
+      <if test="countryId != null" >
+        #{countryId,jdbcType=INTEGER},
+      </if>
+      <if test="nationType != null" >
+        #{nationType,jdbcType=INTEGER},
+      </if>
+      <if test="politicalFeatureType != null" >
+        #{politicalFeatureType,jdbcType=INTEGER},
+      </if>
+      <if test="nativePlace != null" >
+        #{nativePlace,jdbcType=VARCHAR},
+      </if>
+      <if test="maritalStatus != null" >
+        #{maritalStatus,jdbcType=INTEGER},
+      </if>
+      <if test="householdType != null" >
+        #{householdType,jdbcType=INTEGER},
+      </if>
+      <if test="degreeType != null" >
+        #{degreeType,jdbcType=INTEGER},
+      </if>
+      <if test="familyAddress != null" >
+        #{familyAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="postcode != null" >
+        #{postcode,jdbcType=VARCHAR},
+      </if>
+      <if test="familyPhone != null" >
+        #{familyPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="officePhone != null" >
+        #{officePhone,jdbcType=VARCHAR},
+      </if>
+      <if test="mobilePhone != null" >
+        #{mobilePhone,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.dkt.school.tea.model.TeacherInfoExample" resultType="java.lang.Integer" >
+    select count(*) from tea_teacher_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update tea_teacher_info
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.teacherId != null" >
+        teacher_id = #{record.teacherId,jdbcType=INTEGER},
+      </if>
+      <if test="record.name != null" >
+        name = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sexType != null" >
+        sex_type = #{record.sexType,jdbcType=INTEGER},
+      </if>
+      <if test="record.birthday != null" >
+        birthday = #{record.birthday,jdbcType=DATE},
+      </if>
+      <if test="record.idCardType != null" >
+        id_card_type = #{record.idCardType,jdbcType=INTEGER},
+      </if>
+      <if test="record.idCard != null" >
+        id_card = #{record.idCard,jdbcType=VARCHAR},
+      </if>
+      <if test="record.countryId != null" >
+        country_id = #{record.countryId,jdbcType=INTEGER},
+      </if>
+      <if test="record.nationType != null" >
+        nation_type = #{record.nationType,jdbcType=INTEGER},
+      </if>
+      <if test="record.politicalFeatureType != null" >
+        political_feature_type = #{record.politicalFeatureType,jdbcType=INTEGER},
+      </if>
+      <if test="record.nativePlace != null" >
+        native_place = #{record.nativePlace,jdbcType=VARCHAR},
+      </if>
+      <if test="record.maritalStatus != null" >
+        marital_status = #{record.maritalStatus,jdbcType=INTEGER},
+      </if>
+      <if test="record.householdType != null" >
+        household_type = #{record.householdType,jdbcType=INTEGER},
+      </if>
+      <if test="record.degreeType != null" >
+        degree_type = #{record.degreeType,jdbcType=INTEGER},
+      </if>
+      <if test="record.familyAddress != null" >
+        family_address = #{record.familyAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="record.postcode != null" >
+        postcode = #{record.postcode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.familyPhone != null" >
+        family_phone = #{record.familyPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.officePhone != null" >
+        office_phone = #{record.officePhone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mobilePhone != null" >
+        mobile_phone = #{record.mobilePhone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.email != null" >
+        email = #{record.email,jdbcType=VARCHAR},
+      </if>
+      <if test="record.remark != null" >
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update tea_teacher_info
+    set id = #{record.id,jdbcType=INTEGER},
+      teacher_id = #{record.teacherId,jdbcType=INTEGER},
+      name = #{record.name,jdbcType=VARCHAR},
+      sex_type = #{record.sexType,jdbcType=INTEGER},
+      birthday = #{record.birthday,jdbcType=DATE},
+      id_card_type = #{record.idCardType,jdbcType=INTEGER},
+      id_card = #{record.idCard,jdbcType=VARCHAR},
+      country_id = #{record.countryId,jdbcType=INTEGER},
+      nation_type = #{record.nationType,jdbcType=INTEGER},
+      political_feature_type = #{record.politicalFeatureType,jdbcType=INTEGER},
+      native_place = #{record.nativePlace,jdbcType=VARCHAR},
+      marital_status = #{record.maritalStatus,jdbcType=INTEGER},
+      household_type = #{record.householdType,jdbcType=INTEGER},
+      degree_type = #{record.degreeType,jdbcType=INTEGER},
+      family_address = #{record.familyAddress,jdbcType=VARCHAR},
+      postcode = #{record.postcode,jdbcType=VARCHAR},
+      family_phone = #{record.familyPhone,jdbcType=VARCHAR},
+      office_phone = #{record.officePhone,jdbcType=VARCHAR},
+      mobile_phone = #{record.mobilePhone,jdbcType=VARCHAR},
+      email = #{record.email,jdbcType=VARCHAR},
+      remark = #{record.remark,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.dkt.school.tea.model.TeacherInfo" >
+    update tea_teacher_info
+    <set >
+      <if test="teacherId != null" >
+        teacher_id = #{teacherId,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="sexType != null" >
+        sex_type = #{sexType,jdbcType=INTEGER},
+      </if>
+      <if test="birthday != null" >
+        birthday = #{birthday,jdbcType=DATE},
+      </if>
+      <if test="idCardType != null" >
+        id_card_type = #{idCardType,jdbcType=INTEGER},
+      </if>
+      <if test="idCard != null" >
+        id_card = #{idCard,jdbcType=VARCHAR},
+      </if>
+      <if test="countryId != null" >
+        country_id = #{countryId,jdbcType=INTEGER},
+      </if>
+      <if test="nationType != null" >
+        nation_type = #{nationType,jdbcType=INTEGER},
+      </if>
+      <if test="politicalFeatureType != null" >
+        political_feature_type = #{politicalFeatureType,jdbcType=INTEGER},
+      </if>
+      <if test="nativePlace != null" >
+        native_place = #{nativePlace,jdbcType=VARCHAR},
+      </if>
+      <if test="maritalStatus != null" >
+        marital_status = #{maritalStatus,jdbcType=INTEGER},
+      </if>
+      <if test="householdType != null" >
+        household_type = #{householdType,jdbcType=INTEGER},
+      </if>
+      <if test="degreeType != null" >
+        degree_type = #{degreeType,jdbcType=INTEGER},
+      </if>
+      <if test="familyAddress != null" >
+        family_address = #{familyAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="postcode != null" >
+        postcode = #{postcode,jdbcType=VARCHAR},
+      </if>
+      <if test="familyPhone != null" >
+        family_phone = #{familyPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="officePhone != null" >
+        office_phone = #{officePhone,jdbcType=VARCHAR},
+      </if>
+      <if test="mobilePhone != null" >
+        mobile_phone = #{mobilePhone,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.dkt.school.tea.model.TeacherInfo" >
+    update tea_teacher_info
+    set teacher_id = #{teacherId,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
+      sex_type = #{sexType,jdbcType=INTEGER},
+      birthday = #{birthday,jdbcType=DATE},
+      id_card_type = #{idCardType,jdbcType=INTEGER},
+      id_card = #{idCard,jdbcType=VARCHAR},
+      country_id = #{countryId,jdbcType=INTEGER},
+      nation_type = #{nationType,jdbcType=INTEGER},
+      political_feature_type = #{politicalFeatureType,jdbcType=INTEGER},
+      native_place = #{nativePlace,jdbcType=VARCHAR},
+      marital_status = #{maritalStatus,jdbcType=INTEGER},
+      household_type = #{householdType,jdbcType=INTEGER},
+      degree_type = #{degreeType,jdbcType=INTEGER},
+      family_address = #{familyAddress,jdbcType=VARCHAR},
+      postcode = #{postcode,jdbcType=VARCHAR},
+      family_phone = #{familyPhone,jdbcType=VARCHAR},
+      office_phone = #{officePhone,jdbcType=VARCHAR},
+      mobile_phone = #{mobilePhone,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

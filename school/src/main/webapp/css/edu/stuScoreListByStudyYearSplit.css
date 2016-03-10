@@ -1,0 +1,72 @@
+
+table.edu_gridtable_byYearAndTerm{
+   margin-left:10%;
+   margin-top:3%;
+}
+
+table.edu_gridtable_byYearAndTerm{
+  margin-top:20px;
+}
+
+table.edu_gridtable_byYearAndTerm {
+	font-family:verdana,arial,sans-serif;
+	font-size:11px;
+	color:#333333;
+	border-width: 1px;
+	border-collapse: collapse;
+	width:518px;
+}
+table.edu_gridtable_byYearAndTerm th {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color:#DDDDDD;
+}
+table.edu_gridtable_byYearAndTerm td {
+	border-width: 1px;
+	padding:8px;
+	border-style: solid;
+	border-color: #666666;
+	font-size:12px;
+}
+table.edu_gridtable_byYearAndTerm tr{
+    line-height:0.2;
+}
+
+table.gridtableInfo td{
+    border-width: 0px;
+	padding: 12px;
+	border-style: solid;
+	border-color: #666666;
+}
+
+#edu_stuInfoDiv_byYearAndTerm{
+    margin-left: auto;
+    margin-right: auto;
+    width:600px;
+}
+
+#edu_stuInfoDiv_byYearAndTerm div{
+    text-align:center;
+}
+
+#edu_stuInfoDiv_byYearAndTerm div span{
+    margin-left:30px;
+    font-weight:bold;
+}
+
+#edu_stuInfoTable{
+    width:518px;
+    margin-left:50px;
+}
+
+#edu_stuInfoTable tr{
+    padding:10px;
+}
+
+#edu_stuInfoTable td{
+    width:150px;
+    padding:1px 10px;
+    text-align:left;
+}

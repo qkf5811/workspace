@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.tea.dao.TeaFamilyCustomMapper" >
+	
+	<resultMap id="BaseResultMapExtend" type="com.dkt.school.tea.model.TeacherFamily"
+		extends="com.dkt.school.tea.dao.TeacherFamilyMapper.BaseResultMap">
+	</resultMap>
+	
+	<resultMap type="com.dkt.school.tea.dto.TeacherFamilyDto" id="TeacherFamilyDto" extends="BaseResultMapExtend">
+		<result column="sex" property="sex" jdbcType="VARCHAR"/>
+		<result column="relation_type_str" property="relationTypeStr" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	
+	<select id="getTeaFamilyCount" resultType="java.lang.Integer">
+		select count(*) 
+		from tea_teacher_family ttf
+		LEFT JOIN tea_teacher tt ON tt.id = ttf.teacher_id 
+		where tt.code= #{code,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="getTeaFamilyCountById" resultType="java.lang.Integer">
+		select count(*) 
+		from tea_teacher_family ttf
+		where ttf.teacher_id= ${id}
+	</select>
+	
+	
+	
+	<select id="selectByLimit" resultMap="TeacherFamilyDto">
+		select	(select ev.name from sys_enumeration_value ev where ev.id=ttf.sex_type) AS sex,
+		(select ev.name from sys_enumeration_value ev where ev.id=ttf.relation_type) AS relation_type_str,
+		ttf.id,ttf.name,ttf.relation_type,ttf.birthday,ttf.remark,ttf.phone
+		from tea_teacher_family ttf
+		LEFT JOIN tea_teacher tt ON tt.id = ttf.teacher_id  
+		
+ 		<where>
+			<if test="name != null and name !=''">
+				tt.name like '%${name}%'
+			</if>  
+ 			<if test="code != null and code != ''">
+				and tt.code like '%${code}%'
+			</if>  
+		</where>
+		 <if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>  
+		
+					
+	</select>
+	
+	<select id="getTeaFamilyById" resultMap="TeacherFamilyDto">
+		select	(select ev.name from sys_enumeration_value ev where ev.id=ttf.sex_type) AS sex,
+		(select ev.name from sys_enumeration_value ev where ev.id=ttf.relation_type) AS relation_type_str,
+		ttf.id,ttf.name,ttf.relation_type,ttf.birthday,ttf.remark,ttf.phone
+		from tea_teacher_family ttf
+		LEFT JOIN tea_teacher tt ON tt.id = ttf.teacher_id  
+		where ttf.teacher_id= ${id}
+ 		
+		<if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>  
+		
+					
+	</select>
+	
+	
+	<select id="findTeaFamilyById" resultMap="TeacherFamilyDto">
+		select *
+		from tea_teacher_family 
+		where id= #{id,jdbcType=INTEGER}
+	</select>
+</mapper>

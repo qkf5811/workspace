@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.sch.dao.MajorCustomMapper">
+	<resultMap id="BaseResultMap" type="com.dkt.school.sch.model.Major">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<resultMap type="com.dkt.school.sch.model.MajorField" id="MajorField">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<select id="getAllMajorInfo" resultMap="BaseResultMap">
+		select * from sch_major;
+	</select>
+	
+	<update id="editMajorName">
+		update sch_major set name = '${newName}' where id = ${majorId}
+	</update>
+	
+	<select id="getAllMajor" resultMap="BaseResultMap">
+		SELECT m.id,m.name FROM sch_major m;
+	</select>
+	
+	<select id="getFieldByMajorId" resultMap="MajorField" parameterType="java.lang.Integer">
+		SELECT mf.id,mf.name FROM sch_major_field AS mf
+		<where>
+			mf.major_id = #{majorId}
+		</where>
+	</select>
+	
+	<select id="selectMajorCountByPage" resultType="java.lang.Integer">
+		select count(*) from sch_major
+		<if test="limit != null">
+			limit ${limit.offset}, ${limit.rows}
+		</if>
+	</select>
+	
+	<select id="selectMajorByPage" resultMap="BaseResultMap">
+		select * from sch_major
+		<if test="limit != null">
+			limit ${limit.offset}, ${limit.rows}
+		</if>
+	</select>
+</mapper>

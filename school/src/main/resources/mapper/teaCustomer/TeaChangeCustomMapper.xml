@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.tea.dao.TeaChangeCustomMapper" >
+	
+	<resultMap id="BaseResultMapExtend" type="com.dkt.school.tea.model.TeacherChange"
+		extends="com.dkt.school.tea.dao.TeacherChangeMapper.BaseResultMap">
+	</resultMap>
+	
+	<resultMap type="com.dkt.school.tea.dto.TeaChangeDto" id="TeaChangeDto" extends="BaseResultMapExtend">
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="change_type_str" property="changeTypeStr" jdbcType="VARCHAR"/>
+		<result column="code" property="code" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	
+	<select id="getTeaChangeCount" resultType="java.lang.Integer">
+		select count(*) 
+		from tea_teacher_change ttc
+		LEFT JOIN tea_teacher tt ON tt.id = ttc.teacher_id  
+		
+ 		<where>
+			<if test="name != null and name !=''">
+				 tt.name like '%${name}%'
+			</if>  
+ 			<if test="code != null and code != ''">
+				and tt.code like '%${code}%'
+			</if>  
+		</where>
+	</select>
+	
+	<select id="selectByLimit" resultMap="TeaChangeDto">
+		select	
+		(select ev.name from sys_enumeration_value ev where ev.id=ttc.change_type) AS change_type_str,
+		ttc.id,ttc.change_type,ttc.cause,ttc.change_date,ttc.oper_user,ttc.remark,
+		tt.name,tt.code
+		from tea_teacher_change ttc
+		LEFT JOIN tea_teacher tt ON tt.id = ttc.teacher_id  
+		
+ 		<where>
+			<if test="name != null and name !=''">
+				 tt.name like '%${name}%'
+			</if>  
+ 			<if test="code != null and code != ''">
+				and tt.code like '%${code}%'
+			</if>  
+		</where>
+		 <if test="limit != null">
+			limit #{limit.offset},#{limit.rows}
+		</if>  
+		
+					
+	</select>
+	
+	<select id="findTeaChangeByCode" resultMap="TeaChangeDto" >
+    	select	
+		(select ev.name from sys_enumeration_value ev where ev.id=ttc.change_type) AS change_type_str,
+		ttc.id,ttc.change_type,ttc.cause,ttc.change_date,ttc.oper_user,ttc.remark,
+		tt.name,tt.code
+		from tea_teacher_change ttc
+		LEFT JOIN tea_teacher tt ON tt.id = ttc.teacher_id
+    	where tt.code = #{code,jdbcType=VARCHAR}
+  	</select>
+</mapper>

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.tea.dao.TeacherWorkExperienceCustomMapper">
+	<resultMap type="com.dkt.school.tea.model.TeacherWorkExperience" 
+		id="TeacherWorkExperience" 
+		extends="com.dkt.school.tea.dao.TeacherWorkExperienceMapper.BaseResultMap"></resultMap>
+	<resultMap type="com.dkt.school.tea.model.Teacher" id="Teacher" 
+			extends="com.dkt.school.tea.dao.TeacherMapper.BaseResultMap"></resultMap>
+	<resultMap type="com.dkt.school.tea.dto.TeacherWorkExperienceDto" 
+		id="TeacherWorkExperienceDto" extends="TeacherWorkExperience">
+			<result property="name" column="name" jdbcType="VARCHAR"/>
+			<result property="code" column="code" jdbcType="VARCHAR" />
+			<result property="startDateStr" column="startDateStr" jdbcType="VARCHAR"/>
+			<result property="endDateStr" column="endDateStr" jdbcType="VARCHAR"/>
+	</resultMap>
+	<sql id="Base_Column_List">
+		twe.id,twe.work_place,twe.position,twe.transfer_cause AS transferCause,twe.remark 
+	</sql>
+	<!-- 
+	<sql id="Set_No_Zero">SET SESSION sql_mode=NO_ZERO_IN_DATE;</sql>
+	 -->
+	<insert id="insertTeaWorkExperienceByXLS" parameterType="java.util.List">
+		<!--  <include refid="Set_No_Zero"/>-->
+		<!--SET SESSION sql_mode=NO_ZERO_IN_DATE;-->
+		INSERT INTO tea_teacher_work_experience VALUES
+		<foreach collection="tList" open="" close="" item="t" separator=",">
+			(null,${t.teacherId},'${t.workPlace}','${t.position}',
+			'${t.startDate}','${t.endDate}','${t.transferCause}','${t.remark}')
+		</foreach>
+	
+	</insert>
+	
+	<select id="getTeacherWorkExperienceById" parameterType="java.lang.Integer" resultMap="TeacherWorkExperienceDto">
+		SELECT <include refid="Base_Column_List" />,
+			DATE_FORMAT(twe.start_date,'%Y-%m-%d') AS startDateStr,
+			DATE_FORMAT(twe.end_date,'%Y-%m-%d') AS endDateStr,
+			t.id AS teacherId,
+			t.`name` AS name,
+			t.code AS code
+		FROM
+			tea_teacher_work_experience AS twe
+		INNER JOIN 
+			tea_teacher AS t 
+		ON twe.teacher_id = t.id
+		<where>
+			twe.id = #{id}
+		</where>
+	</select>
+	
+	<select id="getTeacherWorkList" resultMap="TeacherWorkExperienceDto">
+		SELECT DISTINCT 
+			<include refid="Base_Column_List" />,
+			DATE_FORMAT(twe.start_date,'%Y-%m-%d') AS startDateStr,
+			DATE_FORMAT(twe.end_date,'%Y-%m-%d') AS endDateStr,
+			t.`name` AS name,
+			t.code AS code
+		FROM
+			tea_teacher_work_experience AS twe
+		INNER JOIN 
+			tea_teacher AS t 
+		ON twe.teacher_id = t.id
+		<where>
+			<if test="code != null and code != '' ">
+				t.code like '%${code}%'
+			</if>
+			<if test="name != null and name != '' ">
+				AND t.name like '%${name}%'
+			</if>
+		</where>
+		<if test="limit != null and limit != '' ">
+			LIMIT #{limit.offset},#{limit.rows}
+		</if>
+	</select>
+	
+	<select id="getTeacherWorkCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) 
+		FROM tea_teacher_work_experience AS twe
+		INNER JOIN 
+			tea_teacher AS t
+		ON twe.teacher_id = t.id
+		<where>
+			<if test="code != null and code != '' ">
+				t.code like '%${code}%'
+			</if>
+			<if test="name != null and name != '' ">
+				AND t.name like '%${name}%'
+			</if>
+		</where>
+	</select>
+	
+	<select id="getTeacherCount" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM  tea_teacher t
+		<where> 
+		<if test="name != null and name != '' ">
+			t.name like '%${name}%'
+		</if>
+		<if test="code != null and code != '' ">
+			AND t.code like '%${code}%'
+		</if>
+		</where>
+	</select>
+	
+	<select id="getAllTeacher" resultMap="Teacher">
+		SELECT t.id,t.code,t.`name`,t.now_position AS nowPosition
+		FROM tea_teacher t
+		<where>
+			<if test="name != null and name != '' ">
+				t.`name` like '%${name}%'
+			</if>
+			<if test="code != null and code != ''">
+				AND t.code like '%${code}%'
+			</if>
+		</where>
+		<if test="limit != null and limit != ''">
+			LIMIT #{limit.offset},#{limit.rows}
+		</if>
+	</select>
+	
+	<select id="getTeacherIdByCode" resultType="java.lang.Integer">
+		SELECT t.id
+		FROM tea_teacher t
+		<where>
+			t.code = #{code}
+		</where>
+	</select>
+	
+	<delete id="deleteWorkItemById">
+		DELETE FROM tea_teacher_work_experience
+		<where>
+			id = #{id}
+		</where>
+	</delete>
+	
+	<!-- 需求变更后新增 -->
+	<select id="getSingleWorkExperienceCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) 
+		FROM tea_teacher_work_experience twe
+		<where>
+			twe.teacher_id = #{id}
+		</where>
+	</select>
+	
+	<select id="getSingleWorkExperienceById" resultMap="TeacherWorkExperienceDto">
+		SELECT DISTINCT 
+			<include refid="Base_Column_List" />,
+			DATE_FORMAT(twe.start_date,'%Y-%m-%d') AS startDateStr,
+			DATE_FORMAT(twe.end_date,'%Y-%m-%d') AS endDateStr
+		FROM
+			tea_teacher_work_experience AS twe
+		<where>
+			twe.teacher_id = #{id}
+		</where>
+	</select>
+</mapper>

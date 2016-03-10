@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.stu.dao.AdmissionScoreCustomMapper" >
+
+	<resultMap type="com.dkt.school.stu.model.AdmissionScore" id="AdmissionScore"
+		extends="com.dkt.school.stu.dao.AdmissionScoreMapper.BaseResultMap">
+	</resultMap>
+	<resultMap type="com.dkt.school.stu.dto.AdmissionScoreDto" id="AdmissionScoreDto" extends="AdmissionScore">
+		
+	</resultMap>
+	
+	<select id="getStudentInfoIdByExamNum" resultType="java.lang.Integer">
+		select student_info_id from stu_admission_score where exam_num='${examNum}'
+	</select>
+	
+	<insert id="insertAdmissionScoreAndGetId" useGeneratedKeys="true" keyProperty="id" 
+		parameterType="com.dkt.school.stu.dto.AdmissionScoreDto">
+		insert into stu_admission_score (student_info_id, exam_num, chinese, 
+     		math, english, politics, 
+      		phyhics, chemistry, history, 
+      		geography, biology, sport, 
+      		total_score, add_score, remark
+      		)
+    	 values (#{studentInfoId,jdbcType=INTEGER}, #{examNum,jdbcType=VARCHAR}, #{chinese,jdbcType=INTEGER}, 
+      		#{math,jdbcType=INTEGER}, #{english,jdbcType=INTEGER}, #{politics,jdbcType=INTEGER}, 
+      		#{phyhics,jdbcType=INTEGER}, #{chemistry,jdbcType=INTEGER}, #{history,jdbcType=INTEGER}, 
+      		#{geography,jdbcType=INTEGER}, #{biology,jdbcType=INTEGER}, #{sport,jdbcType=INTEGER}, 
+      		#{totalScore,jdbcType=INTEGER}, #{addScore,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}
+     		 )
+	</insert>
+</mapper>

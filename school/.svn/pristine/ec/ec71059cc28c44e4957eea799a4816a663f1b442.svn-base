@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dkt.school.fin.dao.ChargeStandardMapper" >
+  <resultMap id="BaseResultMap" type="com.dkt.school.fin.model.ChargeStandard" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="grade_id" property="gradeId" jdbcType="INTEGER" />
+    <result column="term_type" property="termType" jdbcType="INTEGER" />
+    <result column="major_id" property="majorId" jdbcType="INTEGER" />
+    <result column="field_id" property="fieldId" jdbcType="INTEGER" />
+    <result column="tuition_fee" property="tuitionFee" jdbcType="REAL" />
+    <result column="room_fee_girl" property="roomFeeGirl" jdbcType="REAL" />
+    <result column="room_fee_boy" property="roomFeeBoy" jdbcType="REAL" />
+    <result column="book_fee" property="bookFee" jdbcType="REAL" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, grade_id, term_type, major_id, field_id, tuition_fee, room_fee_girl, room_fee_boy, 
+    book_fee
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.dkt.school.fin.model.ChargeStandardExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from fin_charge_standard
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from fin_charge_standard
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from fin_charge_standard
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.dkt.school.fin.model.ChargeStandardExample" >
+    delete from fin_charge_standard
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.dkt.school.fin.model.ChargeStandard" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into fin_charge_standard (grade_id, term_type, major_id, 
+      field_id, tuition_fee, room_fee_girl, 
+      room_fee_boy, book_fee)
+    values (#{gradeId,jdbcType=INTEGER}, #{termType,jdbcType=INTEGER}, #{majorId,jdbcType=INTEGER}, 
+      #{fieldId,jdbcType=INTEGER}, #{tuitionFee,jdbcType=REAL}, #{roomFeeGirl,jdbcType=REAL}, 
+      #{roomFeeBoy,jdbcType=REAL}, #{bookFee,jdbcType=REAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.dkt.school.fin.model.ChargeStandard" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into fin_charge_standard
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="gradeId != null" >
+        grade_id,
+      </if>
+      <if test="termType != null" >
+        term_type,
+      </if>
+      <if test="majorId != null" >
+        major_id,
+      </if>
+      <if test="fieldId != null" >
+        field_id,
+      </if>
+      <if test="tuitionFee != null" >
+        tuition_fee,
+      </if>
+      <if test="roomFeeGirl != null" >
+        room_fee_girl,
+      </if>
+      <if test="roomFeeBoy != null" >
+        room_fee_boy,
+      </if>
+      <if test="bookFee != null" >
+        book_fee,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="gradeId != null" >
+        #{gradeId,jdbcType=INTEGER},
+      </if>
+      <if test="termType != null" >
+        #{termType,jdbcType=INTEGER},
+      </if>
+      <if test="majorId != null" >
+        #{majorId,jdbcType=INTEGER},
+      </if>
+      <if test="fieldId != null" >
+        #{fieldId,jdbcType=INTEGER},
+      </if>
+      <if test="tuitionFee != null" >
+        #{tuitionFee,jdbcType=REAL},
+      </if>
+      <if test="roomFeeGirl != null" >
+        #{roomFeeGirl,jdbcType=REAL},
+      </if>
+      <if test="roomFeeBoy != null" >
+        #{roomFeeBoy,jdbcType=REAL},
+      </if>
+      <if test="bookFee != null" >
+        #{bookFee,jdbcType=REAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.dkt.school.fin.model.ChargeStandardExample" resultType="java.lang.Integer" >
+    select count(*) from fin_charge_standard
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update fin_charge_standard
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.gradeId != null" >
+        grade_id = #{record.gradeId,jdbcType=INTEGER},
+      </if>
+      <if test="record.termType != null" >
+        term_type = #{record.termType,jdbcType=INTEGER},
+      </if>
+      <if test="record.majorId != null" >
+        major_id = #{record.majorId,jdbcType=INTEGER},
+      </if>
+      <if test="record.fieldId != null" >
+        field_id = #{record.fieldId,jdbcType=INTEGER},
+      </if>
+      <if test="record.tuitionFee != null" >
+        tuition_fee = #{record.tuitionFee,jdbcType=REAL},
+      </if>
+      <if test="record.roomFeeGirl != null" >
+        room_fee_girl = #{record.roomFeeGirl,jdbcType=REAL},
+      </if>
+      <if test="record.roomFeeBoy != null" >
+        room_fee_boy = #{record.roomFeeBoy,jdbcType=REAL},
+      </if>
+      <if test="record.bookFee != null" >
+        book_fee = #{record.bookFee,jdbcType=REAL},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update fin_charge_standard
+    set id = #{record.id,jdbcType=INTEGER},
+      grade_id = #{record.gradeId,jdbcType=INTEGER},
+      term_type = #{record.termType,jdbcType=INTEGER},
+      major_id = #{record.majorId,jdbcType=INTEGER},
+      field_id = #{record.fieldId,jdbcType=INTEGER},
+      tuition_fee = #{record.tuitionFee,jdbcType=REAL},
+      room_fee_girl = #{record.roomFeeGirl,jdbcType=REAL},
+      room_fee_boy = #{record.roomFeeBoy,jdbcType=REAL},
+      book_fee = #{record.bookFee,jdbcType=REAL}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.dkt.school.fin.model.ChargeStandard" >
+    update fin_charge_standard
+    <set >
+      <if test="gradeId != null" >
+        grade_id = #{gradeId,jdbcType=INTEGER},
+      </if>
+      <if test="termType != null" >
+        term_type = #{termType,jdbcType=INTEGER},
+      </if>
+      <if test="majorId != null" >
+        major_id = #{majorId,jdbcType=INTEGER},
+      </if>
+      <if test="fieldId != null" >
+        field_id = #{fieldId,jdbcType=INTEGER},
+      </if>
+      <if test="tuitionFee != null" >
+        tuition_fee = #{tuitionFee,jdbcType=REAL},
+      </if>
+      <if test="roomFeeGirl != null" >
+        room_fee_girl = #{roomFeeGirl,jdbcType=REAL},
+      </if>
+      <if test="roomFeeBoy != null" >
+        room_fee_boy = #{roomFeeBoy,jdbcType=REAL},
+      </if>
+      <if test="bookFee != null" >
+        book_fee = #{bookFee,jdbcType=REAL},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.dkt.school.fin.model.ChargeStandard" >
+    update fin_charge_standard
+    set grade_id = #{gradeId,jdbcType=INTEGER},
+      term_type = #{termType,jdbcType=INTEGER},
+      major_id = #{majorId,jdbcType=INTEGER},
+      field_id = #{fieldId,jdbcType=INTEGER},
+      tuition_fee = #{tuitionFee,jdbcType=REAL},
+      room_fee_girl = #{roomFeeGirl,jdbcType=REAL},
+      room_fee_boy = #{roomFeeBoy,jdbcType=REAL},
+      book_fee = #{bookFee,jdbcType=REAL}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
